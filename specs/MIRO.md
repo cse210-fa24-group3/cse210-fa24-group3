@@ -1,0 +1,6 @@
+## MIRO BOARD LINK
+
+https://miro.com/welcomeonboard/YXJiUU5pREV3RWFNR0NrY3M4Z2ZkT3dWaVlkOVl1SnFFdjVKMHM0c0dKVEVlS0p5N0gzWFVlbG1sT3lLRnlvQngyeW5KU2FvT3kySHZNRUVMeXhvb2dWdy9kaEQrMFJTT3FPK2dhK2dnQnJNQkJpakhWaVdHeVdlajlndWxjVG8hZQ==?share_link_id=658193822608
+
+
+
