@@ -4,10 +4,10 @@
 Accepted
 
 ## Context
-Our team is developing a journaling tool for developers to store notes, ideas, and project documentation. Currently, all data is stored in Notion's cloud, but Notion’s storage format is inconsistent with other project and versioning records, making it harder to locate and cross-reference information. To improve data accessibility and unify storage methods across projects, we aim to implement a “Git Commit” button, allowing users to export journal entries directly to Git repositories where they can be versioned and integrated with the rest of their codebase.
+Our team is building a journaling tool designed for developers to capture notes, ideas, and project documentation. Unlike similar tools (such as Notion), which store data in their proprietary cloud with a format that doesn't align well with other project and versioning systems, our tool aims to make it easier to locate and cross-reference information. To address this and unify storage methods across projects, we aim to implement a "Git Commit" button that enables users to export journal entries directly to Git repositories. These entries can then be subject to version control and integrated with the rest of the codebase.
 
 ## Decision
-To implement a Git Commit button for exporting to Git, we will create a feature in API using NodeJS and Express that allows users to sync selected entries with their Git repositories. This will add value by providing robust version control, enhancing collaboration, and improving traceability of changes over time.
+To implement a Git Commit button for exporting to Git, we will create a feature that allows users to sync selected entries with their Git repositories. This will add value by providing robust version control, enhancing collaboration, and improving traceability of changes over time.
 
 ## Consequences
 ### Positive:
