@@ -1,0 +1,83 @@
+.editor-container {
+    padding-top: 5rem;
+    min-height: 100vh;
+    background-color: var(--bg-primary);
+}
+
+.editor-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.title-input {
+    width: 100%;
+    font-size: 2rem;
+    font-weight: bold;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: none;
+    border-bottom: 2px solid var(--bg-navbar);
+    background-color: transparent;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.title-input:focus {
+    border-bottom-color: #4A90E2;
+}
+
+.content-input {
+    width: 100%;
+    min-height: 70vh;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    padding: 1rem;
+    border: none;
+    background-color: transparent;
+    color: var(--text-primary);
+    resize: vertical;
+    outline: none;
+}
+
+.back-button {
+    font-size: 1.5rem;
+    text-decoration: none;
+    color: var(--text-navbar);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.save-button {
+    padding: 0.5rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background-color: #4A90E2;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 1rem;
+}
+
+.save-button:hover {
+    background-color: #357ABD;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .editor-content {
+        padding: 1.5rem;
+    }
+
+    .title-input {
+        font-size: 1.5rem;
+    }
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Journey</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div class="menu-icon">☰</div>
+            <div class="logo">DevLog</div>
+        </div>
+        <div class="navbar-right">
+            <div class="theme-toggle">
+                <span class="light-mode">☀️</span>
+                <span class="dark-mode" style="display: none;">🌙</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="sidebar">
+        <a href="#">Home</a>
+        <a href="#">About</a>
+    </div>
+
+    <div class="overlay"></div>
+
+    <main>
+        <section class="hero-section">
+            <div class="hero-text-container">
+                <h1 class="hero-text">Chronicle your <span class="highlight">code</span> journey.</h1>
+                <h1 class="hero-text">One commit at a time.</h1>
+            </div>
+            <div class="action-container">
+                <a href="new-page/editor.html" class="create-button">
+                    <span class="icon">+</span>
+                    Create New
+                </a>
+            </div>
+        </section>
+
+        <section class="entries-section">
+            <div class="entries-grid" id="entries-grid">
+                <!-- Entries will be dynamically inserted here -->
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script src="home.js"></script>
+</body>
+</html>
