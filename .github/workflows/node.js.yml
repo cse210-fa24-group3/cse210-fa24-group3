@@ -19,10 +19,10 @@ jobs:
           node-version: 14
 
       - name: Install dependencies
-        run: npm install
+        run: cd src/uitest/ && npm install
 
       - name: Build
-        run: npm run build
+        run: cd src/uitest/ && npm run build
         
       - name: Run Test
-        run: npm run uitest
+        run: cd src/uitest/ && npm run uitest
