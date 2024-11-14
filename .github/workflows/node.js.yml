@@ -3,7 +3,7 @@ name: UI test
 on:
   push:
     branches:
-      - 9-e2e-ui-testing-mocha--chai
+      - Workflow-test
 
 jobs:
   build:
