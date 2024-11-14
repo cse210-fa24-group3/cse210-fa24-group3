@@ -20,9 +20,6 @@ jobs:
 
       - name: Install dependencies
         run: cd src/uitest/ && npm install
-
-      - name: Build
-        run: cd src/uitest/ && npm run build
         
       - name: Run Test
         run: cd src/uitest/ && npm run uitest
