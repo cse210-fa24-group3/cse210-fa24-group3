@@ -61,38 +61,46 @@ describe("UI Test", function () {
     }
   });
 
-  /* ------------------------------ Test #1 : Login Page ------------------------------ */
-  /* Test #1-1 : 'Sign in' Text */
-  it(`UT - ${++i} : 'About' Text`, async function () {
+  /* ------------------------------ Test #1 : Main Page ------------------------------ */
+  /* Test #1-1 : 'DevLog' Text */
+  it(`UT - ${++i} : 'DevLog' Text`, async function () {
     util = new Utility(page);
-    console.info(`\n** UI Test #1 - google.com Test -------------------------`);
+    console.info(`\n** UI Test #1 - DevLog Test -------------------------`);
 
     current_time = util.getTimezone();
-    msg = `Test #1 : Google Main Page| ${current_time}`;
+    msg = `Test #1 : DevLog Main Page| ${current_time}`;
 
-    const text_result = await util.getText(XP.google_about_xp);
-    expect(text_result).to.equal("About"); // Test for 'About' text
-
-    await this.timeout(3000)
-  });
-
-  /* Test #1-2 : 'Log in' Button */
-  it(`UT - ${++i} : 'Store' Button`, async function () {
-    const text_result = await util.getText(XP.google_store_xp);
-    expect(text_result).to.equal("Store"); // Test for 'Store' text
+    const text_result = await util.getText(XP.main_devlog_xp);
+    expect(text_result).to.equal("DevLog"); // Test for 'About' text
 
     await this.timeout(3000)
   });
 
-    /* Test #2-1 : About Tab */
-  it(`UT - ${++i} : About Page`, async function () {
-    console.info("*** Navigating to 'About' page");
-    await util.click(XP.google_about_xp);
-    console.info(`\n*** Test #2-1 : About page - 'Learn more' test`);
-    const text_result = await util.getText(XP.google_learnmore_xp);
-    expect(text_result).to.equal("\n          Learn more\n        "); // Test for 'New Folder' text
+  /* Test #1-2 : 'Home' Text */
+  it(`UT - ${++i} : 'Home' Text`, async function () {
+    const text_result = await util.getText(XP.main_home_xp);
+    expect(text_result).to.equal("Home"); // Test for 'Store' text
 
     await this.timeout(3000)
+  });
+
+  /* Test #1-3 : 'About' Text */
+  it(`UT - ${++i} : 'About' Text`, async function () {
+    const text_result = await util.getText(XP.main_about_xp);
+    expect(text_result).to.equal("About"); // Test for 'Store' text
+
+    await this.timeout(3000)
+  });
+
+  //   /* Test #2-1 : About Tab */
+  // it(`UT - ${++i} : About Page`, async function () {
+  //   console.info("*** Navigating to 'About' page");
+  //   await util.click(XP.google_about_xp);
+  //   console.info(`\n*** Test #2-1 : About page - 'Learn more' test`);
+  //   const text_result = await util.getText(XP.google_learnmore_xp);
+  //   expect(text_result).to.equal("\n          Learn more\n        "); // Test for 'New Folder' text
+
+  //   await this.timeout(3000)
 
 
     // await this.timeout(5000);
@@ -102,7 +110,6 @@ describe("UI Test", function () {
     // await page.keyboard.press("Enter");
     // await util.click(DP.LNB_newFolder_svg_xp);
     // await util.click(DP.LNB_newFolder_rename_xp);
-  });
 
 
   after(async function () {
