@@ -22,6 +22,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: cd src/uitest/ && npm install --save-dev rimraf@latest
     - run: cd src/uitest/ && npm install --save-dev puppeteer@latest # or playwright if using Playwright
+    - run: cd src/uitest/ && npm install
 
     # Install missing dependencies for headless browser
     - name: before_script
