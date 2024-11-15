@@ -1,0 +1,17 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: “Deployed site” 
+        run: curl -X POST -d {} https://api.netlify.com/build_hooks/6736d893c0646f06be574e8b
