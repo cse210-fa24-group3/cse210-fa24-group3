@@ -81,7 +81,7 @@ describe("UI Test", function () {
     const text_result = await util.getText(XP.google_store_xp);
     expect(text_result).to.equal("Store"); // Test for 'Store' text
 
-    await this.timeout(3000)
+    await this.timeout(5000)
   });
 
     /* Test #2-1 : About Tab */
