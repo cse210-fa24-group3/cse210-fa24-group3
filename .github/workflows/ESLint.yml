@@ -17,10 +17,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18'  # Use the Node.js version required by your project
+          node-version: '18'  
 
       - name: Install Dependencies
         run: cd src && npm install
 
       - name: Run ESLint
-        run: cd src && npx eslint .  # Lint all files in the repository
+        run: cd src && npx eslint .  
