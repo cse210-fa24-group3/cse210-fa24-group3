@@ -3,11 +3,11 @@ name: UI test
 on:
   push:
     branches:
-      - main
+      - Workflow-test
       
   pull_request:
     branches:
-      - main  # Runs the workflow when a PR is opened, synchronized, or merged into main
+      - Workflow-test  # Runs the workflow when a PR is opened, synchronized, or merged into main
 
 jobs:
   test:
