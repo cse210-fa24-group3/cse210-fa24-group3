@@ -20,16 +20,10 @@ jobs:
       - name: Install Dependencies
         run: cd src && npm install
 
-      # - name: ESLint Test home.js
-      #   run: cd src && npx eslint home.js
-        
-      # - name: ESLint Test editor.js
-      #   run: cd src && npx eslint ./new-page 
-
       - name: Run ESLint Checks 
         id: eslint
         run: |
-          files=("home.js" "./new-page")  
+          files=("home.js" "./new-page/editor.js")  
           for file in "${files[@]}"; do
             echo "Running ESLint on $file"
             if cd src && npx eslint "$file"; then
