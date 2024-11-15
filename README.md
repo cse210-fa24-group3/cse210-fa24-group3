@@ -1,2 +1,2 @@
 ## DevLog
-Journal 
+Journal Tool
