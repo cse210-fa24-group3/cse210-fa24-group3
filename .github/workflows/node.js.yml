@@ -3,11 +3,11 @@ name: UI test
 on:
   push:
     branches:
-      - Workflow-test
+      - main
       
   pull_request:
     branches:
-      - Workflow-test  # Runs the workflow when a PR is opened, synchronized, or merged into main
+      - main 
 
 jobs:
   test:
@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
           ref: Workflow-test  # Checkout the main branch code for testing
-    - run: cd src/uitest/ && npm install
+    - run: cd uiTestSuite/src/uitest/ && npm install
 
     # Install missing dependencies for headless browser
     - name: before_script
@@ -39,4 +39,4 @@ jobs:
       run: |
           export DISPLAY=:99
           Xvfb :99 -screen 0 1024x768x24 &
-          cd src/uitest/ && npm run uitest
+          cd uiTestSuite/src/uitest/ && npm run uitest
