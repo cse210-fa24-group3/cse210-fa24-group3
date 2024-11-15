@@ -21,6 +21,7 @@ jobs:
         run: cd src && npm install
 
       - name: Run ESLint Checks 
+        working-directory: src
         id: eslint
         run: |
           files=("home.js" "./new-page/editor.js")  
