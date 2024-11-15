@@ -29,10 +29,10 @@ jobs:
       - name: Run ESLint Checks 
         id: eslint
         run: |
-          files=("home.js" "new-page/editor.js")  
+          files=("home.js" "./new-page")  
           for file in "${files[@]}"; do
             echo "Running ESLint on $file"
-            if npx eslint "$file"; then
+            if cd src && npx eslint "$file"; then
               echo -e "\033[32m✔ ESLint Passed for $file\033[0m"
             else
               echo -e "\033[31m✘ ESLint Failed for $file. Please fix errors.\033[0m"
