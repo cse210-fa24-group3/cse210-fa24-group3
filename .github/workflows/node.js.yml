@@ -6,20 +6,30 @@ on:
       - Workflow-test
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [14, 16, 18]
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: cd src/uitest/ && npm install
+    - run: cd src/uitest/ && npm install puppeteer  # or playwright if using Playwright
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
+    # Install missing dependencies for headless browser
+    - name: Install dependencies for headless browser
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxrandr2 libxdamage1 libxkbcommon0 libgbm1 libpango-1.0-0 libpangocairo-1.0-0
 
-      - name: Install dependencies
-        run: cd src/uitest/ && npm install
-        
-      - name: Run Test
-        run: cd src/uitest/ && npm run uitest
+    # Run tests
+    - name: Run Tests
+      env:
+        CI: true  # Set CI environment variable
+      run: cd src/uitest/ && npm run uitest
