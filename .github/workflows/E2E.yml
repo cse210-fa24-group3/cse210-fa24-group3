@@ -2,9 +2,9 @@ name: UI test
 on:
   workflow_run:
     workflows:
-      -  Deployment 
+      - Deployment
     types:
-      - completed  
+      - completed
 
 jobs:
   test:
@@ -22,6 +22,6 @@ jobs:
 
     - name: E2E Test
       run: |
-          export DISPLAY=:99
-          Xvfb :99 -screen 0 1024x768x24 &
-          cd uiTestSuite/src/ && npm run uitest
+        export DISPLAY=:99
+        Xvfb :99 -screen 0 1024x768x24 &
+        cd uiTestSuite/src/ && npm run uitest | sed 's/\(✔ UT - .*\)/\033[0;32m\1\033[0m/'
