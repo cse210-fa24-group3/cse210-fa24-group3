@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+      
+  pull_request:
+    branches:
+      - main  # Runs the workflow when a PR is opened, synchronized, or merged into main
 
 jobs:
   test:
