@@ -19,8 +19,8 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-    - run: cd src/uitest/ && npm install
-    - run: cd src/uitest/ && npm install puppeteer  # or playwright if using Playwright
+    - run: cd src/uitest/ && npm install --save-dev rimraf@latest
+    - run: cd src/uitest/ && npm install --save-dev puppeteer@latest # or playwright if using Playwright
 
     # Install missing dependencies for headless browser
     - name: Install dependencies for headless browser
