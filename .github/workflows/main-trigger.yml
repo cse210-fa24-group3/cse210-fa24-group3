@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Workflow on Test Branch
-        uses: actions/github-script@v6
+        # uses: actions/github-script@v6
         env:
           github-token: ${{ secrets.TOKEN }}
           script: |
