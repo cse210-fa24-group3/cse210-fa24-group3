@@ -12,7 +12,7 @@ jobs:
       - name: Trigger Workflow on Test Branch
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TOKEN }}
           script: |
             await github.actions.createWorkflowDispatch({
               owner: context.repo.owner,
