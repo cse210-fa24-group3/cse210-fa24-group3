@@ -3,7 +3,7 @@ name: UI test
 on:
   push:
     branches:
-      - Workflow-test
+      - main
 
 jobs:
   test:
