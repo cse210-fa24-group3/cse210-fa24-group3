@@ -1,0 +1,22 @@
+name: Trigger Test Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger-test-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Workflow on Test Branch
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'node.js.yml', # Ensure this name matches the workflow file in the test branch
+              ref: 'Workflow-test',  # The branch where your test workflow file resides
+            });
