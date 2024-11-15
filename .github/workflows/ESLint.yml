@@ -27,7 +27,7 @@ jobs:
           files=("home.js" "./new-page/editor.js")  
           for file in "${files[@]}"; do
             echo "Running ESLint on $file"
-            if cd src && npx eslint "$file"; then
+            if npx eslint "$file"; then
               echo -e "\033[32m✔ ESLint Passed for $file\033[0m"
             else
               echo -e "\033[31m✘ ESLint Failed for $file. Please fix errors.\033[0m"
