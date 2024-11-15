@@ -21,7 +21,7 @@ jobs:
         run: cd src && npm install
 
       - name: ESLint Test home.js
-        run: cd src && npx eslint ./home.js
+        run: cd src && npx eslint home.js
         
       - name: ESLint Test editor.js
-        run: cd src && npx eslint ./editor.js
+        run: cd src && npx eslint ./new-page 
