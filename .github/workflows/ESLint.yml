@@ -20,8 +20,22 @@ jobs:
       - name: Install Dependencies
         run: cd src && npm install
 
-      - name: ESLint Test home.js
-        run: cd src && npx eslint home.js
+      # - name: ESLint Test home.js
+      #   run: cd src && npx eslint home.js
         
-      - name: ESLint Test editor.js
-        run: cd src && npx eslint ./new-page 
+      # - name: ESLint Test editor.js
+      #   run: cd src && npx eslint ./new-page 
+
+      - name: Run ESLint Checks 
+        id: eslint
+        run: |
+          files=("home.js" "new-page/editor.js")  
+          for file in "${files[@]}"; do
+            echo "Running ESLint on $file"
+            if npx eslint "$file"; then
+              echo -e "\033[32m✔ ESLint Passed for $file\033[0m"
+            else
+              echo -e "\033[31m✘ ESLint Failed for $file. Please fix errors.\033[0m"
+              exit 1  # Fail the workflow if any file fails
+            fi
+          done
