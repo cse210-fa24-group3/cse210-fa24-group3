@@ -11,8 +11,7 @@ jobs:
     steps:
       - name: Trigger Workflow on Test Branch
         uses: actions/github-script@v6
-        with:
-        
+        env:
           github-token: ${{ secrets.TOKEN }}
           script: |
             await github.actions.createWorkflowDispatch({
