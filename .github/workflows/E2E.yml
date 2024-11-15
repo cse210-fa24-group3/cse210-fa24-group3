@@ -1,8 +1,10 @@
 name: UI test
 on:
-  push:
-    branches:
-      - main 
+  workflow_run:
+    workflows:
+      -  Deployment 
+    types:
+      - completed  
 
 jobs:
   test:
