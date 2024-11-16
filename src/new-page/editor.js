@@ -1,16 +1,16 @@
 // DOM Elements
 const titleInput = document.getElementById('title-input');
 const contentInput = document.getElementById('content-input');
-const saveButton = document.querySelector('.save-button');
+// const saveButton = document.querySelector('.save-button');
 
 // Auto-save functionality
 let autoSaveTimeout;
-const autoSave = () => {
-    clearTimeout(autoSaveTimeout);
-    autoSaveTimeout = setTimeout(() => {
-        saveContent(true); // true indicates this is an auto-save
-    }, 2000);
-};
+// const autoSave = () => {
+//     clearTimeout(autoSaveTimeout);
+//     autoSaveTimeout = setTimeout(() => {
+//         saveContent(true); // true indicates this is an auto-save
+//     }, 2000);
+// };
 
 const saveContent = (isAutoSave = false) => {
     const title = titleInput.value.trim();

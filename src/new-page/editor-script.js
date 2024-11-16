@@ -1,5 +1,5 @@
 // DOM Elements
-const overlay = document.querySelector('.overlay');
+// const overlay = document.querySelector('.overlay');
 const themeToggle = document.querySelector('.theme-toggle');
 const lightModeIcon = document.querySelector('.light-mode');
 const darkModeIcon = document.querySelector('.dark-mode');
