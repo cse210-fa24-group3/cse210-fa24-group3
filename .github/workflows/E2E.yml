@@ -24,4 +24,4 @@ jobs:
       run: |
         export DISPLAY=:99
         Xvfb :99 -screen 0 1024x768x24 &
-        cd uiTestSuite/src/ && npm run uitest | sed 's/\(✔ UT - .*\)/\033[0;32m\1\033[0m/'
+        cd uiTestSuite/src/ && npm run uitest 
