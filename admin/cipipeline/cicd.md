@@ -61,7 +61,7 @@ The pipeline is designed to ensure code quality and proper functionality before 
   - Integration with existing ESLint workflow
 
 ## CI/CD Pipeline Diagram
-<img src= "CI_CD Pipeline.drawio.png" width="500"/>
+<img src= "CI_CD _Pipeline.drawio.png" width="500"/>
 
 ## Conclusion
 
