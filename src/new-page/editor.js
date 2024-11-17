@@ -1,18 +1,9 @@
 // DOM Elements
 const titleInput = document.getElementById('title-input');
 const contentInput = document.getElementById('content-input');
-const saveButton = document.querySelector('.save-button');
 
-// Auto-save functionality
-let autoSaveTimeout;
-const autoSave = () => {
-    clearTimeout(autoSaveTimeout);
-    autoSaveTimeout = setTimeout(() => {
-        saveContent(true); // true indicates this is an auto-save
-    }, 2000);
-};
-
-const saveContent = (isAutoSave = false) => {
+// Save function for both auto-save and manual save
+function saveContent(isAutoSave = false) {
     const title = titleInput.value.trim();
     const content = contentInput.value.trim();
     
@@ -64,14 +55,37 @@ const saveContent = (isAutoSave = false) => {
         document.body.appendChild(message);
         setTimeout(() => message.remove(), 2000);
 
+        // Fixed: Use absolute path to return to main page
         setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
         }, 1000);
     }
-};
+}
 
-// Load existing entry if editing
-window.addEventListener('load', () => {
+// Auto-save functionality
+let autoSaveTimeout;
+function setupAutoSave() {
+    const handleInput = () => {
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(() => {
+            saveContent(true);
+        }, 2000);
+    };
+
+    titleInput.addEventListener('input', handleInput);
+    contentInput.addEventListener('input', handleInput);
+}
+
+// Save button click handler
+function setupSaveButton() {
+    const saveButton = document.querySelector('.save-button');
+    if (saveButton) {
+        saveButton.addEventListener('click', () => saveContent(false));
+    }
+}
+
+// Load existing entry or draft content
+function loadContent() {
     const urlParams = new URLSearchParams(window.location.search);
     const editingId = urlParams.get('id');
     
@@ -93,4 +107,26 @@ window.addEventListener('load', () => {
             localStorage.removeItem('draftContent');
         }
     }
-});
+}
+
+// Save draft before unloading
+function setupBeforeUnload() {
+    window.addEventListener('beforeunload', () => {
+        const title = titleInput.value.trim();
+        const content = contentInput.value.trim();
+        if (title || content) {
+            localStorage.setItem('draftContent', JSON.stringify({ title, content }));
+        }
+    });
+}
+
+// Initialize all functionality
+function init() {
+    setupAutoSave();
+    setupSaveButton();
+    loadContent();
+    setupBeforeUnload();
+}
+
+// Start the application
+init();
