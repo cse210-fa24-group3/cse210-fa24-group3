@@ -26,6 +26,12 @@ The pipeline is designed to ensure code quality and proper functionality before 
   - Triggered after successful ESLint checks
   - Handles build and deployment processes
   - Acts as a prerequisite for E2E testing
+  - Integrated with pull request workflow### 2. Deployment Workflow
+- **Status:** Functional
+- **Functionality:**
+  - Triggered after successful ESLint checks
+  - Handles build and deployment processes
+  - Acts as a prerequisite for E2E testing
   - Integrated with pull request workflow
 
 ### 3. E2E UI Testing Workflow
