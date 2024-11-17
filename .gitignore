@@ -6,3 +6,5 @@ mochawesome.html
 mochawesome.json
 mochawesome-report/mochawesome1.html
 xpath_ideas.js
+DS_Store
+yarn.lock
