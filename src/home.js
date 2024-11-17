@@ -1,4 +1,3 @@
-// Format date to relative time (e.g., "2 hours ago")
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -12,13 +11,11 @@ function formatRelativeTime(dateString) {
     return date.toLocaleDateString();
 }
 
-// Truncate text to a specific length
 function truncateText(text, maxLength) {
     if (text.length <= maxLength) return text;
     return text.substr(0, maxLength - 3) + '...';
 }
 
-// Create HTML for a single entry tile
 function createEntryTile(entry) {
     const tile = document.createElement('div');
     tile.className = 'entry-tile';
@@ -28,32 +25,41 @@ function createEntryTile(entry) {
         <h3 class="entry-title">${entry.title}</h3>
         <p class="entry-preview">${truncateText(entry.content, 150)}</p>
         <div class="entry-meta">
-            ${formatRelativeTime(entry.createdAt)}
+            ${formatRelativeTime(entry.created_at)}
         </div>
     `;
 
     return tile;
 }
 
-// Display all entries
-function displayEntries() {
+async function displayEntries() {
     const entriesGrid = document.getElementById('entries-grid');
-    const entries = JSON.parse(localStorage.getItem('entries') || '[]');
+    
+    try {
+        const response = await fetch('http://localhost:3000/api/entries');
+        const entries = await response.json();
 
-    if (entries.length === 0) {
+        if (entries.length === 0) {
+            entriesGrid.innerHTML = `
+                <div class="no-entries">
+                    No entries yet. Click "Create New" to get started!
+                </div>
+            `;
+            return;
+        }
+
+        entriesGrid.innerHTML = '';
+        entries.forEach(entry => {
+            entriesGrid.appendChild(createEntryTile(entry));
+        });
+    } catch (error) {
+        console.error('Error fetching entries:', error);
         entriesGrid.innerHTML = `
-            <div class="no-entries">
-                No entries yet. Click "Create New" to get started!
+            <div class="error-message">
+                Failed to load entries. Please try again later.
             </div>
         `;
-        return;
     }
-
-    entriesGrid.innerHTML = '';
-    entries.forEach(entry => {
-        entriesGrid.appendChild(createEntryTile(entry));
-    });
 }
 
 // Initial load of entries
-displayEntries();
