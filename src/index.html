@@ -13,6 +13,10 @@
             <div class="logo">DevLog</div>
         </div>
         <div class="navbar-right">
+            <a href="recently-viewed.html" class="recently-viewed-button">
+                <span class="icon">🕒</span>
+                Recent
+            </a>
             <div class="theme-toggle">
                 <span class="light-mode">☀️</span>
                 <span class="dark-mode" style="display: none;">🌙</span>
@@ -38,6 +42,16 @@
                     <span class="icon">+</span>
                     Create New
                 </a>
+            </div>
+        </section>
+
+        <section class="recently-viewed-section" id="recently-viewed-section" style="display: none;">
+            <h2 class="recently-viewed-header">
+                <span class="recently-viewed-icon">🕒</span>
+                Recently Viewed
+            </h2>
+            <div class="recently-viewed-grid" id="recently-viewed-grid">
+                <!-- Recently viewed entries will be dynamically inserted here -->
             </div>
         </section>
 

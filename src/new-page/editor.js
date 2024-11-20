@@ -98,12 +98,17 @@ window.addEventListener('load', async () => {
     if (editingId) {
         try {
             const response = await fetch(`http://localhost:3000/api/entries/${editingId}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch entry');
-            }
+            if (!response.ok) throw new Error('Entry not found');
+            
             const entry = await response.json();
-            titleInput.value = entry.title;
-            contentInput.value = entry.content;
+            
+            // Add to recently viewed
+            addToRecentlyViewed(editingId);
+            
+            // Populate the editor
+            document.getElementById('title-input').value = entry.title;
+            document.getElementById('content-input').value = entry.content;
+            
         } catch (error) {
             console.error('Error loading entry:', error);
             const message = document.createElement('div');
@@ -123,6 +128,27 @@ window.addEventListener('load', async () => {
         }
     }
 });
+
+function addToRecentlyViewed(entryId) {
+    if (!entryId) return;
+    
+    try {
+        let recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+        
+        // Remove if already exists
+        recentlyViewed = recentlyViewed.filter(id => id !== entryId);
+        
+        // Add to the beginning
+        recentlyViewed.unshift(entryId);
+        
+        // Keep only the last 3 entries
+        recentlyViewed = recentlyViewed.slice(0, 3);
+        
+        localStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewed));
+    } catch (error) {
+        console.error('Error updating recently viewed entries:', error);
+    }
+}
 
 titleInput.addEventListener('input', autoSave);
 contentInput.addEventListener('input', autoSave);
