@@ -1,6 +1,5 @@
 const titleInput = document.getElementById('title-input');
 const contentInput = document.getElementById('content-input');
-const saveButton = document.querySelector('.save-button');
 
 let autoSaveTimeout;
 const autoSave = () => {
@@ -89,7 +88,7 @@ const saveContent = async (isAutoSave = false) => {
         document.body.appendChild(message);
         setTimeout(() => message.remove(), 2000);
     }
-};
+}
 
 window.addEventListener('load', async () => {
     const urlParams = new URLSearchParams(window.location.search);
