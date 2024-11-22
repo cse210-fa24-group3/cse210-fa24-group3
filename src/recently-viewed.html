@@ -1,13 +1,66 @@
-<!DOCTYPE html>
+`<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8">.recently-viewed {
+    border-left: 4px solid #4A90E2;
+}
+
+.back-button {
+    text-decoration: none;
+    color: var(--text-navbar);
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.back-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+    padding: 0 2rem;
+}
+
+.no-entries {
+    text-align: center;
+    color: var(--text-primary);
+    opacity: 0.7;
+    font-size: 1.2rem;
+    padding: 2rem;
+}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recently Viewed | DevLog</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="root"></div>
-    <script type="module" src="recently-viewed.js"></script>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a href="index.html" class="back-button">←</a>
+            <div class="logo">DevLog</div>
+        </div>
+        <div class="navbar-right">
+            <div class="theme-toggle">
+                <span class="light-mode">☀️</span>
+                <span class="dark-mode" style="display: none;">🌙</span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="entries-section">
+            <h1 class="section-title">Recently Viewed</h1>
+            <div class="entries-grid" id="recently-viewed-grid">
+                <!-- Recently viewed entries will be dynamically inserted here -->
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script src="recently-viewed.js"></script>
 </body>
-</html>
+</html>`
