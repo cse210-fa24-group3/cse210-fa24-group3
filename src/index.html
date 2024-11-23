@@ -1,68 +1,95 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Journey</title>
+    <title>DevLog</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-left">
-            <div class="menu-icon">☰</div>
-            <div class="logo">DevLog</div>
+            <div>☰</div>
+            <div>DevLog</div>
         </div>
         <div class="navbar-right">
-            <a href="recently-viewed.html" class="recently-viewed-button">
-                <span class="icon">🕒</span>
-                Recent
-            </a>
-            <div class="theme-toggle">
-                <span class="light-mode">☀️</span>
-                <span class="dark-mode" style="display: none;">🌙</span>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Hinted search text">
+                <span class="search-icon">🔍</span>
             </div>
+            <div>🌙</div>
+            <div>👤</div>
         </div>
     </nav>
 
     <div class="sidebar">
-        <a href="#">Home</a>
-        <a href="#">About</a>
+        <div class="sidebar-links">
+            <a href="#">Home</a>
+            <a href="#">My Documents</a>
+            <a href="#">Templates</a>
+            <a href="#">Settings</a>
+        </div>
+    </div>
+    
+    <div class="overlay"></div>
+    
+    <div class="user-menu">
+        <a href="#" class="block p-2">Profile</a>
+        <a href="#" class="block p-2">Settings</a>
+        <a href="#" class="block p-2">Logout</a>
     </div>
 
-    <div class="overlay"></div>
 
-    <main>
-        <section class="hero-section">
-            <div class="hero-text-container">
-                <h1 class="hero-text">Chronicle your <span class="highlight">code</span> journey.</h1>
-                <h1 class="hero-text">One commit at a time.</h1>
-            </div>
-            <div class="action-container">
-                <a href="new-page/editor.html" class="create-button">
-                    <span class="icon">+</span>
-                    Create New
+    <main class="main-content">
+        <div class="hero-text">
+            Chronicle your code journey.<br>
+            One commit at a time.
+        </div>
+    
+        <section>
+            <h2 class="section-title">Start a new document</h2>
+            <div class="card-grid">
+                <a href="new-page/editor.html" class="card create-card">
+                    <span class="plus-icon">+</span>
                 </a>
+                
+                <div class="card"><a href="todo template/todo.html">To-do list</a></div>
+                <div class="card">Engineering Review Doc</div>
+                <div class="card">Bug - Root Cause Analysis</div>
             </div>
+            <a href="#" class="see-more">see more templates</a>
         </section>
-
-        <section class="recently-viewed-section" id="recently-viewed-section" style="display: none;">
-            <h2 class="recently-viewed-header">
-                <span class="recently-viewed-icon">🕒</span>
-                Recently Viewed
-            </h2>
-            <div class="recently-viewed-grid" id="recently-viewed-grid">
-                <!-- Recently viewed entries will be dynamically inserted here -->
+    
+        <section>
+            <h2 class="section-title">Recently edited pages</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-title">CSE 210: To-do</div>
+                    <div class="card-author">John Doe</div>
+                    <div class="card-date">11/05/24 01:21 PM</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Minutes of meeting</div>
+                    <div class="card-author">John Doe</div>
+                    <div class="card-date">10/31/24 11:23 PM</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Bug #345: Root Cause</div>
+                    <div class="card-author">John Doe</div>
+                    <div class="card-date">10/31/24 11:23 PM</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">CSE 210: To-do</div>
+                    <div class="card-author">John Doe</div>
+                    <div class="card-date">11/05/24 01:21 PM</div>
+                </div>
             </div>
-        </section>
-
-        <section class="entries-section">
-            <div class="entries-grid" id="entries-grid">
-                <!-- Entries will be dynamically inserted here -->
-            </div>
+            <a href="#" class="see-more">see more</a>
         </section>
     </main>
 
     <script src="script.js"></script>
-    <script src="home.js"></script>
+</body>
+</html>
 </body>
 </html>

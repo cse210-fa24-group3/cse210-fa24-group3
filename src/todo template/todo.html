@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo List Template</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 800px;
+            margin-top: 7rem;
+            max-width: 600px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+        }
+        
+        .date {
+            color: #666;
+        }
+        
+        .add-task {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background: #6b4fbb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background: #5a3ea0;
+        }
+        
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            gap: 10px;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-item span {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div>☰</div>
+            <div>DevLog</div>
+        </div>
+        <div class="navbar-right">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Hinted search text">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div>🌙</div>
+            <div>👤</div>
+        </div>
+    </nav>
+
+    <div class="sidebar">
+        <div class="sidebar-links">
+            <a href="#">Home</a>
+            <a href="#">My Documents</a>
+            <a href="#">Templates</a>
+            <a href="#">Settings</a>
+        </div>
+    </div>
+    
+    <div class="overlay"></div>
+    
+    <div class="user-menu">
+        <a href="#" class="block p-2">Profile</a>
+        <a href="#" class="block p-2">Settings</a>
+        <a href="#" class="block p-2">Logout</a>
+    </div>
+    <main>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">To-do List</h1>
+            <span class="date" id="currentDate"></span>
+        </div>
+        
+        <div class="add-task">
+            <input type="text" id="taskInput" placeholder="Add a new task..." />
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        
+        <ul class="task-list" id="taskList"></ul>
+    </div>
+</main>
+
+    <script>
+        // Update the date
+        function updateDate() {
+            const dateElement = document.getElementById('currentDate');
+            const now = new Date();
+            dateElement.textContent = now.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+
+        // Initialize tasks from localStorage
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            
+            tasks.forEach(task => {
+                const li = createTaskElement(task.text, task.completed);
+                taskList.appendChild(li);
+            });
+        }
+
+        // Create new task element
+        function createTaskElement(text, completed = false) {
+            const li = document.createElement('li');
+            li.className = 'task-item';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = completed;
+            checkbox.addEventListener('change', () => saveTasksToStorage());
+            
+            const span = document.createElement('span');
+            span.textContent = text;
+            span.style.textDecoration = completed ? 'line-through' : 'none';
+            
+            checkbox.onchange = function() {
+                span.style.textDecoration = checkbox.checked ? 'line-through' : 'none';
+                saveTasksToStorage();
+            };
+            
+            li.appendChild(checkbox);
+            li.appendChild(span);
+            
+            return li;
+        }
+
+        // Add new task
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                const taskList = document.getElementById('taskList');
+                const li = createTaskElement(text);
+                taskList.appendChild(li);
+                input.value = '';
+                saveTasksToStorage();
+            }
+        }
+
+        // Save tasks to localStorage
+        function saveTasksToStorage() {
+            const taskList = document.getElementById('taskList');
+            const tasks = [];
+            
+            taskList.querySelectorAll('.task-item').forEach(item => {
+                tasks.push({
+                    text: item.querySelector('span').textContent,
+                    completed: item.querySelector('input[type="checkbox"]').checked
+                });
+            });
+            
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Initialize
+        updateDate();
+        loadTasks();
+
+        // Add enter key support
+        document.getElementById('taskInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
