@@ -6,24 +6,38 @@
     <link rel="stylesheet" href="../styles.css">
     <style>
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
         }
         
         body {
-            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #fff;
+            min-height: 100vh;
+            padding-top: 6rem;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            z-index: 100;
             display: flex;
-            justify-content: center;
-            padding: 20px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
         }
         
         .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
             width: 800px;
-            margin-top: 7rem;
             max-width: 600px;
         }
         
@@ -31,74 +45,225 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 2rem;
         }
         
         .title {
-            font-size: 24px;
-            color: #333;
+            font-size: 2.5rem;
+            color: #166534;
             margin: 0;
+            line-height: 1.2;
         }
         
         .date {
-            color: #666;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .list-name {
+            font-size: 1.5rem;
+            color: #6b7280;
+            margin: 0 0 1.5rem 0;
+            padding: 0.5rem;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .list-name:hover {
+            border-color: #e5e7eb;
+            border-radius: 0.5rem;
+        }
+        
+        .list-name-input {
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            width: 100%;
+            color: #111827;
+            margin-bottom: 1.5rem;
+            font-family: inherit;
         }
         
         .add-task {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
         
         input[type="text"] {
             flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            color: #111827;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #166534;
         }
         
         button {
-            background: #6b4fbb;
+            background: #166534;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 0.875rem;
+            transition: background-color 0.2s ease;
         }
         
         button:hover {
-            background: #5a3ea0;
+            background: #14532d;
         }
         
         .task-list {
             list-style: none;
             padding: 0;
             margin: 0;
+            display: grid;
+            gap: 1rem;
         }
         
         .task-item {
             display: flex;
             align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            gap: 10px;
+            padding: 1.5rem;
+            gap: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: white;
         }
         
-        .task-item:last-child {
-            border-bottom: none;
+        .task-item input[type="checkbox"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.25rem;
+            cursor: pointer;
         }
         
         .task-item span {
             flex: 1;
+            color: #111827;
+            font-size: 0.875rem;
         }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .navbar,
+        body.dark-mode .container,
+        body.dark-mode .task-item {
+            background: #2d2d2d;
+        }
+
+        body.dark-mode input[type="text"],
+        body.dark-mode .list-name-input {
+            background: #404040;
+            color: #ffffff;
+            border-color: #404040;
+        }
+
+        body.dark-mode .task-item {
+            border-color: #404040;
+        }
+
+        body.dark-mode .list-name,
+        body.dark-mode .task-item span {
+            color: #ffffff;
+        }
+
+        body.dark-mode .list-name:hover {
+            border-color: #404040;
+        }
+        /* Add these new styles to your existing CSS */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.save-btn {
+    background: #64748b; /* Secondary color */
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.save-btn:hover {
+    background: #475569;
+}
+
+.save-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.save-status {
+    color: #64748b;
+    font-size: 0.875rem;
+    min-width: 120px;
+    text-align: right;
+}
+
+.loading-spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Update the dark mode styles */
+body.dark-mode .save-btn {
+    background: #64748b;
+}
+
+body.dark-mode .save-btn:hover {
+    background: #475569;
+}
+
+body.dark-mode .save-btn:disabled {
+    background: #94a3b8;
+}
+
+body.dark-mode .save-status {
+    color: #94a3b8;
+}
     </style>
 </head>
 <body>
-
+    
     <nav class="navbar">
         <div class="navbar-left">
             <div>☰</div>
@@ -116,13 +281,13 @@
 
     <div class="sidebar">
         <div class="sidebar-links">
-            <a href="#">Home</a>
+            <a href="/index.html">Home</a>
             <a href="#">My Documents</a>
             <a href="#">Templates</a>
             <a href="#">Settings</a>
         </div>
     </div>
-    
+
     <div class="overlay"></div>
     
     <div class="user-menu">
@@ -131,46 +296,164 @@
         <a href="#" class="block p-2">Logout</a>
     </div>
     <main>
-    <div class="container">
-        <div class="header">
-            <h1 class="title">To-do List</h1>
-            <span class="date" id="currentDate"></span>
+        <div class="container">
+            <div class="header-container">
+                <h2>Todo List</h2>
+                <div class="header-right">
+                    <div class="save-status" id="saveStatus"></div>
+                    <button class="save-btn secondary" id="saveButton" onclick="saveToDatabase()">
+                        <span class="loading-spinner" id="saveSpinner"></span>
+                        <span>Save</span>
+                    </button>
+                </div>
+            </div>
+            
+            <h2 class="list-name" id="listName" onclick="editListName()">Click to add list name</h2>
+            <div class="date" id="currentDate"></div>
+            
+            <div class="add-task">
+                <input type="text" id="taskInput" placeholder="Add a new task..." />
+                <button onclick="addTask()">Add Task</button>
+            </div>
+            
+            <ul class="task-list" id="taskList"></ul>
         </div>
-        
-        <div class="add-task">
-            <input type="text" id="taskInput" placeholder="Add a new task..." />
-            <button onclick="addTask()">Add Task</button>
-        </div>
-        
-        <ul class="task-list" id="taskList"></ul>
-    </div>
 </main>
 
     <script>
-        // Update the date
-        function updateDate() {
-            const dateElement = document.getElementById('currentDate');
-            const now = new Date();
-            dateElement.textContent = now.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-        }
-
-        // Initialize tasks from localStorage
-        function loadTasks() {
-            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-            const taskList = document.getElementById('taskList');
-            taskList.innerHTML = '';
+        // ============= INITIALIZATION (runs when page loads) =============
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the date display
+            updateDate();
             
-            tasks.forEach(task => {
-                const li = createTaskElement(task.text, task.completed);
-                taskList.appendChild(li);
-            });
+            // Load saved tasks from localStorage
+            loadTasks();
+            
+            // Check for and load existing document
+            const documentId = localStorage.getItem('todoDocumentId');
+            if (documentId) {
+                loadDocument(documentId);
+            }
+        });
+
+        // ============= EVENT LISTENERS =============
+        // Add enter key support for task input
+        document.getElementById('taskInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        // ============= SAVE FUNCTIONS =============
+        async function saveToDatabase() {
+
+                const saveButton = document.getElementById('saveButton');
+                const saveSpinner = document.getElementById('saveSpinner');
+                const saveStatus = document.getElementById('saveStatus');
+                
+                saveButton.disabled = true;
+                saveSpinner.style.display = 'block';
+                saveStatus.textContent = 'Saving...';
+
+                const todoData = {
+                    title: document.getElementById('listName').textContent,
+                    content: JSON.stringify({
+                        tasks: getAllTasks(),
+                        lastUpdated: new Date().toISOString()
+                    }),
+                    template_type: 'todo'
+                };
+
+                try {
+                    const documentId = localStorage.getItem('todoDocumentId');
+                    // Add base URL to ensure we're hitting the correct endpoint
+                    const baseUrl = 'http://localhost:3000';
+                    const url = documentId ? 
+                        `${baseUrl}/api/documents/${documentId}` : 
+                        `${baseUrl}/api/documents`;
+                    const method = documentId ? 'PUT' : 'POST';
+
+                    console.log('Sending request to:', url);
+                    console.log('Request data:', todoData);
+
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(todoData)
+                    });
+
+                    console.log('Response status:', response.status);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`Failed to save: ${errorData.error || 'Unknown error'}`);
+                    }
+
+                    const result = await response.json();
+                    console.log('Response data:', result);
+                    
+                    if (!documentId && result.documentId) {
+                        localStorage.setItem('todoDocumentId', result.documentId);
+                    }
+
+                    saveStatus.textContent = 'Saved successfully';
+                    
+                    setTimeout(() => {
+                        saveStatus.textContent = '';
+                    }, 3000);
+
+                } catch (error) {
+                    console.error('Save failed:', error);
+                    saveStatus.textContent = `Failed to save: ${error.message}`;
+                } finally {
+                    saveButton.disabled = false;
+                    saveSpinner.style.display = 'none';
+                }
+
         }
 
-        // Create new task element
+        function saveTasksToStorage() {
+            const taskList = document.getElementById('taskList');
+            const tasks = [];
+            
+            taskList.querySelectorAll('.task-item').forEach(item => {
+                tasks.push({
+                    text: item.querySelector('span').textContent,
+                    completed: item.querySelector('input[type="checkbox"]').checked
+                });
+            });
+            
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function saveListName(name) {
+            const input = document.querySelector('.list-name-input');
+            const h2 = document.createElement('h2');
+            h2.id = 'listName';
+            h2.className = 'list-name';
+            h2.onclick = editListName;
+            h2.textContent = name.trim() || 'Click to add list name';
+            
+            localStorage.setItem('listName', h2.textContent);
+            input.parentNode.replaceChild(h2, input);
+        }
+
+        // ============= TASK MANAGEMENT FUNCTIONS =============
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                const taskList = document.getElementById('taskList');
+                const li = createTaskElement(text);
+                taskList.appendChild(li);
+                input.value = '';
+                saveTasksToStorage();
+            }
+        }
+
         function createTaskElement(text, completed = false) {
             const li = document.createElement('li');
             li.className = 'task-item';
@@ -191,50 +474,129 @@
             
             li.appendChild(checkbox);
             li.appendChild(span);
+            // Add checkbox change event listener
+            checkbox.addEventListener('change', () => {
+                saveTasksToStorage();
+                scheduleAutoSave();
+            });
             
             return li;
         }
-
-        // Add new task
-        function addTask() {
-            const input = document.getElementById('taskInput');
-            const text = input.value.trim();
-            
-            if (text) {
-                const taskList = document.getElementById('taskList');
-                const li = createTaskElement(text);
-                taskList.appendChild(li);
-                input.value = '';
-                saveTasksToStorage();
-            }
-        }
-
-        // Save tasks to localStorage
-        function saveTasksToStorage() {
+       
+        // Add this function to your todo.html script section
+        function getAllTasks() {
             const taskList = document.getElementById('taskList');
             const tasks = [];
             
             taskList.querySelectorAll('.task-item').forEach(item => {
                 tasks.push({
                     text: item.querySelector('span').textContent,
-                    completed: item.querySelector('input[type="checkbox"]').checked
+                    completed: item.querySelector('input[type="checkbox"]').checked,
+                    created_at: item.getAttribute('data-created') || new Date().toISOString(),
+                    updated_at: new Date().toISOString()
                 });
             });
             
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            return tasks;
         }
 
-        // Initialize
-        updateDate();
-        loadTasks();
+        // ============= LIST NAME FUNCTIONS =============
+        function editListName() {
+            const listNameElement = document.getElementById('listName');
+            const currentName = listNameElement.textContent;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'list-name-input';
+            input.value = currentName === 'Click to add list name' ? '' : currentName;
+            
+            input.onblur = function() {
+                saveListName(this.value);
+            };
+            
+            input.onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    saveListName(this.value);
+                }
+            };
+            
+            listNameElement.parentNode.replaceChild(input, listNameElement);
+            input.focus();
+        }
 
-        // Add enter key support
-        document.getElementById('taskInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addTask();
+        // ============= LOADING FUNCTIONS =============
+        async function loadDocument(documentId) {
+            try {
+                const baseUrl = 'http://localhost:3000';
+                const response = await fetch(`${baseUrl}/api/documents/${documentId}`);
+                
+                console.log('Load response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(``);
+                }
+                
+                const document = await response.json();
+                console.log('Loaded document:', document);
+                
+                const content = JSON.parse(document.content);
+                
+                // Update list name
+                document.getElementById('listName').textContent = document.title;
+                
+                // Load tasks
+                const taskList = document.getElementById('taskList');
+                taskList.innerHTML = '';
+                
+                content.tasks.forEach(task => {
+                    const li = createTaskElement(task.text, task.completed);
+                    taskList.appendChild(li);
+                });
+                
+                localStorage.setItem('todoDocumentId', documentId);
+                
+            } catch (error) {
+                console.error('Failed to load document:', error);
+                const saveStatus = document.getElementById('saveStatus');
+                saveStatus.textContent = ``;
             }
-        });
+        }
+
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            
+            tasks.forEach(task => {
+                const li = createTaskElement(task.text, task.completed);
+                taskList.appendChild(li);
+            });
+            
+            // Load list name
+            const savedListName = localStorage.getItem('listName');
+            if (savedListName) {
+                document.getElementById('listName').textContent = savedListName;
+            }
+        }
+        // ============= UTILITY FUNCTIONS =============
+         // Update the date
+         function updateDate() {
+            const dateElement = document.getElementById('currentDate');
+            const now = new Date();
+            dateElement.textContent = now.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Auto-save functionality
+        let autoSaveTimeout;
+        function scheduleAutoSave() {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(saveToDatabase, 30000);
+        }
     </script>
-    <script src="script.js"></script>
+    <script src="../script.js"></script>
 </body>
 </html>

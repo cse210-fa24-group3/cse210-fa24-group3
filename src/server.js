@@ -36,6 +36,42 @@ const db = new sqlite3.Database(path.join(__dirname, 'devlog.db'), (err) => {
     }
 });
 
+db.serialize(() => {
+    // Existing entries table
+    db.run(`
+        CREATE TABLE IF NOT EXISTS entries (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            content TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+    `);
+
+    // New documents table for todo lists
+    db.run(`
+        CREATE TABLE IF NOT EXISTS documents (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            template_type TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+    `);
+
+    // New history table for tracking document changes
+    db.run(`
+        CREATE TABLE IF NOT EXISTS history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            document_id TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (document_id) REFERENCES documents(id)
+        )
+    `);
+});
+
 // Helper function to export DB entries to JSON
 async function exportToJson() {
     return new Promise((resolve, reject) => {
@@ -207,6 +243,157 @@ app.post('/api/import', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// Get all documents
+app.get('/api/documents', (req, res) => {
+    db.all('SELECT * FROM documents ORDER BY created_at DESC', [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+// Get single document
+app.get('/api/documents/:id', (req, res) => {
+    console.log('Received PUT request for document:', req.params.id, req.body);
+    
+    db.get('SELECT * FROM documents WHERE id = ?', [req.params.id], (err, row) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (!row) {
+            res.status(404).json({ error: 'Document not found' });
+            return;
+        }
+        res.json(row);
+    });
+});
+
+// Create new document
+app.post('/api/documents', (req, res) => {
+    console.log('Received POST request for document:', req.body);
+    const { title, content, template_type } = req.body;
+    const id = Date.now().toString(); // Generate unique ID
+    const now = new Date().toISOString();
+
+    db.serialize(() => {
+        console.log('Starting document creation transaction');
+        
+        db.run('BEGIN TRANSACTION');
+
+        // Insert into documents table
+        db.run(
+            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+            [id, title, content, template_type, now, now],
+            function(err) {
+                if (err) {
+                    db.run('ROLLBACK');
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
+
+                // Insert into history table
+                db.run(
+                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                    [id, now, now],
+                    function(err) {
+                        if (err) {
+                            db.run('ROLLBACK');
+                            res.status(500).json({ error: err.message });
+                            return;
+                        }
+
+                        db.run('COMMIT', (err) => {
+                            if (err) {
+                                db.run('ROLLBACK');
+                                res.status(500).json({ error: err.message });
+                                return;
+                            }
+                            res.json({ 
+                                success: true, 
+                                documentId: id,
+                                message: 'Document created successfully' 
+                            });
+                        });
+                    }
+                );
+            }
+        );
+    });
+});
+
+// Update document
+app.put('/api/documents/:id', (req, res) => {
+    const { title, content } = req.body;
+    const now = new Date().toISOString();
+
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+
+        // Update documents table
+        db.run(
+            'UPDATE documents SET title = ?, content = ?, updated_at = ? WHERE id = ?',
+            [title, content, now, req.params.id],
+            function(err) {
+                if (err) {
+                    db.run('ROLLBACK');
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
+
+                if (this.changes === 0) {
+                    db.run('ROLLBACK');
+                    res.status(404).json({ error: 'Document not found' });
+                    return;
+                }
+
+                // Modified: Include created_at in history insert
+                db.run(
+                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                    [req.params.id, now, now], // Added now as created_at
+                    function(err) {
+                        if (err) {
+                            db.run('ROLLBACK');
+                            res.status(500).json({ error: err.message });
+                            return;
+                        }
+
+                        db.run('COMMIT', (err) => {
+                            if (err) {
+                                db.run('ROLLBACK');
+                                res.status(500).json({ error: err.message });
+                                return;
+                            }
+                            res.json({ 
+                                success: true, 
+                                message: 'Document updated successfully' 
+                            });
+                        });
+                    }
+                );
+            }
+        );
+    });
+});
+
+db.run(`
+    CREATE TABLE IF NOT EXISTS history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        document_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (document_id) REFERENCES documents(id)
+    )
+`);
+
+// Serve todo.html for the todo route
+app.get('/todo', (req, res) => {
+    res.sendFile(path.join(__dirname, 'todo.html'));
+});
+
 
 // Serve index.html for the root route
 app.get('/', (req, res) => {
