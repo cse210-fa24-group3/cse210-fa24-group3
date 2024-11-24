@@ -53,8 +53,8 @@ jobs:
 
       # Step 6: Upload JUnit test results to Codecov
       - name: Upload test results to Codecov
-        working-directory: src
         if: ${{ !cancelled() }}
+        working-directory: src
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
