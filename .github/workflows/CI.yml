@@ -49,6 +49,7 @@ jobs:
           flags: unittests
           fail_ci_if_error: true
           verbose: true
+          debug: true
 
       # Step 6: Upload JUnit test results to Codecov
       - name: Upload test results to Codecov
@@ -57,3 +58,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: src/junit.xml
+          verbose: true
+          debug: true
