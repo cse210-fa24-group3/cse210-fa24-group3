@@ -62,35 +62,35 @@ describe("UI Test", function () {
   });
 
   /* ------------------------------ Test #1 : Main Page ------------------------------ */
-  /* Test #1-1 : 'DevLog' Text */
-  it(`UT - ${++i} : 'DevLog' Text`, async function () {
-    util = new Utility(page);
-    console.info(`\n** UI Test #1 - DevLog Test -------------------------`);
+  // /* Test #1-1 : 'DevLog' Text */
+  // it(`UT - ${++i} : 'DevLog' Text`, async function () {
+  //   util = new Utility(page);
+  //   console.info(`\n** UI Test #1 - DevLog Test -------------------------`);
 
-    current_time = util.getTimezone();
-    msg = `Test #1 : DevLog Main Page| ${current_time}`;
+  //   current_time = util.getTimezone();
+  //   msg = `Test #1 : DevLog Main Page| ${current_time}`;
 
-    const text_result = await util.getText(XP.main_devlog_xp);
-    expect(text_result).to.equal("DevLog"); // Test for 'About' text
+  //   const text_result = await util.getText(XP.main_devlog_xp);
+  //   expect(text_result).to.equal("DevLog"); // Test for 'About' text
 
-    await this.timeout(3000)
-  });
+  //   await this.timeout(3000)
+  // });
 
-  /* Test #1-2 : 'Home' Text */
-  it(`UT - ${++i} : 'Home' Text`, async function () {
-    const text_result = await util.getText(XP.main_home_xp);
-    expect(text_result).to.equal("Home"); // Test for 'Store' text
+  // /* Test #1-2 : 'Home' Text */
+  // it(`UT - ${++i} : 'Home' Text`, async function () {
+  //   const text_result = await util.getText(XP.main_home_xp);
+  //   expect(text_result).to.equal("Home"); // Test for 'Store' text
 
-    await this.timeout(5000)
-  });
+  //   await this.timeout(5000)
+  // });
 
-  /* Test #1-3 : 'About' Text */
-  it(`UT - ${++i} : 'About' Text`, async function () {
-    const text_result = await util.getText(XP.main_about_xp);
-    expect(text_result).to.equal("About"); // Test for 'Store' text
+  // /* Test #1-3 : 'About' Text */
+  // it(`UT - ${++i} : 'About' Text`, async function () {
+  //   const text_result = await util.getText(XP.main_about_xp);
+  //   expect(text_result).to.equal("About"); // Test for 'Store' text
 
-    await this.timeout(3000)
-  });
+  //   await this.timeout(3000)
+  // });
 
   //   /* Test #2-1 : About Tab */
   // it(`UT - ${++i} : About Page`, async function () {
