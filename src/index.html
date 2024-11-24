@@ -1,54 +1,95 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Journey</title>
+    <title>DevLog</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-left">
-            <div class="menu-icon">☰</div>
-            <div class="logo">DevLog</div>
+            <div>☰</div>
+            <div>DevLog</div>
         </div>
         <div class="navbar-right">
-            <div class="theme-toggle">
-                <span class="light-mode">☀️</span>
-                <span class="dark-mode" style="display: none;">🌙</span>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search entries">
+                <span class="search-icon">🔍</span>
             </div>
+            <div class="theme-toggle">
+                <span class="light-mode">🌙</span>
+                <span class="dark-mode" style="display:none;">☀️</span>
+            </div>
+            <div class="user-btn">👤</div>
         </div>
     </nav>
 
     <div class="sidebar">
-        <a href="#">Home</a>
-        <a href="#">About</a>
+        <div class="sidebar-links">
+            <a href="#">Home</a>
+            <a href="#">My Documents</a>
+            <a href="#">Templates</a>
+            <a href="#">Settings</a>
+        </div>
     </div>
 
     <div class="overlay"></div>
 
-    <main>
-        <section class="hero-section">
-            <div class="hero-text-container">
-                <h1 class="hero-text">Chronicle your <span class="highlight">code</span> journey.</h1>
-                <h1 class="hero-text">One commit at a time.</h1>
-            </div>
-            <div class="action-container">
-                <a href="new-page/editor.html" class="create-button">
-                    <span class="icon">+</span>
-                    Create New
+    <div class="user-menu">
+        <a href="#" class="block p-2">Profile</a>
+        <a href="#" class="block p-2">Settings</a>
+        <a href="#" class="block p-2">Logout</a>
+    </div>
+
+    <main class="main-content">
+        <div class="hero-text">
+            Chronicle your code journey.<br>
+            One commit at a time.
+        </div>
+
+        <section>
+            <h2 class="section-title">Start a new document</h2>
+            <div class="card-grid">
+                <a href="new-page/editor.html" class="card create-card">
+                    <span class="plus-icon">+</span>
                 </a>
+
+                <div class="card" onclick="createNewTodoFromTemplate()">To-do list</div>
+                <div class="card">Engineering Review Doc</div>
+                <div class="card">Bug - Root Cause Analysis</div>
             </div>
+            <a href="#" class="see-more">see more templates</a>
         </section>
 
-        <section class="entries-section">
-            <div class="entries-grid" id="entries-grid">
-                <!-- Entries will be dynamically inserted here -->
+        <section class="recently-edited">
+            <h2 class="section-title">Recently edited pages</h2>
+            <div id="recently-edited-container" class="card-grid">
+                <div class="card loading">Loading recent entries...</div>
             </div>
+            <button id="see-more-button" style="display: none;">See More</button>
         </section>
     </main>
-
-    <script src="script.js"></script>
     <script src="home.js"></script>
+    <script>
+        async function handleTodoCreation() {
+            try {
+                // Optional: Show loading state
+                // const card = event.currentTarget;
+                // card.style.opacity = '0.7';
+                // card.style.pointerEvents = 'none';
+        
+                await createNewTodoFromTemplate();
+            } catch (error) {
+                console.error('Creation handling error:', error);
+            } finally {
+                // Optional: Reset loading state if needed
+                // const card = event.currentTarget;
+                // card.style.opacity = '1';
+                // card.style.pointerEvents = 'auto';
+            }
+        }
+        </script>
+    <script src="script.js"></script>
 </body>
 </html>

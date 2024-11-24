@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal - DevLog</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .journal-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .journal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .title-input {
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            width: 100%;
+            margin-right: 1rem;
+            background: transparent;
+        }
+
+        .save-button {
+            background: #166534;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .save-button:hover {
+            background: #14532d;
+        }
+
+        .content-area {
+            width: 100%;
+            min-height: 500px;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            resize: vertical;
+            background: transparent;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode .title-input,
+        body.dark-mode .content-area {
+            color: white;
+            border-color: #404040;
+        }
+
+        body.dark-mode .title-input::placeholder,
+        body.dark-mode .content-area::placeholder {
+            color: #9ca3af;
+        }
+
+        .save-status {
+            color: #6b7280;
+            margin-left: 1rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div>☰</div>
+            <div>DevLog</div>
+        </div>
+        <div class="navbar-right">
+            <div>🌙</div>
+            <div>👤</div>
+        </div>
+    </nav>
+
+    <div class="sidebar">
+        <div class="sidebar-links">
+            <a href="/">Home</a>
+            <a href="#">My Documents</a>
+            <a href="#">Templates</a>
+            <a href="#">Settings</a>
+        </div>
+    </div>
+    
+    <div class="overlay"></div>
+
+    <main class="main-content">
+        <div class="journal-container">
+            <div class="journal-header">
+                <input type="text" class="title-input" placeholder="Untitled Journal Entry" id="titleInput">
+                <div style="display: flex; align-items: center;">
+                    <button class="save-button" id="saveButton">
+                        <span>Save</span>
+                    </button>
+                    <span class="save-status" id="saveStatus"></span>
+                </div>
+            </div>
+            <textarea class="content-area" placeholder="Start writing..." id="contentArea"></textarea>
+        </div>
+    </main>
+
+    <script src="/script.js"></script>
+    <script src="/journal.js"></script>
+</body>
+</html>

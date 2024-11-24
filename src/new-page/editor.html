@@ -1,39 +1,32 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Entry | Code Journey</title>
-    <link rel="stylesheet" href="../styles.css">
+    <title>DevLog Editor</title>
     <link rel="stylesheet" href="editor.css">
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-left">
-            <!-- Fixed: Back button path -->
-            <a href="../index.html" class="back-button">←</a>
-            <div class="logo">Your Logo</div>
+            <a href="../index.html" class="back-button">☰</a>
+            <a href="../index.html" class="logo">DevLog</a>
         </div>
         <div class="navbar-right">
             <button class="save-button">Save</button>
-            <div class="theme-toggle">
-                <span class="light-mode">☀️</span>
-                <span class="dark-mode" style="display: none;">🌙</span>
-            </div>
+            <button class="theme-toggle" id="theme-toggle">
+                <span class="theme-icon">☀️</span>
+            </button>
         </div>
     </nav>
 
-    <main class="editor-container">
+    <div class="editor-container">
         <div class="editor-content">
-            <input type="text" id="title-input" class="title-input" placeholder="Enter title...">
-            <textarea id="content-input" class="content-input" placeholder="Start writing your content here..."></textarea>
+            <input type="text" id="title-input" class="title-input" placeholder="Title">
+            <textarea id="content-input" class="content-input" placeholder="Write your thoughts..."></textarea>
         </div>
-    </main>
+    </div>
 
-    <script src="editor-script.js"></script>
-
-    <!-- Fixed: Script paths -->
-    <script src="../script.js"></script>
     <script src="editor.js"></script>
 </body>
 </html>

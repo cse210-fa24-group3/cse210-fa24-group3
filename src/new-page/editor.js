@@ -1,12 +1,37 @@
-// DOM Elements
 const titleInput = document.getElementById('title-input');
 const contentInput = document.getElementById('content-input');
+const saveButton = document.querySelector('.save-button');
+const themeToggle = document.getElementById('theme-toggle');
+const themeIcon = document.querySelector('.theme-icon');
 
-// Save function for both auto-save and manual save
-function saveContent(isAutoSave = false) {
+// Theme handling
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+}
+
+function updateThemeIcon(theme) {
+    themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+// Initialize theme
+initializeTheme();
+themeToggle.addEventListener('click', toggleTheme);
+
+async function saveContent(isAutoSave = false) {
     const title = titleInput.value.trim();
     const content = contentInput.value.trim();
-    
+
     if (!title && !content) return;
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -14,119 +39,90 @@ function saveContent(isAutoSave = false) {
     const timestamp = new Date().toISOString();
 
     const entry = {
-        id: editingId || crypto.randomUUID(),
+        id: editingId || Date.now().toString(),
         title: title || 'Untitled',
         content,
-        createdAt: timestamp,
-        updatedAt: timestamp
+        created_at: editingId ? undefined : timestamp,
+        updated_at: timestamp
     };
 
-    // Get existing entries
-    const entries = JSON.parse(localStorage.getItem('entries') || '[]');
-    
-    if (editingId) {
-        // Update existing entry
-        const index = entries.findIndex(e => e.id === editingId);
-        if (index !== -1) {
-            entry.createdAt = entries[index].createdAt;
-            entries[index] = entry;
+    try {
+        const url = editingId 
+            ? `http://localhost:3000/api/entries/${editingId}`
+            : 'http://localhost:3000/api/entries';
+
+        const response = await fetch(url, {
+            method: editingId ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(entry),
+        });
+
+        if (!response.ok) throw new Error('Failed to save entry');
+
+        showNotification(isAutoSave ? 'Auto-saved!' : 'Saved successfully!', 'success');
+
+        if (!isAutoSave) {
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 1000);
         }
-    } else {
-        // Add new entry
-        entries.unshift(entry);
+    } catch (error) {
+        console.error('Error saving entry:', error);
+        showNotification('Failed to save entry', 'error');
     }
+}
+
+function showNotification(message, type = 'success') {
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.className = `notification ${type}`;
     
-    localStorage.setItem('entries', JSON.stringify(entries));
-
-    if (!isAutoSave) {
-        // Show success message and redirect
-        const message = document.createElement('div');
-        message.textContent = 'Saved successfully!';
-        message.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: var(--olive-green);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 4px;
-            animation: fadeIn 0.3s ease;
-        `;
-        document.body.appendChild(message);
-        setTimeout(() => message.remove(), 2000);
-
-        // Fixed: Use absolute path to return to main page
-        setTimeout(() => {
-            window.location.href = '../index.html';
-        }, 1000);
-    }
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.remove(), 2000);
 }
 
-// Auto-save functionality
-let autoSaveTimeout;
-function setupAutoSave() {
-    const handleInput = () => {
-        clearTimeout(autoSaveTimeout);
-        autoSaveTimeout = setTimeout(() => {
-            saveContent(true);
-        }, 2000);
-    };
-
-    titleInput.addEventListener('input', handleInput);
-    contentInput.addEventListener('input', handleInput);
-}
-
-// Save button click handler
-function setupSaveButton() {
-    const saveButton = document.querySelector('.save-button');
-    if (saveButton) {
-        saveButton.addEventListener('click', () => saveContent(false));
-    }
-}
-
-// Load existing entry or draft content
-function loadContent() {
+async function loadEntry() {
     const urlParams = new URLSearchParams(window.location.search);
     const editingId = urlParams.get('id');
-    
-    if (editingId) {
-        const entries = JSON.parse(localStorage.getItem('entries') || '[]');
-        const entry = entries.find(e => e.id === editingId);
+
+    if (!editingId) {
+        titleInput.value = '';
+        contentInput.value = '';
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/entries/${editingId}`);
+        if (!response.ok) {
+            throw new Error(`Failed to load entry: ${response.status}`);
+        }
+
+        const entry = await response.json();
         
-        if (entry) {
-            titleInput.value = entry.title;
-            contentInput.value = entry.content;
-        }
-    } else {
-        // Check for draft content
-        const draftContent = localStorage.getItem('draftContent');
-        if (draftContent) {
-            const { title, content } = JSON.parse(draftContent);
-            titleInput.value = title || '';
-            contentInput.value = content || '';
-            localStorage.removeItem('draftContent');
-        }
+        titleInput.value = entry.title || '';
+        contentInput.value = entry.content || '';
+        
+        document.title = `Editing: ${entry.title || 'Untitled'} | Code Journey`;
+        
+        const editorContainer = document.querySelector('.editor-container');
+        editorContainer.classList.add('editing-existing');
+        
+    } catch (error) {
+        console.error('Error loading entry:', error);
+        showNotification('Failed to load entry', 'error');
+        
+        setTimeout(() => {
+            window.location.href = '../index.html';
+        }, 2000);
     }
 }
 
-// Save draft before unloading
-function setupBeforeUnload() {
-    window.addEventListener('beforeunload', () => {
-        const title = titleInput.value.trim();
-        const content = contentInput.value.trim();
-        if (title || content) {
-            localStorage.setItem('draftContent', JSON.stringify({ title, content }));
-        }
-    });
-}
-
-// Initialize all functionality
-function init() {
-    setupAutoSave();
-    setupSaveButton();
-    loadContent();
-    setupBeforeUnload();
-}
-
-// Start the application
-init();
+// Event Listeners
+saveButton.addEventListener('click', () => saveContent(false));
+window.addEventListener('load', loadEntry);
