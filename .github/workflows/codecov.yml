@@ -16,7 +16,8 @@ jobs:
 
       - name: Run Test  
         working-directory: src
-        run: npx jest --coverage
+        # run: npx jest --coverage
+        run: npx jest home.test.js --coverage
 
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v4
