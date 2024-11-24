@@ -1,4 +1,4 @@
-name: Run Unit Tests and Upload Results
+name: Code Coverage
 
 on:
   pull_request:
@@ -45,7 +45,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: /**/coverage/clover.xml
+          files: src/coverage/clover.xml
           flags: unittests
 
       # Step 6: Upload JUnit test results to Codecov
@@ -54,4 +54,4 @@ jobs:
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: /**/junit.xml
+          files: src/junit.xml
