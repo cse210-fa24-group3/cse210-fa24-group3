@@ -196,3 +196,19 @@
     - 1 min FE / Pipeline / Testing
     - We need 'some' features working.
         - To-do List, Create new document, Navigation bar
+    - Video Talking Points
+        - Home page
+        - Light/dark mode
+        - Create new, fill in and save
+        - Recently viewed + edit recent
+        - Templates (todo, … )
+        - Pipeline review
+        - Health of team/Git processes
+        - Challenges so far 
+        - Preview of next sprint (new templates, hosting backend, light/dark mode fine tuning, etc...)
+
+- Challenges
+    - Issues with hosting/no free hosting for the backend that results in issues for the pipeline
+    - Merge conflicts - after new features are developed
+    - Tight deadlines
+    - 
