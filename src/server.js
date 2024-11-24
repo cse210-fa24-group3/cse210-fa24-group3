@@ -380,10 +380,6 @@ app.get('/editor', (req, res) => {
     res.sendFile(path.join(__dirname, 'new-page', 'editor.html'));
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
-
 app.get('/todo/:id', (req, res) => {
     console.log('Loading todo with ID:', req.params.id);
     // Use absolute path to todo.html
