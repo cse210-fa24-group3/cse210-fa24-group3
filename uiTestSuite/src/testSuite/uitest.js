@@ -18,7 +18,7 @@ describe("UI Test", function () {
   let msg;
   let current_time;
 
-  let util = new Utility(page);
+  // let util = new Utility(page);
   // let LP = new LoginPage(page);
   let XP = new xp(page);
 
@@ -27,13 +27,18 @@ describe("UI Test", function () {
   before(async function () {
     // console.info("before")
     browser = await puppeteer.launch({
-      headless: false,  // true: run test without window opening / false: window opens
+      headless: true,  // true: run test without window opening / false: window opens
       args: ["--no-sandbox", defaultSetting.WINODW_SIZE_UITEST],
       slowMo: 30, // 30ms delay
     });
     page = await browser.newPage();
     // page.setDefaultTimeout(150000);
     page.setDefaultNavigationTimeout(0);
+    console.log("Page object:", page);
+    console.log("Available methods on page:", Object.keys(page));
+    console.log("Testing page.$x method:", typeof page.$x === "function");
+
+    util = new Utility(page);
     await page.setViewport({
       width: defaultSetting.WIDTH_UITEST,
       height: defaultSetting.HEIGHT_UITEST,
@@ -43,7 +48,7 @@ describe("UI Test", function () {
     console.info(`* Starting UI Test`);
     // util = new Utility(page);
     current_time = util.getTimezone();
-
+  
     // this.timeout(0);
     // done();
   });
@@ -117,20 +122,18 @@ describe("UI Test", function () {
     let util = new Utility(page);
     current_time = util.getTimezone();
 
-
-
-    await page.waitForTimeout(2000);
-    await page.close();
-    await browser.close();
-
     // Save mochawesome report 
     console.log("Generating Mochawesome report...");
     const { generate } = require("mochawesome-report-generator");
     await generate({
       reportDir: "mochawesome-report",
-      reportFilename: "index",
+      reportFilename: "uitest-result",
     });
 
+    await page.waitForTimeout(2000);
+    await page.close();
+    await browser.close();
     // done();
+
   });
 });

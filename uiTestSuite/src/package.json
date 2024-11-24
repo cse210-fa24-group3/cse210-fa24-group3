@@ -11,7 +11,7 @@
     "puppeteer-cluster": "^0.23.0"
   },
   "scripts": {
-    "uitest": "mocha --timeout 300000 --reporter mochawesome --reporter-options reportDir=mochawesome-report,reportFilename=index,overwrite=true,html=true,json=true testSuite/uitest.js"
+    "uitest": "mocha --timeout 300000 --reporter mochawesome --reporter-options reportDir=mochawesome-report,reportFilename=uitest_result,overwrite=true,html=true,json=true testSuite/uitest.js"
   },
   "devDependencies": {
     "chai": "^5.1.2",
