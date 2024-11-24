@@ -187,7 +187,7 @@
 
 - Updates
     - Major updates done / Page Journal done / Bug review page almost done / Entries -> Documents / Work on Template format / Issues with merging branches / 'Recently added pages' - done
-    - Code Coverage test (CodeCov) - fixing issues with setting up the CI run.
+    - Code Coverage test (CodeCov) - fixing issues with setting up the CI run. - FIXED
     - UI Test - html report generation ongoing / Test cases sheet - updating
  
 - Issues
