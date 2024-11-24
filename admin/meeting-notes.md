@@ -160,7 +160,7 @@
     - Worked on generating an HTML report.
 
 - Aryan:
-  
+    - Added Code Coverage to the repo -working on jsdocs 
 
 - Keqian:
     - Created a template for feature specifications and meeting minutes, aligned with Figma designs.
