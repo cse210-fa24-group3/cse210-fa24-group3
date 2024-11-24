@@ -1,18 +1,37 @@
 const titleInput = document.getElementById('title-input');
 const contentInput = document.getElementById('content-input');
+const saveButton = document.querySelector('.save-button');
+const themeToggle = document.getElementById('theme-toggle');
+const themeIcon = document.querySelector('.theme-icon');
 
-let autoSaveTimeout;
-const autoSave = () => {
-    clearTimeout(autoSaveTimeout);
-    autoSaveTimeout = setTimeout(() => {
-        saveContent(true);
-    }, 2000);
-};
+// Theme handling
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+}
 
-const saveContent = async (isAutoSave = false) => {
+function updateThemeIcon(theme) {
+    themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+// Initialize theme
+initializeTheme();
+themeToggle.addEventListener('click', toggleTheme);
+
+async function saveContent(isAutoSave = false) {
     const title = titleInput.value.trim();
     const content = contentInput.value.trim();
-    
+
     if (!title && !content) return;
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -20,10 +39,10 @@ const saveContent = async (isAutoSave = false) => {
     const timestamp = new Date().toISOString();
 
     const entry = {
-        id: editingId || crypto.randomUUID(),
+        id: editingId || Date.now().toString(),
         title: title || 'Untitled',
         content,
-        created_at: timestamp,
+        created_at: editingId ? undefined : timestamp,
         updated_at: timestamp
     };
 
@@ -31,124 +50,79 @@ const saveContent = async (isAutoSave = false) => {
         const url = editingId 
             ? `http://localhost:3000/api/entries/${editingId}`
             : 'http://localhost:3000/api/entries';
-        
-        const method = editingId ? 'PUT' : 'POST';
-        const body = editingId ? { 
-            title: entry.title, 
-            content: entry.content, 
-            updated_at: entry.updated_at 
-        } : entry;
-        
+
         const response = await fetch(url, {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
+            method: editingId ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(entry),
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to save entry');
-        }
+        if (!response.ok) throw new Error('Failed to save entry');
+
+        showNotification(isAutoSave ? 'Auto-saved!' : 'Saved successfully!', 'success');
 
         if (!isAutoSave) {
-            const message = document.createElement('div');
-            message.textContent = 'Saved successfully!';
-            message.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background-color: var(--olive-green);
-                color: white;
-                padding: 1rem 2rem;
-                border-radius: 4px;
-                animation: fadeIn 0.3s ease;
-            `;
-            document.body.appendChild(message);
-            setTimeout(() => message.remove(), 2000);
-
             setTimeout(() => {
                 window.location.href = '../index.html';
             }, 1000);
         }
     } catch (error) {
         console.error('Error saving entry:', error);
-        const message = document.createElement('div');
-        message.textContent = 'Failed to save entry';
-        message.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #ff4444;
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 4px;
-            animation: fadeIn 0.3s ease;
-        `;
-        document.body.appendChild(message);
-        setTimeout(() => message.remove(), 2000);
+        showNotification('Failed to save entry', 'error');
     }
 }
 
-window.addEventListener('load', async () => {
+function showNotification(message, type = 'success') {
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.className = `notification ${type}`;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.remove(), 2000);
+}
+
+async function loadEntry() {
     const urlParams = new URLSearchParams(window.location.search);
     const editingId = urlParams.get('id');
-    
-    if (editingId) {
-        try {
-            const response = await fetch(`http://localhost:3000/api/entries/${editingId}`);
-            if (!response.ok) throw new Error('Entry not found');
-            
-            const entry = await response.json();
-            
-            // Add to recently viewed
-            addToRecentlyViewed(editingId);
-            
-            // Populate the editor
-            document.getElementById('title-input').value = entry.title;
-            document.getElementById('content-input').value = entry.content;
-            
-        } catch (error) {
-            console.error('Error loading entry:', error);
-            const message = document.createElement('div');
-            message.textContent = 'Failed to load entry';
-            message.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background-color: #ff4444;
-                color: white;
-                padding: 1rem 2rem;
-                border-radius: 4px;
-                animation: fadeIn 0.3s ease;
-            `;
-            document.body.appendChild(message);
-            setTimeout(() => message.remove(), 2000);
-        }
-    }
-});
 
-function addToRecentlyViewed(entryId) {
-    if (!entryId) return;
-    
+    if (!editingId) {
+        titleInput.value = '';
+        contentInput.value = '';
+        return;
+    }
+
     try {
-        let recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+        const response = await fetch(`http://localhost:3000/api/entries/${editingId}`);
+        if (!response.ok) {
+            throw new Error(`Failed to load entry: ${response.status}`);
+        }
+
+        const entry = await response.json();
         
-        // Remove if already exists
-        recentlyViewed = recentlyViewed.filter(id => id !== entryId);
+        titleInput.value = entry.title || '';
+        contentInput.value = entry.content || '';
         
-        // Add to the beginning
-        recentlyViewed.unshift(entryId);
+        document.title = `Editing: ${entry.title || 'Untitled'} | Code Journey`;
         
-        // Keep only the last 3 entries
-        recentlyViewed = recentlyViewed.slice(0, 3);
+        const editorContainer = document.querySelector('.editor-container');
+        editorContainer.classList.add('editing-existing');
         
-        localStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewed));
     } catch (error) {
-        console.error('Error updating recently viewed entries:', error);
+        console.error('Error loading entry:', error);
+        showNotification('Failed to load entry', 'error');
+        
+        setTimeout(() => {
+            window.location.href = '../index.html';
+        }, 2000);
     }
 }
 
-titleInput.addEventListener('input', autoSave);
-contentInput.addEventListener('input', autoSave);
+// Event Listeners
 saveButton.addEventListener('click', () => saveContent(false));
+window.addEventListener('load', loadEntry);
