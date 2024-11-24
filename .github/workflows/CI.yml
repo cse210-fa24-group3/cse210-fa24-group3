@@ -26,20 +26,33 @@ jobs:
         with:
           node-version: 18
 
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.11
       # Step 3: Install dependencies in `src`
+      # - name: Install dependencies
+      #   working-directory: src
+      #   run: |
+      #     npm install
+      #     npm install --save-dev jest jest-junit
+
+      # # Step 4: Run Jest tests with coverage and JUnit report
+      # - name: Run Jest tests
+      #   working-directory: src
+      #   run: |
+      #     mkdir -p reports
+      #     JEST_JUNIT_OUTPUT="junit.xml" npx jest --coverage --reporters=default --reporters=jest-junit
       - name: Install dependencies
         working-directory: src
         run: |
-          npm install
-          npm install --save-dev jest jest-junit
-
-      # Step 4: Run Jest tests with coverage and JUnit report
-      - name: Run Jest tests
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Test with pytest
         working-directory: src
         run: |
-          mkdir -p reports
-          JEST_JUNIT_OUTPUT="junit.xml" npx jest --coverage --reporters=default --reporters=jest-junit
-
+          pytest --cov --junitxml=junit.xml
       # Step 5: Upload coverage to Codecov
       # - name: Upload coverage to Codecov
       #   uses: codecov/codecov-action@v4
