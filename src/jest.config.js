@@ -1,7 +1,7 @@
 module.exports = {
     testEnvironment: "jest-environment-jsdom", // For DOM-based tests
     roots: ["<rootDir>/"], // Root directory of your project
-    testMatch: ["**/__tests__/**/*.test.js", "**/?(*.)+(spec|test).[jt]s?(x)"], // Test file patterns
+    testMatch: ["**/__tests__/*.test.js", "**/?(*.)+(spec|test).[jt]s?(x)"], // Test file patterns
     testPathIgnorePatterns: ["/node_modules/", "/dist/"], // Ignore node_modules and dist folders
   
     // Collect coverage information
@@ -12,7 +12,7 @@ module.exports = {
       "!**/node_modules/**", // Exclude node_modules
       "!**/dist/**", // Exclude dist folder
       "**/home.js", // Exclude home.js globally
-      "**/script.js"
+      "!**/script.js"
     ],
     coverageDirectory: "<rootDir>/coverage", // Output directory for coverage reports
     coverageReporters: ["lcov", "text", "clover"], // Report formats
