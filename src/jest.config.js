@@ -5,9 +5,9 @@ module.exports = {
     testPathIgnorePatterns: ["/node_modules/", "/dist/"],
     collectCoverage: true,
     collectCoverageFrom: [
-      "src/**/*.{js,jsx}",
-      "!src/**/*.d.ts",
-      "!src/__tests__/**",
+      "/**/*.{js,jsx}",
+      "/**/*.d.ts",
+      "/__tests__/**",
     ],
     coverageDirectory: "<rootDir>/coverage",
     reporters: [
