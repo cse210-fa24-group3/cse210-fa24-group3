@@ -56,4 +56,4 @@ function displayEntries() {
 }
 
 // Initial load of entries
-displayEntries();
+// displayEntries();
