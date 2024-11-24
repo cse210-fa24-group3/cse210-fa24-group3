@@ -21,58 +21,11 @@ console.log('Server running from directory:', __dirname);
 const ENTRIES_FILE = path.join(__dirname, 'entries.json');
 
 // Database setup
-const db = new sqlite3.Database(path.join(__dirname, 'devlog.db'), (err) => {
-    if (err) {
-        console.error('Error opening database:', err);
-    } else {
-        console.log('Connected to SQLite database');
-        // Create entries table if it doesn't exist
-        db.run(`
-            CREATE TABLE IF NOT EXISTS entries (
-                id TEXT PRIMARY KEY,
-                title TEXT NOT NULL,
-                content TEXT,
-                created_at TEXT NOT NULL,
-                updated_at TEXT NOT NULL
-            )
-        `);
-    }
-});
+const db = new sqlite3.Database(':memory:');
 
+// Initialize database
 db.serialize(() => {
-    // Existing entries table
-    db.run(`
-        CREATE TABLE IF NOT EXISTS entries (
-            id TEXT PRIMARY KEY,
-            title TEXT NOT NULL,
-            content TEXT,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
-        )
-    `);
-
-    // New documents table for todo lists
-    db.run(`
-        CREATE TABLE IF NOT EXISTS documents (
-            id TEXT PRIMARY KEY,
-            title TEXT NOT NULL,
-            content TEXT NOT NULL,
-            template_type TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
-        )
-    `);
-
-    // New history table for tracking document changes
-    db.run(`
-        CREATE TABLE IF NOT EXISTS history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            document_id TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL,
-            FOREIGN KEY (document_id) REFERENCES documents(id)
-        )
-    `);
+    db.run("CREATE TABLE entries (id TEXT PRIMARY KEY, title TEXT, content TEXT, created_at TEXT, updated_at TEXT)");
 });
 
 // Helper function to export DB entries to JSON
@@ -102,113 +55,54 @@ app.use((req, res, next) => {
 // API Routes
 // Get all entries
 app.get('/api/entries', (req, res) => {
-    db.all('SELECT * FROM entries ORDER BY created_at DESC', [], (err, rows) => {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : null;
+    let sql = 'SELECT * FROM entries ORDER BY updated_at DESC';
+    if (limit) {
+        sql += ` LIMIT ${limit}`;
+    }
+    db.all(sql, [], (err, rows) => {
         if (err) {
-            res.status(500).json({ error: err.message });
-            return;
+            return res.status(500).json({ error: err.message });
         }
         res.json(rows);
     });
 });
 
-// Get single entry
-app.get('/api/entries/:id', (req, res) => {
-    db.get('SELECT * FROM entries WHERE id = ?', [req.params.id], (err, row) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        if (!row) {
-            res.status(404).json({ error: 'Entry not found' });
-            return;
-        }
-        res.json(row);
-    });
-});
-
-// Create new entry
 app.post('/api/entries', (req, res) => {
     const { id, title, content, created_at, updated_at } = req.body;
-    db.run(
-        'INSERT INTO entries (id, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
-        [id, title, content, created_at, updated_at],
-        async function(err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
-            // Export to JSON after successful insert
-            try {
-                await exportToJson();
-                res.json({ id, message: 'Entry created successfully' });
-            } catch (error) {
-                console.error('Error exporting to JSON:', error);
-                // Still return success since DB operation worked
-                res.json({ id, message: 'Entry created successfully (JSON export failed)' });
-            }
-        }
-    );
-});
 
-// Update entry
-app.put('/api/entries/:id', (req, res) => {
-    const { title, content, updated_at } = req.body;
-    db.run(
-        'UPDATE entries SET title = ?, content = ?, updated_at = ? WHERE id = ?',
-        [title, content, updated_at, req.params.id],
-        async function(err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
-            if (this.changes === 0) {
-                res.status(404).json({ error: 'Entry not found' });
-                return;
-            }
-            // Export to JSON after successful update
-            try {
-                await exportToJson();
-                res.json({ message: 'Entry updated successfully' });
-            } catch (error) {
-                console.error('Error exporting to JSON:', error);
-                // Still return success since DB operation worked
-                res.json({ message: 'Entry updated successfully (JSON export failed)' });
-            }
-        }
-    );
-});
-
-// Delete entry
-app.delete('/api/entries/:id', (req, res) => {
-    db.run('DELETE FROM entries WHERE id = ?', [req.params.id], async function(err) {
+    db.get('SELECT id FROM entries WHERE id = ?', [id], async (err, row) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        if (this.changes === 0) {
-            res.status(404).json({ error: 'Entry not found' });
+        if (row) {
+            res.status(400).json({ error: 'Entry with the same ID already exists' });
             return;
         }
-        // Export to JSON after successful delete
-        try {
-            await exportToJson();
-            res.json({ message: 'Entry deleted successfully' });
-        } catch (error) {
-            console.error('Error exporting to JSON:', error);
-            // Still return success since DB operation worked
-            res.json({ message: 'Entry deleted successfully (JSON export failed)' });
-        }
+
+        db.run(
+            'INSERT INTO entries (id, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
+            [id, title, content, created_at, updated_at],
+            async function(err) {
+                if (err) {
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
+
+                try {
+                    await exportToJson();
+                    res.json({ id, message: 'Entry created successfully' });
+                } catch (error) {
+                    res.status(500).json({ message: 'Entry created in database but JSON export failed' });
+                }
+            }
+        );
     });
 });
 
-// Export entries to JSON file manually
-app.post('/api/export', async (req, res) => {
-    try {
-        await exportToJson();
-        res.json({ message: 'Entries exported to JSON successfully' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
 });
 
 // Import entries from JSON file

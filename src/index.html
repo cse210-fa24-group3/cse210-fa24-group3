@@ -14,11 +14,14 @@
         </div>
         <div class="navbar-right">
             <div class="search-container">
-                <input type="text" class="search-input" placeholder="Hinted search text">
+                <input type="text" class="search-input" placeholder="Search entries">
                 <span class="search-icon">🔍</span>
             </div>
-            <div>🌙</div>
-            <div>👤</div>
+            <div class="theme-toggle">
+                <span class="light-mode">🌙</span>
+                <span class="dark-mode" style="display:none;">☀️</span>
+            </div>
+            <div class="user-btn">👤</div>
         </div>
     </nav>
 
@@ -30,22 +33,21 @@
             <a href="#">Settings</a>
         </div>
     </div>
-    
+
     <div class="overlay"></div>
-    
+
     <div class="user-menu">
         <a href="#" class="block p-2">Profile</a>
         <a href="#" class="block p-2">Settings</a>
         <a href="#" class="block p-2">Logout</a>
     </div>
 
-
     <main class="main-content">
         <div class="hero-text">
             Chronicle your code journey.<br>
             One commit at a time.
         </div>
-    
+
         <section>
             <h2 class="section-title">Start a new document</h2>
             <div class="card-grid">
@@ -59,32 +61,13 @@
             </div>
             <a href="#" class="see-more">see more templates</a>
         </section>
-    
-        <section>
+
+        <section class="recently-edited">
             <h2 class="section-title">Recently edited pages</h2>
-            <div class="card-grid">
-                <div class="card">
-                    <div class="card-title">CSE 210: To-do</div>
-                    <div class="card-author">John Doe</div>
-                    <div class="card-date">11/05/24 01:21 PM</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Minutes of meeting</div>
-                    <div class="card-author">John Doe</div>
-                    <div class="card-date">10/31/24 11:23 PM</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Bug #345: Root Cause</div>
-                    <div class="card-author">John Doe</div>
-                    <div class="card-date">10/31/24 11:23 PM</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">CSE 210: To-do</div>
-                    <div class="card-author">John Doe</div>
-                    <div class="card-date">11/05/24 01:21 PM</div>
-                </div>
+            <div id="recently-edited-container" class="card-grid">
+                <div class="card loading">Loading recent entries...</div>
             </div>
-            <a href="#" class="see-more">see more</a>
+            <button id="see-more-button" style="display: none;">See More</button>
         </section>
     </main>
     <script>
@@ -107,7 +90,5 @@
         }
         </script>
     <script src="script.js"></script>
-</body>
-</html>
 </body>
 </html>

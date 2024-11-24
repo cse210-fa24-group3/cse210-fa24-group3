@@ -1,34 +1,70 @@
-document.addEventListener('DOMContentLoaded', async () => {
-    const recentlyViewedGrid = document.getElementById('recently-viewed-grid');
+// recently-viewed.js
 
-    async function loadRecentlyViewed() {
-        try {
-            const response = await fetch('http://localhost:3000/api/recently-viewed');
-            if (!response.ok) {
-                throw new Error('Failed to fetch recently viewed entries');
-            }
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
 
-            const entries = await response.json();
+function createEntryCard(entry) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+        <div class="card-content">
+            <h3 class="card-title">${entry.title}</h3>
+            <div class="card-meta">
+                <span class="card-author">${entry.author}</span>
+                <span class="card-date">${formatDate(entry.lastEdited)}</span>
+            </div>
+        </div>
+    `;
+    
+    card.addEventListener('click', () => {
+        window.location.href = `/new-page/editor.html?id=${entry.id}`;
+    });
+    
+    return card;
+}
 
-            if (entries.length === 0) {
-                recentlyViewedGrid.innerHTML = '<div class="no-entries">No recently viewed entries</div>';
-                return;
-            }
-
-            recentlyViewedGrid.innerHTML = entries.map(entry => `
-                <div class="entry-tile recently-viewed" onclick="window.location.href='new-page/editor.html?id=${entry.id}'">
-                    <h3 class="entry-title">${entry.title || 'Untitled'}</h3>
-                    <p class="entry-preview">${entry.content?.substring(0, 150) || 'No content'}...</p>
-                    <div class="entry-meta">
-                        Viewed: ${new Date(entry.viewed_at).toLocaleString()}
-                    </div>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Error loading recently viewed entries:', error);
-            recentlyViewedGrid.innerHTML = '<div class="no-entries">Failed to load recently viewed entries</div>';
-        }
+function displayRecentlyEdited() {
+    const grid = document.getElementById('recently-edited-grid');
+    const recentlyEdited = JSON.parse(localStorage.getItem('recentlyEdited') || '[]');
+    
+    if (recentlyEdited.length === 0) {
+        grid.innerHTML = `
+            <div class="no-entries">
+                No recently edited entries.
+            </div>
+        `;
+        return;
     }
+    
+    grid.innerHTML = '';
+    recentlyEdited.forEach(entry => {
+        grid.appendChild(createEntryCard(entry));
+    });
+}
 
-    loadRecentlyViewed();
+// Initialize dark mode
+function initThemeToggle() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const storedTheme = localStorage.getItem('theme') || 'light';
+    document.body.classList.toggle('dark-mode', storedTheme === 'dark');
+    
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const newTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+        localStorage.setItem('theme', newTheme);
+    });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    displayRecentlyEdited();
+    initThemeToggle();
 });
