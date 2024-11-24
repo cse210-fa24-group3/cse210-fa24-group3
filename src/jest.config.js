@@ -16,6 +16,8 @@ module.exports = {
       [
         "jest-junit",
         {
+          collectCoverage: true,
+          coverageReporters: ['lcov', 'text', 'clover'],
           outputDirectory: "reports", // Directory for JUnit XML report
           outputName: "junit.xml", // File name for the report
           classNameTemplate: "{filepath}", // Use file path as classname
