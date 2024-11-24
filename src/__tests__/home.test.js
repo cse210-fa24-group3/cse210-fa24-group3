@@ -1,3 +1,11 @@
-<testsuite name="Home Component Tests" tests="1" failures="0">
-  <testcase classname="src/__tests__/home.test.js" name="renders home component" time="0.01"/>
-</testsuite>
+const { truncateText } = require('../home');
+
+describe('truncateText', () => {
+  test('returns full text if shorter than maxLength', () => {
+    expect(truncateText('Short text', 20)).toBe('Short text');
+  });
+
+  test('truncates text and adds ellipsis if longer than maxLength', () => {
+    expect(truncateText('This is a long text', 10)).toBe('This is...');
+  });
+});
