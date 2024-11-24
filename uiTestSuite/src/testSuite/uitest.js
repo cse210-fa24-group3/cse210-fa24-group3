@@ -117,11 +117,19 @@ describe("UI Test", function () {
     let util = new Utility(page);
     current_time = util.getTimezone();
 
-    // TODO: Save mochawesome report 
+
 
     await page.waitForTimeout(2000);
     await page.close();
     await browser.close();
+
+    // Save mochawesome report 
+    console.log("Generating Mochawesome report...");
+    const { generate } = require("mochawesome-report-generator");
+    await generate({
+      reportDir: "mochawesome-report",
+      reportFilename: "index",
+    });
 
     // done();
   });
