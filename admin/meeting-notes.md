@@ -160,7 +160,8 @@
     - Worked on generating an HTML report.
 
 - Aryan:
-    - Added Code Coverage to the repo -working on jsdocs 
+    - Added Code Coverage to the repo
+    - working on jsdocs 
 
 - Keqian:
     - Created a template for feature specifications and meeting minutes, aligned with Figma designs.
@@ -180,3 +181,18 @@
     - Displayed the top three recently viewed documents on the homepage.
     - Planned to work on a separate page for the recently viewed documents.
 
+## 11/22/2024
+- Tasks progress + Video check-in discussion
+- Attended by: Amy, Andrew, Aryan, Keqian, Krithika, Sneha, Venu
+
+- Updates
+    - Major updates done / Page Journal done / Bug review page almost done / Entries -> Documents / Work on Template format / Issues with merging branches / 'Recently added pages' - done
+    - Code Coverage test (CodeCov) - fixing issues with setting up the CI run.
+    - UI Test - html report generation ongoing / Test cases sheet - updating
+ 
+- Issues
+
+- Video Demo (< 4 mins)
+    - 1 min FE / Pipeline / Testing
+    - We need 'some' features working.
+        - To-do List, Create new document, Navigation bar
