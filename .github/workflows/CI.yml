@@ -1,0 +1,37 @@
+name: Code Coverage
+
+on:
+  pull_request:
+    branches:
+      - main  
+
+jobs:
+  lint:
+    name: Run Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        working-directory: src
+        run: |
+          npm install
+          npm install --save-dev jest-environment-jsdom
+
+      - name: Run Test  
+        working-directory: src
+        # run: npx jest --coverage
+        run: npx jest home.test.js --coverage
+
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
