@@ -1,0 +1,13 @@
+comment: false  # Disable PR comments if you only want commit status checks
+
+coverage:
+  status:
+    project:
+      default:
+        threshold: 1%  # Fail if coverage drops by more than 1%
+    patch:
+      default:
+        target: auto  # Target coverage is auto-calculated for the patch
+    changes:
+      default:
+        threshold: 0.1%  # Fail if changes reduce coverage by more than 0.1%
