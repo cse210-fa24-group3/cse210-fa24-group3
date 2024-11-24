@@ -40,19 +40,19 @@ function displayEntries() {
     const entriesGrid = document.getElementById('entries-grid');
     const entries = JSON.parse(localStorage.getItem('entries') || '[]');
 
-    if (entries.length === 0) {
-        entriesGrid.innerHTML = `
-            <div class="no-entries">
-                No entries yet. Click "Create New" to get started!
-            </div>
-        `;
-        return;
-    }
+    // if (entries.length === 0) {
+    //     entriesGrid.innerHTML = `
+    //         <div class="no-entries">
+    //             No entries yet. Click "Create New" to get started!
+    //         </div>
+    //     `;
+    //     return;
+    // }
 
-    entriesGrid.innerHTML = '';
-    entries.forEach(entry => {
-        entriesGrid.appendChild(createEntryTile(entry));
-    });
+    // entriesGrid.innerHTML = '';
+    // entries.forEach(entry => {
+    //     entriesGrid.appendChild(createEntryTile(entry));
+    // });
 }
 
 // Initial load of entries
