@@ -93,3 +93,34 @@ document.addEventListener('click', (e) => {
         userMenu.classList.remove('active');
     }
 });
+
+async function createNewTodoFromTemplate() {
+    try {
+        console.log('Starting todo creation...');
+        
+        const response = await fetch('/api/documents/new-todo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Response received:', response);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success && data.documentId) {
+            console.log('Redirecting to todo with ID:', data.documentId);
+            window.location.href = `/todo/${data.documentId}`;
+        } else {
+            throw new Error('Failed to get document ID');
+        }
+    } catch (error) {
+        console.error('Error creating todo:', error);
+    }
+}
+
+document.querySelector('.create-card').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '/journal';
+});

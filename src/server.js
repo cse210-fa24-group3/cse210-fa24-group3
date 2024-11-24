@@ -12,7 +12,10 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from the src directory
-app.use(express.static(path.join(__dirname)));
+// app.use(express.static(path.join(__dirname)));
+app.use(express.static(__dirname));
+
+console.log('Server running from directory:', __dirname);
 
 // Path to the entries.json file
 const ENTRIES_FILE = path.join(__dirname, 'entries.json');
@@ -89,6 +92,12 @@ async function exportToJson() {
         });
     });
 }
+
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
+
 
 // API Routes
 // Get all entries
@@ -257,17 +266,19 @@ app.get('/api/documents', (req, res) => {
 
 // Get single document
 app.get('/api/documents/:id', (req, res) => {
-    console.log('Received PUT request for document:', req.params.id, req.body);
+    const { id } = req.params;
+    console.log('Fetching document:', id);
     
-    db.get('SELECT * FROM documents WHERE id = ?', [req.params.id], (err, row) => {
+    db.get('SELECT * FROM documents WHERE id = ?', [id], (err, row) => {
         if (err) {
-            res.status(500).json({ error: err.message });
-            return;
+            console.error('Database error:', err);
+            return res.status(500).json({ error: err.message });
         }
         if (!row) {
-            res.status(404).json({ error: 'Document not found' });
-            return;
+            console.log('Document not found:', id);
+            return res.status(404).json({ error: 'Document not found' });
         }
+        console.log('Found document:', row);
         res.json(row);
     });
 });
@@ -316,6 +327,74 @@ app.post('/api/documents', (req, res) => {
                                 success: true, 
                                 documentId: id,
                                 message: 'Document created successfully' 
+                            });
+                        });
+                    }
+                );
+            }
+        );
+    });
+});
+
+app.post('/api/documents/new-todo', (req, res) => {
+    const id = Date.now().toString();
+    const now = new Date().toISOString();
+    
+    console.log('Creating new todo document...');
+
+    const emptyTodo = {
+        title: "Untitled Todo List",
+        content: JSON.stringify({
+            tasks: [],
+            lastUpdated: now
+        }),
+        template_type: 'todo'
+    };
+
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+
+        db.run(
+            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+            [id, emptyTodo.title, emptyTodo.content, emptyTodo.template_type, now, now],
+            function(err) {
+                if (err) {
+                    console.error('Document creation error:', err);
+                    db.run('ROLLBACK');
+                    return res.status(500).json({ 
+                        success: false, 
+                        error: err.message 
+                    });
+                }
+
+                db.run(
+                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                    [id, now, now],
+                    function(err) {
+                        if (err) {
+                            console.error('History creation error:', err);
+                            db.run('ROLLBACK');
+                            return res.status(500).json({ 
+                                success: false, 
+                                error: err.message 
+                            });
+                        }
+
+                        db.run('COMMIT', (err) => {
+                            if (err) {
+                                console.error('Commit error:', err);
+                                db.run('ROLLBACK');
+                                return res.status(500).json({ 
+                                    success: false, 
+                                    error: err.message 
+                                });
+                            }
+                            
+                            console.log('Todo created successfully with ID:', id);
+                            return res.status(200).json({ 
+                                success: true, 
+                                documentId: id,
+                                message: 'Todo created successfully'
                             });
                         });
                     }
@@ -389,6 +468,8 @@ db.run(`
     )
 `);
 
+
+
 // Serve todo.html for the todo route
 app.get('/todo', (req, res) => {
     res.sendFile(path.join(__dirname, 'todo.html'));
@@ -407,4 +488,30 @@ app.get('/editor', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
+});
+
+app.get('/todo/:id', (req, res) => {
+    console.log('Loading todo with ID:', req.params.id);
+    // Use absolute path to todo.html
+    const todoPath = path.join(__dirname, 'todo.html');
+    console.log('Serving file from:', todoPath); // Debug log
+    res.sendFile(todoPath);
+});
+
+app.get('/todo', (req, res) => {
+    const indexPath = path.join(__dirname, 'index.html');
+    res.sendFile(indexPath);
+});
+
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).send('Something broke!');
+});
+
+app.get('/journal', (req, res) => {
+    res.sendFile(path.join(__dirname, 'journal.html'));
+});
+
+app.get('/journal/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'journal.html'));
 });
