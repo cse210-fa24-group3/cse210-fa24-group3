@@ -1,0 +1,42 @@
+codecov:
+  require_ci_to_pass: yes
+
+coverage:
+  precision: 2
+  round: down
+  range: "70..100"
+
+comment:
+  layout: "diff, flags, files"
+  behavior: default
+  require_changes: yes
+  require_base: yes
+  require_head: yes
+  after_n_builds: 1
+
+parsers:
+  jest: "**/coverage/clover.xml"
+
+flags:
+  unittests:
+    paths:
+      - "src/"
+
+fixes:
+  - "src/:src/"
+
+ignore:
+  - "tests/helpers/*"
+  - "**/__mocks__/*"
+
+status:
+  project:
+    default:
+      target: auto
+      threshold: 1%
+      base: auto
+  patch:
+    default:
+      target: auto
+      threshold: 0.1%
+      base: auto
