@@ -118,3 +118,97 @@
         - Code quality via tool (ex. Codeclimate, Codacy, etc.)
         - Documentation generation via automation (HTML Report)
         - Including e2e (end-to-end) and pixel testing
+
+## 11/18/2024
+- Attended by: Sneha, Aryan, Venu, and Krithika
+
+- Overview: The document (https://docs.google.com/document/d/1cc-5wbQG7Qk1U0q4Q7K4kKPsSUzM2fPEAb8QGOZ6YU4/edit?tab=t.0) for the Sprint 1 retrospective was shared, and we reviewed the key points together, covering:
+
+    - What Went Well
+        - Aryan: Successfully assigned issues to each Pull Request and CI/CD pipeline workflows were established.
+        - Venu: Editor details were saved correctly in the respective entries.json file.
+        - Krithika: CI/CD workflow ran smoothly and coordination for setting up both CI/CD and frontend was effective.
+        - Sneha: CI/CD pipeline workflows were completed. GitHub PRs and issues were aligned well. Basic frontend and backend setup was completed. Good timeline planning, coordination of tasks. 
+
+    - What Didn’t Go Well
+        - Aryan: Some tasks were pending until the last day of the sprint, despite plans to finish earlier.
+        - Venu: Faced issues with file paths during integration.
+        - Krithika:  Some tasks were delayed until the last moment.
+        - Sneha: Timeline was an issue
+    - What Could Be Done Better
+        - Aryan: Follow proper issue and PR linkage, ensuring alignment with story points, milestones, and PR review requests.
+        - Venu: Avoid delaying tasks until the last minute and seek iterative feedback from teammates when one is working on a subtask.
+        - Krithika: Plan tasks better to prevent last-minute delays.
+        - Sneha: Focus on better estimation and coordination to ensure smoother task progression.
+
+- Further Discussion
+    - Break down tasks for each story into smaller, step-wise subtasks for better time estimation and clarity.
+    - Schedule a post-class meeting with all team members to break down their story points into subtasks to estimate the time it will take.
+ 
+
+## 11/22/2024
+- Sprint 2 Review
+- Attended by: Amy, Andrew, Aryan, Keqian, Krithika, Sneha, Venu
+
+- Amy:
+    - Updated the homepage to include templates and fixed issues with the recently viewed section.
+    - Awaited backend PR merge and incorporated backend/recent changes from Sneha.
+    - Created a bug review template and prepared it for PR submission.
+
+- Andrew:
+    - Updated the UI test cases and corresponding sheets.
+    - Worked on generating an HTML report.
+
+- Aryan:
+    - Added Code Coverage to the repo
+    - working on jsdocs 
+
+- Keqian:
+    - Created a template for feature specifications and meeting minutes, aligned with Figma designs.
+    - Began working on integrating the templates with backend functionalities.
+
+- Krithika:
+    - Designed the ER diagram for the backend.
+    - Investigated the use of SQLite for connecting databases, aiming to resolve challenges with local-only access.
+
+- Sneha:
+    - Set up the table for "Recently Viewed" and template-saving functionalities.
+    - Revamped the homepage and integrated the "Recently Viewed" section with backend logic.
+    - Worked on saving files and aligning templates with backend workflows.
+
+- Venu:
+    - Implemented backend functionality for the "Recently Viewed" section.
+    - Displayed the top three recently viewed documents on the homepage.
+    - Planned to work on a separate page for the recently viewed documents.
+
+## 11/22/2024
+- Tasks progress + Video check-in discussion
+- Attended by: Amy, Andrew, Aryan, Keqian, Krithika, Sneha, Venu
+
+- Updates
+    - Major updates done / Page Journal done / Bug review page almost done / Entries -> Documents / Work on Template format / Issues with merging branches / 'Recently added pages' - done
+    - Code Coverage test (CodeCov) - fixing issues with setting up the CI run. - FIXED
+    - UI Test - html report generation ongoing / Test cases sheet - updating
+ 
+- Issues
+
+- Video Demo (< 4 mins)
+    - 1 min FE / Pipeline / Testing
+    - We need 'some' features working.
+        - To-do List, Create new document, Navigation bar
+    - Video Talking Points
+        - Home page
+        - Light/dark mode
+        - Create new, fill in and save
+        - Recently viewed + edit recent
+        - Templates (todo, … )
+        - Pipeline review
+        - Health of team/Git processes
+        - Challenges so far 
+        - Preview of next sprint (new templates, hosting backend, light/dark mode fine tuning, etc...)
+
+- Challenges
+    - Issues with hosting/no free hosting for the backend that results in issues for the pipeline
+    - Merge conflicts - after new features are developed
+    - Tight deadlines
+    - 
