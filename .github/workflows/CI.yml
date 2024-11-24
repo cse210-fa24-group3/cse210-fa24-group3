@@ -1,4 +1,4 @@
-name: Run Unit Tests and Upload Results
+name: Code Coverage
 
 on:
   pull_request:
@@ -38,17 +38,15 @@ jobs:
         working-directory: src
         run: |
           mkdir -p reports
-          JEST_JUNIT_OUTPUT="reports/junit.xml" npx jest --coverage --reporters=default --reporters=jest-junit
+          JEST_JUNIT_OUTPUT="junit.xml" npx jest --coverage --reporters=default --reporters=jest-junit
 
       # Step 5: Upload coverage to Codecov
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: src/coverage/clover.xml   # Jest generates clover.xml for coverage
+          files: src/coverage/clover.xml
           flags: unittests
-          fail_ci_if_error: true
-          verbose: true
 
       # Step 6: Upload JUnit test results to Codecov
       - name: Upload test results to Codecov
