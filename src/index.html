@@ -51,10 +51,10 @@
         <section>
             <h2 class="section-title">Start a new document</h2>
             <div class="card-grid">
-                <div class="card create-card">
+                <a href="new-page/editor.html" class="card create-card">
                     <span class="plus-icon">+</span>
-                </div>
-                
+                </a>
+
                 <div class="card" onclick="createNewTodoFromTemplate()">To-do list</div>
                 <div class="card">Engineering Review Doc</div>
                 <div class="card">Bug - Root Cause Analysis</div>
@@ -70,6 +70,7 @@
             <button id="see-more-button" style="display: none;">See More</button>
         </section>
     </main>
+    <script src="home.js"></script>
     <script>
         async function handleTodoCreation() {
             try {
