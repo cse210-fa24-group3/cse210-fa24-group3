@@ -42,7 +42,6 @@ jobs:
 
       # Step 5: Upload coverage to Codecov
       - name: Upload coverage to Codecov
-        working-directory: src
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -54,7 +53,6 @@ jobs:
       # Step 6: Upload JUnit test results to Codecov
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        working-directory: src
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
