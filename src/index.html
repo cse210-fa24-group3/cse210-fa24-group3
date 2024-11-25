@@ -57,9 +57,9 @@
 
                 <div class="card" onclick="createNewTodoFromTemplate()">To-do list</div>
                 <div class="card">Engineering Review Doc</div>
-                <div class="card">Bug - Root Cause Analysis</div>
+                <div class="card" onclick="createNewBugReviewFromTemplate()">Bug - Root Cause Analysis</div>
             </div>
-            <a href="#" class="see-more">see more templates</a>
+            <a href="#" class="see-more">See more templates</a>
         </section>
 
         <section class="recently-edited">
@@ -70,7 +70,6 @@
             <button id="see-more-button" style="display: none;">See More</button>
         </section>
     </main>
-    <script src="home.js"></script>
     <script>
         async function handleTodoCreation() {
             try {
@@ -91,5 +90,6 @@
         }
         </script>
     <script src="script.js"></script>
+    <script src="home.js"></script>
 </body>
 </html>
