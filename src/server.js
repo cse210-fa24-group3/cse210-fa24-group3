@@ -424,7 +424,7 @@ app.post('/api/documents/new-bug-review', (req, res) => {
     const emptyBugReview = {
         title: "Untitled Bug Review",
         content: JSON.stringify({
-            tasks: [],
+            text: '',
             lastUpdated: now
         }),
         template_type: 'bug-review'
