@@ -56,40 +56,128 @@
 // // Initialize theme on page load
 // loadSavedTheme();
 
+/// comment
 // Menu toggle
-const menuBtn = document.querySelector('.navbar-left div:first-child');
-const sidebar = document.querySelector('.sidebar');
-const overlay = document.querySelector('.overlay');
+// const menuBtn = document.querySelector('.navbar-left div:first-child');
+// const sidebar = document.querySelector('.sidebar');
+// const overlay = document.querySelector('.overlay');
 
-menuBtn.addEventListener('click', toggleSidebar);
-overlay.addEventListener('click', toggleSidebar);
+// menuBtn.addEventListener('click', toggleSidebar);
+// overlay.addEventListener('click', toggleSidebar);
 
-function toggleSidebar() {
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
+// function toggleSidebar() {
+//     sidebar.classList.toggle('active');
+//     overlay.classList.toggle('active');
+// }
+
+// // Dark mode toggle
+// const darkModeToggle = document.querySelector('.navbar-right div:nth-child(2)');
+// const moon = '🌙';
+// const sun = '☀️';
+
+// darkModeToggle.addEventListener('click', () => {
+//     document.body.classList.toggle('dark-mode');
+//     darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? sun : moon;
+// });
+
+
+// // User menu toggle
+// const userBtn = document.querySelector('.navbar-right div:last-child');
+// const userMenu = document.querySelector('.user-menu');
+
+// userBtn.addEventListener('click', (e) => {
+//     e.stopPropagation();
+//     userMenu.classList.toggle('active');
+// });
+
+// document.addEventListener('click', (e) => {
+//     if (!userMenu.contains(e.target)) {
+//         userMenu.classList.remove('active');
+//     }
+// });
+
+async function createNewTodoFromTemplate() {
+    try {
+        console.log('Starting todo creation...');
+        
+        const response = await fetch('/api/documents/new-todo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Response received:', response);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success && data.documentId) {
+            console.log('Redirecting to todo with ID:', data.documentId);
+            window.location.href = `/todo/${data.documentId}`;
+        } else {
+            throw new Error('Failed to get document ID');
+        }
+    } catch (error) {
+        console.error('Error creating todo:', error);
+    }
 }
 
-// Dark mode toggle
-const darkModeToggle = document.querySelector('.navbar-right div:nth-child(2)');
-const moon = '🌙';
-const sun = '☀️';
+async function createNewBugReviewFromTemplate() {
+    try {
+        console.log('Starting bug review creation...');
+        
+        const response = await fetch('/api/documents/new-bug-review', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-darkModeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? sun : moon;
-});
+        console.log('Response received:', response);
+        const data = await response.json();
+        console.log('Response data:', data);
 
-// User menu toggle
-const userBtn = document.querySelector('.navbar-right div:last-child');
-const userMenu = document.querySelector('.user-menu');
-
-userBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    userMenu.classList.toggle('active');
-});
-
-document.addEventListener('click', (e) => {
-    if (!userMenu.contains(e.target)) {
-        userMenu.classList.remove('active');
+        if (data.success && data.documentId) {
+            console.log('Redirecting to todo with ID:', data.documentId);
+            window.location.href = `/bug-review/${data.documentId}`;
+        } else {
+            throw new Error('Failed to get document ID');
+        }
+    } catch (error) {
+        console.error('Error creating bug review:', error);
     }
+}
+
+// feature
+async function createNewFeatureFromTemplate() {
+    try {
+        console.log('Starting feature creation...');
+        
+        const response = await fetch('/api/documents/new-feature', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Response received:', response);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success && data.documentId) {
+            console.log('Redirecting to feature with ID:', data.documentId);
+            window.location.href = `/feature/${data.documentId}`;
+        } else {
+            throw new Error('Failed to get document ID');
+        }
+    } catch (error) {
+        console.error('Error creating feature:', error);
+    }
+}
+
+
+
+document.querySelector('.create-card').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '/journal';
 });
