@@ -25,7 +25,7 @@ const db = new sqlite3.Database(':memory:');
 
 // Initialize database
 db.serialize(() => {
-    db.run("CREATE TABLE entries (id TEXT PRIMARY KEY, title TEXT, content TEXT, created_at TEXT, updated_at TEXT)");
+    db.run("CREATE TABLE documents (id TEXT PRIMARY KEY, title TEXT, content TEXT, template_type TEXT, created_at TEXT, updated_at TEXT)");
 });
 
 // Helper function to export DB entries to JSON
@@ -404,4 +404,81 @@ app.get('/journal', (req, res) => {
 
 app.get('/journal/:id', (req, res) => {
     res.sendFile(path.join(__dirname, 'journal.html'));
+});
+
+// Bug Review
+app.get('/bug-review', (req, res) => {
+    res.sendFile(path.join(__dirname, 'bug-review.html'));
+});
+
+app.get('/bug-review/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'bug-review.html'));
+});
+
+app.post('/api/documents/new-bug-review', (req, res) => {
+    const id = Date.now().toString();
+    const now = new Date().toISOString();
+    
+    console.log('Creating new bug review document...');
+
+    const emptyBugReview = {
+        title: "Untitled Bug Review",
+        content: JSON.stringify({
+            text: '',
+            lastUpdated: now
+        }),
+        template_type: 'bug-review'
+    };
+
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+
+        db.run(
+            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+            [id, emptyBugReview.title, emptyBugReview.content, emptyBugReview.template_type, now, now],
+            function(err) {
+                if (err) {
+                    console.error('Document creation error:', err);
+                    db.run('ROLLBACK');
+                    return res.status(500).json({ 
+                        success: false, 
+                        error: err.message 
+                    });
+                }
+
+                db.run(
+                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                    [id, now, now],
+                    function(err) {
+                        if (err) {
+                            console.error('History creation error:', err);
+                            db.run('ROLLBACK');
+                            return res.status(500).json({ 
+                                success: false, 
+                                error: err.message 
+                            });
+                        }
+
+                        db.run('COMMIT', (err) => {
+                            if (err) {
+                                console.error('Commit error:', err);
+                                db.run('ROLLBACK');
+                                return res.status(500).json({ 
+                                    success: false, 
+                                    error: err.message 
+                                });
+                            }
+                            
+                            console.log('Bug review created successfully with ID:', id);
+                            return res.status(200).json({ 
+                                success: true, 
+                                documentId: id,
+                                message: 'Bug review created successfully'
+                            });
+                        });
+                    }
+                );
+            }
+        );
+    });
 });
