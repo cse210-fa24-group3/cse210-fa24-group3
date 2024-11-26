@@ -119,31 +119,95 @@
         - Documentation generation via automation (HTML Report)
         - Including e2e (end-to-end) and pixel testing
 
+
+## 11/15/2024
+- Updates
+    - Sneha Pujari
+        - Working on setting up the frontend (HTML, JS, CSS).
+        - Problem: Encountered issues with the saving part.
+    - Aryan Dokania
+        - Workflow setup completed.
+        - Added LinkedIn workflow, deployed workflow, and end-to-end tested it.
+        - Implemented branch protection rules.
+    - Amy Munson
+        - Progress on theme toggle button.
+        - Adjusted button sizes and functionality.
+    - Andrew
+        - Developed code for UI end-to-end tests.
+        - Will create additional test cases as work progresses.
+    - Keqian Wang
+        - Finished the navbar task.
+    - Krithika Iyer
+        - Completed the basic flow diagram for the CI/CD pipeline.
+        - Working on the documentation.
+    - Venu Chaudhari
+        - Connected the frontend to the backend using SQLite.
+        - Problem: Facing issues with saving functionality, expected to resolve soon.
+    Pending Tasks from Current Week
+    - Sneha: Push changes to editor.js.
+    - Andrew: Optional task to work on console color changes.
+- Next Week Tasks
+    - General Notes
+        - For CI/CD: Unit testing is pending and will be worked on progressively.
+        - Aryan and Andrew suggested skipping unit tests for now and focusing on code coverage.
+        - Aim to generate an HTML report.
+    - Task Division – Target: Complete Stage 1 of User Stories
+        - Frontend/Backend
+            - Saving the File
+            - Responsible: Venu Chaudhari & Sneha Pujari
+            - Recently Viewed on Homepage
+            - Responsible: Venu Chaudhari & Sneha Pujari
+            - Integration with backend.
+        - Frontend
+            - Templates Creation
+            - Homepage: Amy Munson
+            - Minutes of Meeting: Keqian Wang
+            - Bug Review: Amy Munson
+            - Feature Specifications: Keqian Wang
+            - To-Do: Sneha Pujari
+            - Tasks for Each Template:
+                - Structure creation.
+                - Backend saving functionality.
+                - Backend integration.
+                - Deletion, updating, saving, and reading functionalities.
+        - Backend
+            - Tables Setup for Template Saving/Creation
+                - Responsible: Krithika Iyer & Sneha Pujari
+            - Recently Viewed Functionality
+            - Table creation and data entry: Venu Chaudhari & Sneha Pujari
+
+
 ## 11/18/2024
 - Attended by: Sneha, Aryan, Venu, and Krithika
 
-- Overview: The document (https://docs.google.com/document/d/1cc-5wbQG7Qk1U0q4Q7K4kKPsSUzM2fPEAb8QGOZ6YU4/edit?tab=t.0) for the Sprint 1 retrospective was shared, and we reviewed the key points together, covering:
-
+- Overview: The document (https://docs.google.com/document/d/1cc-5wbQG7Qk1U0q4Q7K4kKPsSUzM2fPEAb8QGOZ6YU4/edit?tab=t.0) for the Sprint 1 retrospective was shared, and we reviewed the key points together.
     - What Went Well
-        - Aryan: Successfully assigned issues to each Pull Request and CI/CD pipeline workflows were established.
-        - Venu: Editor details were saved correctly in the respective entries.json file.
-        - Krithika: CI/CD workflow ran smoothly and coordination for setting up both CI/CD and frontend was effective.
-        - Sneha: CI/CD pipeline workflows were completed. GitHub PRs and issues were aligned well. Basic frontend and backend setup was completed. Good timeline planning, coordination of tasks. 
-
+        - Aryan: Successfully assigned issues to each Pull Request and CI/CD pipeline workflows were established
+        - Venu: Editor details were saved correctly in the respective entries.json file
+        - Krithika: CI/CD workflow ran smoothly and coordination for setting up both CI/CD and frontend was effective
+        - Sneha: CI/CD pipeline workflows were completed. GitHub PRs and issues were aligned well. Basic frontend and backend setup was completed. Good timeline planning, coordination of tasks
+        - Amy: Using GitHub Issues and PRs. Implementing the frontend and backend went well
+        - Andrew: Initial Web page & CI/CD setup and development was very quick and well-planned
+        - Keqian: The tasks assigned were well planned and decided very quickly
     - What Didn’t Go Well
-        - Aryan: Some tasks were pending until the last day of the sprint, despite plans to finish earlier.
-        - Venu: Faced issues with file paths during integration.
-        - Krithika:  Some tasks were delayed until the last moment.
+        - Aryan: Some tasks were pending until the last day of the sprint, despite plans to finish earlier
+        - Venu: Faced issues with file paths during integration
+        - Krithika:  Some tasks were delayed until the last moment
         - Sneha: Timeline was an issue
+        - Amy: There was a tight schedule and eneven task distribution
+        - Andrew: Deadline for submission was a bit tight
+        - Keqian: The whole developing process is not long, so deadline for each task was tight
     - What Could Be Done Better
-        - Aryan: Follow proper issue and PR linkage, ensuring alignment with story points, milestones, and PR review requests.
-        - Venu: Avoid delaying tasks until the last minute and seek iterative feedback from teammates when one is working on a subtask.
-        - Krithika: Plan tasks better to prevent last-minute delays.
-        - Sneha: Focus on better estimation and coordination to ensure smoother task progression.
-
+        - Aryan: Follow proper issue and PR linkage, ensuring alignment with story points, milestones, and PR review requests
+        - Venu: Avoid delaying tasks until the last minute and seek iterative feedback from teammates when one is working on a subtask
+        - Krithika: Plan tasks better to prevent last-minute delays
+        - Sneha: Focus on better estimation and coordination to ensure smoother task progression
+        - Amy: More even task distribution and more consistent communication
+        - Andrew: Improve on timeline management and completing tasks prior to deadlines will be greatly helpful
+        - Keqian: follow the timeline and start early on the tasks, better plan the task with other works
 - Further Discussion
-    - Break down tasks for each story into smaller, step-wise subtasks for better time estimation and clarity.
-    - Schedule a post-class meeting with all team members to break down their story points into subtasks to estimate the time it will take.
+    - Break down tasks for each story into smaller, step-wise subtasks for better time estimation and clarity
+    - Schedule a post-class meeting with all team members to break down their story points into subtasks to estimate the time it will take
  
 
 ## 11/22/2024
@@ -154,34 +218,28 @@
     - Updated the homepage to include templates and fixed issues with the recently viewed section.
     - Awaited backend PR merge and incorporated backend/recent changes from Sneha.
     - Created a bug review template and prepared it for PR submission.
-
 - Andrew:
     - Updated the UI test cases and corresponding sheets.
     - Worked on generating an HTML report.
-
 - Aryan:
     - Added Code Coverage to the repo
     - working on jsdocs 
-
 - Keqian:
     - Created a template for feature specifications and meeting minutes, aligned with Figma designs.
     - Began working on integrating the templates with backend functionalities.
-
 - Krithika:
     - Designed the ER diagram for the backend.
     - Investigated the use of SQLite for connecting databases, aiming to resolve challenges with local-only access.
-
 - Sneha:
     - Set up the table for "Recently Viewed" and template-saving functionalities.
     - Revamped the homepage and integrated the "Recently Viewed" section with backend logic.
     - Worked on saving files and aligning templates with backend workflows.
-
 - Venu:
     - Implemented backend functionality for the "Recently Viewed" section.
     - Displayed the top three recently viewed documents on the homepage.
     - Planned to work on a separate page for the recently viewed documents.
 
-## 11/22/2024
+## 11/23/2024
 - Tasks progress + Video check-in discussion
 - Attended by: Amy, Andrew, Aryan, Keqian, Krithika, Sneha, Venu
 
@@ -189,9 +247,6 @@
     - Major updates done / Page Journal done / Bug review page almost done / Entries -> Documents / Work on Template format / Issues with merging branches / 'Recently added pages' - done
     - Code Coverage test (CodeCov) - fixing issues with setting up the CI run. - FIXED
     - UI Test - html report generation ongoing / Test cases sheet - updating
- 
-- Issues
-
 - Video Demo (< 4 mins)
     - 1 min FE / Pipeline / Testing
     - We need 'some' features working.
@@ -206,9 +261,59 @@
         - Health of team/Git processes
         - Challenges so far 
         - Preview of next sprint (new templates, hosting backend, light/dark mode fine tuning, etc...)
-
 - Challenges
     - Issues with hosting/no free hosting for the backend that results in issues for the pipeline
     - Merge conflicts - after new features are developed
     - Tight deadlines
-    - 
+    - Connection between front end and backend makes it hard to have members independently work on things that impact each other/share files
+
+
+## 11/25/2024
+- Attended by: Amy, Andrew, Aryan, Keqian, Krithika, Sneha, Venu
+
+- Overview
+    - What went well
+        - Active Communication
+        - Responsibility as an individual contributor
+        - Frequent meetings
+        - Active communication, participation, and collaboration
+        - Coordination between team members
+        - Good progress made in completing tasks
+        - Planning of tasks was done properly
+    - What didn’t go well
+        - Code coverage required unit tests, which required last minute work
+        - Merge conflicts
+        - Different people’s tasks were interwoven, and so progress was slower and harder to coordinate than before
+        - Difficulties when developing on a local backend
+        - Did not realize some tasks would take more time
+    - What could be done better
+        - Task creation after proper planning of scope
+        - Better planning for tasks that interact
+        - Starting deliverables like the video sooner
+        - Better planning for the corporation between frontend and backend
+        - PR review timeliness 
+- Next Tasks
+- Add/ Manage Tags: Aryan Dokania
+- Light/ Dark Theme: Amy Munson
+- Minutes of Meeting Template: Keqian Wang
+    - Template structure
+    - Integration with backend
+    - Deletion
+    - Updating
+    - Saving/Reading
+- Feature Specifications Template: Keqian Wang
+    - Template structure 
+    - Integration with backend
+    - Deletion
+    - Updating
+    - Saving/Reading
+- To-do Template: Sneha Pujari
+    - Deletion
+- Implement uniform formatting style: Amy Munson
+    - Styling across all the pages
+    - Logos
+    - Fonts
+- Integrating and linking all the templates and making sure that all templates are in sync: Sneha Pujari
+- UI tests: Andrew Choi
+- Hosting DB: Krithika Iyer
+- Finalise recently viewed and todo being saved to recently viewed: Venu Chaudhari
