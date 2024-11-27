@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feature Specification</title>
+    <title>Minutes of Meeting</title>
     <link rel="stylesheet" href="/styles.css">
     <style>
         * {
@@ -174,7 +174,7 @@
     <main class="main-content">
         <div class="container">
             <div class="header">
-                <input type="text" class="title-input" placeholder="Untitled Feature Specifications ###" id="featureName">
+                <input type="text" class="title-input" placeholder="Untitled Minutes of Meeting ###" id="meetingName">
                 <div class="header-right">
                     <div class="save-status" id="saveStatus"></div>
                     <button class="save-button" id="saveButton" onclick="saveDocument()">
@@ -183,75 +183,61 @@
                 </div>
             </div>
             <div class="section">
-                <h3>Feature description</h3>
-                <textarea class="content-area" id="feature-content" contenteditable="true">
-Feature ID: [Tracking number from your system]
-Title: [Short, descriptive title of the bug]
-Target Release: [version/sprint]
-Status: [Draft/In Review/Approved]
-Reported By: [Name]
-Reported Date: [YYYY-MM-DD]
-
-1. Overview 
-Feature Summary: [Brief description of the feature in 2-3 sentences]
-
-Business Context 
-• Problem Statement: [What problem does this solve?]
-• Success Metrics: [How will we measure success?]
-• User Value: [Why is this important to users?]
+                <h3>Meeting description</h3>
+                <textarea class="content-area" id="meeting-content" contenteditable="true">
+Meeting Title: [Descriptive title of the meeting]
+Meeting Date: [YYYY-MM-DD]
+Meeting Time: [Start Time - End Time]
+Location/Platform: [Physical location or virtual platform]
     
-Scope 
-• In Scope: [List of what's included]
-• Out of Scope: [List of what's explicitly not included]
-• Future Considerations: [Potential future enhancements]
+Participants
+Chairperson: [Name]
+Attendees: [List of participant names]
+Absent: [List of absent members]
     
-2. Technical Architecture
-System Design:
-• Architecture Diagram: High-level system diagram depicting API requests, data model interactions, and response handling.
-Component Interaction: APIs interact with the updated database schema and leverage error-handling middleware.
-• Data Flow: [input data, processed data, responses]
+Agenda
+• [Agenda item 1]
+• [Agenda item 2]
+• [Agenda item 3]
+• [Continue as needed]
     
-Data Model:
-• Schema Changes: Introduction of new fields to support detailed API requests.
-• New Tables/Fields:
-• User transaction logs
-• Performance benchmarks
-• Data Migration: Scripts to migrate legacy data to the updated schema.
+Discussion Points
     
-API Design:
-• Endpoints: New endpoints to handle advanced requests.
-• Request/Response Format: Updated API contracts with clear error messages.
-• Error Handling: Graceful recovery mechanisms for invalid requests.
-
-3. Implementation Details
-Technical Requirements:
-• Dependencies: Node.js, PostgreSQL, and Express.js framework.
-• Infrastructure Changes: New AWS S3 storage buckets for logs.
-• Security Considerations: Implementation of JWT-based authentication.
-• Performance Requirements: Ensure requests are processed in under 200ms.
+[Agenda Item 1 Title]
+• Key Points Discussed: [Summary of discussion]
+• Decisions Made: [Any decisions made regarding this item]
+• Action Items: [Actions to be taken, by whom, and deadlines]
     
-Algorithm/Logic:
-• Business Logic: Advanced validation of user inputs and dynamic response generation.
-• Edge Cases: Handling of malformed data and network timeouts.
-• State Management: User session data stored securely in Redis.
+[Agenda Item 2 Title]
+• Key Points Discussed: [Summary of discussion]
+• Decisions Made: [Any decisions made regarding this item]
+• Action Items: [Actions to be taken, by whom, and deadlines]
     
-User Interface:
-• UI Components: Minimal changes to reflect API updates.
-• User Flows: Seamless user interaction with APIs via the developer portal.
-• Mockups: Link to design prototypes.
-
-4. Testing Strategy
-Test Plan:
-• Unit Tests: Validate individual API endpoints and data validation logic.
-• Integration Tests: End-to-end testing of API interactions with the database.
-• Performance Tests: Benchmark the response time and system load capacity.
-• User Acceptance: Feedback from a pilot group of users to ensure feature readiness.
+[Agenda item 3 Title]
+• Key Points Discussed: [Summary of discussion]
+• Decisions Made: [Any decisions made regarding this item]
+• Action Items: [Actions to be taken, by whom, and deadlines]
+    
+Action Items Summary
+• [Action Item 1]: [Responsible person], Deadline: [YYYY-MM-DD]
+• [Action Item 2]: [Responsible person], Deadline: [YYYY-MM-DD]
+    
+Next Meeting
+Date: [YYYY-MM-DD]
+Time: [Start Time]
+Location/Platform: [Physical location or virtual platform]
+    
+Sign-off
+Prepared By: [Note taker name]
+Approved By: [Chairperson name]
+    
+Minutes Circulated Date: [YYYY-MM-DD]
             </textarea>
             </div>
         </div>
     </main>
 
-    <script src="/feature.js"></script>
+    <script src="/meeting.js"></script>
     <script src="/script.js"></script>
 </body>
 </html>

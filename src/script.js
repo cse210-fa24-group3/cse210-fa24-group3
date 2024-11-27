@@ -58,43 +58,43 @@
 
 /// comment
 // Menu toggle
-// const menuBtn = document.querySelector('.navbar-left div:first-child');
-// const sidebar = document.querySelector('.sidebar');
-// const overlay = document.querySelector('.overlay');
+const menuBtn = document.querySelector('.navbar-left div:first-child');
+const sidebar = document.querySelector('.sidebar');
+const overlay = document.querySelector('.overlay');
 
-// menuBtn.addEventListener('click', toggleSidebar);
-// overlay.addEventListener('click', toggleSidebar);
+menuBtn.addEventListener('click', toggleSidebar);
+overlay.addEventListener('click', toggleSidebar);
 
-// function toggleSidebar() {
-//     sidebar.classList.toggle('active');
-//     overlay.classList.toggle('active');
-// }
+function toggleSidebar() {
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
 
-// // Dark mode toggle
-// const darkModeToggle = document.querySelector('.navbar-right div:nth-child(2)');
-// const moon = '🌙';
-// const sun = '☀️';
+// Dark mode toggle
+const darkModeToggle = document.querySelector('.navbar-right div:nth-child(2)');
+const moon = '🌙';
+const sun = '☀️';
 
-// darkModeToggle.addEventListener('click', () => {
-//     document.body.classList.toggle('dark-mode');
-//     darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? sun : moon;
-// });
+darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? sun : moon;
+});
 
 
-// // User menu toggle
-// const userBtn = document.querySelector('.navbar-right div:last-child');
-// const userMenu = document.querySelector('.user-menu');
+// User menu toggle
+const userBtn = document.querySelector('.navbar-right div:last-child');
+const userMenu = document.querySelector('.user-menu');
 
-// userBtn.addEventListener('click', (e) => {
-//     e.stopPropagation();
-//     userMenu.classList.toggle('active');
-// });
+userBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    userMenu.classList.toggle('active');
+});
 
-// document.addEventListener('click', (e) => {
-//     if (!userMenu.contains(e.target)) {
-//         userMenu.classList.remove('active');
-//     }
-// });
+document.addEventListener('click', (e) => {
+    if (!userMenu.contains(e.target)) {
+        userMenu.classList.remove('active');
+    }
+});
 
 async function createNewTodoFromTemplate() {
     try {
@@ -172,6 +172,34 @@ async function createNewFeatureFromTemplate() {
         }
     } catch (error) {
         console.error('Error creating feature:', error);
+    }
+}
+
+
+// Meeting
+async function createNewMeetingFromTemplate() {
+    try {
+        console.log('Starting Meeting creation...');
+        
+        const response = await fetch('/api/documents/new-meeting', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Response received:', response);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success && data.documentId) {
+            console.log('Redirecting to meeting with ID:', data.documentId);
+            window.location.href = `/meeting/${data.documentId}`;
+        } else {
+            throw new Error('Failed to get document ID');
+        }
+    } catch (error) {
+        console.error('Error creating meeting:', error);
     }
 }
 

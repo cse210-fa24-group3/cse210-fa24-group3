@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         console.log('Current document ID:', documentId);
 
-        if (documentId && documentId !== 'feature') {
+        if (documentId && documentId !== 'meeting') {
             // Load document by ID
             const response = await fetch(`/api/documents/${documentId}`);
             console.log('Load response:', response);
@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.log(content);
 
             // Set the document
-            document.getElementById('featureName').value = loadDocument.title;
+            document.getElementById('meetingName').value = loadDocument.title;
             if (content.text != ''){
-                document.getElementById('feature-content').value = content.text;
+                document.getElementById('meeting-content').value = content.text;
             }
 
             // Store the ID for future saves
-            localStorage.setItem('featureDocumentId', documentId);
+            localStorage.setItem('meetingDocumentId', documentId);
         }
     } catch (error) {
         console.error('Error loading document:', error);
@@ -48,27 +48,27 @@ async function saveDocument() {
         const pathParts = window.location.pathname.split('/');
         const documentId = pathParts[pathParts.length - 1];
 
-        if (!documentId || documentId === 'feature') {
+        if (!documentId || documentId === 'meeting') {
             throw new Error('Invalid document ID');
         }
 
-        const featureData = {
+        const meetingData = {
             id: documentId,
-            title: document.getElementById('featureName').value,
+            title: document.getElementById('meetingName').value,
             content: JSON.stringify({
-                text: document.getElementById('feature-content').value,
+                text: document.getElementById('meeting-content').value,
             }),
-            template_type: 'feature'
+            template_type: 'meeting'
         };
 
-        console.log(featureData);
+        console.log(meetingData);
 
         const response = await fetch(`/api/documents/${documentId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(featureData)
+            body: JSON.stringify(meetingData)
         });
 
         if (!response.ok) {
@@ -108,13 +108,13 @@ async function loadDocument(documentId) {
         console.log(content);
 
         // Update document
-        document.getElementById('featureName').textContent = loadDocument.title;
+        document.getElementById('meetingName').textContent = loadDocument.title;
         if (content.text != ''){
-            document.getElementById('feature-content').textContent = content.text;
+            document.getElementById('meeting-content').textContent = content.text;
         }
 
         // Store the ID
-        localStorage.setItem('featureDocumentId', documentId);
+        localStorage.setItem('meetingDocumentId', documentId);
 
     } catch (error) {
         console.error('Failed to load document:', error);

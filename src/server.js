@@ -499,7 +499,10 @@ app.post('/api/documents/new-feature', (req, res) => {
 
     const emptyFeature = {
         title: "Untitled Feature",
-        content: "",
+        content: JSON.stringify({
+            text: '',
+            lastUpdated: now
+        }),
         template_type: 'feature'
     };
 
@@ -520,6 +523,54 @@ app.post('/api/documents/new-feature', (req, res) => {
                         return res.status(500).json({ success: false, error: err.message });
                     }
                     return res.status(200).json({ success: true, documentId: id, message: 'Feature created successfully' });
+                });
+            }
+        );
+    });
+});
+
+
+
+// meeting
+app.get('/meeting', (req, res) => {
+    res.sendFile(path.join(__dirname, 'meeting.html'));
+});
+
+app.get('/meeting/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'meeting.html'));
+});
+
+// Create new meeting document
+app.post('/api/documents/new-meeting', (req, res) => {
+    const id = Date.now().toString();
+    const now = new Date().toISOString();
+
+    const emptyMeeting = {
+        title: "Untitled Meeting",
+        content: JSON.stringify({
+            text: '',
+            lastUpdated: now
+        }),
+        template_type: 'meeting'
+    };
+
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+        db.run(
+            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+            [id, emptyMeeting.title, emptyMeeting.content, emptyMeeting.template_type, now, now],
+            function(err) {
+                if (err) {
+                    db.run('ROLLBACK');
+                    return res.status(500).json({ success: false, error: err.message });
+                }
+
+                db.run('COMMIT', (err) => {
+                    if (err) {
+                        db.run('ROLLBACK');
+                        return res.status(500).json({ success: false, error: err.message });
+                    }
+                    return res.status(200).json({ success: true, documentId: id, message: 'Meeting created successfully' });
                 });
             }
         );

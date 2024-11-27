@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', async function () {
     try {
         // Get document ID from URL path
@@ -27,7 +28,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (content.text != ''){
                 document.getElementById('contentArea').value = content.text;
             }
-    
 
             // Store the ID for future saves
             localStorage.setItem('currentId', documentId);
