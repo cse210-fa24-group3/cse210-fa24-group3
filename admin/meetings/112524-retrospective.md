@@ -1,0 +1,50 @@
+# Sprint 2 Retrospective Meeting Notes
+Date: 11/25/2024  
+Attended by: Amy, Andrew, Aryan, Keqian, Krithika, Sneha, Venu
+
+- Overview
+    - What went well
+        - Active Communication
+        - Responsibility as an individual contributor
+        - Frequent meetings
+        - Active communication, participation, and collaboration
+        - Coordination between team members
+        - Good progress made in completing tasks
+        - Planning of tasks was done properly
+    - What didn’t go well
+        - Code coverage required unit tests, which required last minute work
+        - Merge conflicts
+        - Different people’s tasks were interwoven, and so progress was slower and harder to coordinate than before
+        - Difficulties when developing on a local backend
+        - Did not realize some tasks would take more time
+    - What could be done better
+        - Task creation after proper planning of scope
+        - Better planning for tasks that interact
+        - Starting deliverables like the video sooner
+        - Better planning for the corporation between frontend and backend
+        - PR review timeliness 
+- Next Tasks
+- Add/ Manage Tags: Aryan Dokania
+- Light/ Dark Theme: Amy Munson
+- Minutes of Meeting Template: Keqian Wang
+    - Template structure
+    - Integration with backend
+    - Deletion
+    - Updating
+    - Saving/Reading
+- Feature Specifications Template: Keqian Wang
+    - Template structure 
+    - Integration with backend
+    - Deletion
+    - Updating
+    - Saving/Reading
+- To-do Template: Sneha Pujari
+    - Deletion
+- Implement uniform formatting style: Amy Munson
+    - Styling across all the pages
+    - Logos
+    - Fonts
+- Integrating and linking all the templates and making sure that all templates are in sync: Sneha Pujari
+- UI tests: Andrew Choi
+- Hosting DB: Krithika Iyer
+- Finalise recently viewed and todo being saved to recently viewed: Venu Chaudhari

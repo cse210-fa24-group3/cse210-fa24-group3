@@ -1,45 +1,65 @@
-// Mock `displayEntries` to avoid invoking it during tests
-jest.mock('../home', () => ({
-    ...jest.requireActual('../home'),
-    displayEntries: jest.fn(),
-  }));
-  
-  const { formatRelativeTime, displayEntries } = require('../home');
-  
-  describe('Home Component Tests', () => {
-    // Test `formatRelativeTime` function
-    // describe('formatRelativeTime', () => {
-    //   test('returns "just now" for very recent dates', () => {
-    //     const now = new Date();
-    //     expect(formatRelativeTime(now.toISOString())).toBe('just now');
-    //   });
-  
-    //   test('returns formatted string for minutes ago', () => {
-    //     const date = new Date(Date.now() - 5 * 60 * 1000); // 5 minutes ago
-    //     expect(formatRelativeTime(date.toISOString())).toBe('5 minutes ago');
-    //   });
-  
-    //   test('returns formatted string for hours ago', () => {
-    //     const date = new Date(Date.now() - 2 * 3600 * 1000); // 2 hours ago
-    //     expect(formatRelativeTime(date.toISOString())).toBe('2 hours ago');
-    //   });
-  
-    //   test('returns formatted string for days ago', () => {
-    //     const date = new Date(Date.now() - 3 * 86400 * 1000); // 3 days ago
-    //     expect(formatRelativeTime(date.toISOString())).toBe('3 days ago');
-    //   });
-  
-    //   test('returns locale date string for dates older than a week', () => {
-    //     const date = new Date('2020-01-01');
-    //     expect(formatRelativeTime(date.toISOString())).toBe(date.toLocaleDateString());
-    //   });
-    // });
-  
-    // Test `displayEntries` (mocked to ensure it doesn’t interact with the DOM)
-    describe('displayEntries', () => {
-      test('is mocked and not executed', () => {
-        expect(jest.isMockFunction(displayEntries)).toBe(true);
-      });
+describe('Home Component Event Listeners', () => {
+    let menuBtn;
+    let sidebar;
+    let overlay;
+
+    beforeEach(() => {
+        // Set up a simple HTML structure before each test
+        document.body.innerHTML = `
+            <div class="navbar-left">
+                <div class="menu-btn">Menu</div>
+            </div>
+            <div class="sidebar"></div>
+            <div class="overlay"></div>
+            <div class="theme-toggle">
+                <div class="light-mode"></div>
+                <div class="dark-mode"></div>
+            </div>
+            <div class="user-btn"></div>
+            <div class="user-menu"></div>
+            <button id="see-more-button"></button>
+            <div id="recently-edited-container"></div>
+        `;
+
+        // Query DOM elements after setting up the structure
+        menuBtn = document.querySelector('.navbar-left .menu-btn');
+        sidebar = document.querySelector('.sidebar');
+        overlay = document.querySelector('.overlay');
+
+        // Import and run the home.js code only after DOM is set up
+        require('../home'); // Import the code to run the event listeners
+
     });
-  });
-  
+
+    afterEach(() => {
+        // Clean up the DOM after each test
+        document.body.innerHTML = '';
+    });
+
+    test('Sidebar toggles on menu button click', () => {
+        // Initial state: sidebar and overlay should not have the 'active' class
+        expect(sidebar.classList.contains('active')).toBe(false);
+        expect(overlay.classList.contains('active')).toBe(false);
+
+        // Simulate a click event on the menu button
+        menuBtn.click();
+
+        // After click: sidebar and overlay should have the 'active' class
+        expect(sidebar.classList.contains('active')).toBe(true);
+        expect(overlay.classList.contains('active')).toBe(true);
+    });
+
+    // test('Sidebar toggles off when overlay is clicked', () => {
+    //     // First, simulate opening the sidebar by clicking the menu button
+    //     menuBtn.click();
+    //     expect(sidebar.classList.contains('active')).toBe(true);
+    //     expect(overlay.classList.contains('active')).toBe(true);
+
+    //     // Simulate a click on the overlay to close the sidebar
+    //     overlay.click();
+
+    //     // After click: sidebar and overlay should not have the 'active' class
+    //     expect(sidebar.classList.contains('active')).toBe(false);
+    //     expect(overlay.classList.contains('active')).toBe(false);
+    // });
+});
