@@ -146,6 +146,59 @@ async function createNewBugReviewFromTemplate() {
     }
 }
 
+// feature and meeting
+async function createNewFeatureFromTemplate() {
+    try {
+        console.log('Starting Feature Specification creation...');
+        
+        const response = await fetch('/api/documents/new-feature', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Response received:', response);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success && data.documentId) {
+            console.log('Redirecting to todo with ID:', data.documentId);
+            window.location.href = `/feature/${data.documentId}`;
+        } else {
+            throw new Error('Failed to get document ID');
+        }
+    } catch (error) {
+        console.error('Error creating Feature:', error);
+    }
+}
+
+async function createNewMeetingFromTemplate() {
+    try {
+        console.log('Starting Minutes of Meeting creation...');
+        
+        const response = await fetch('/api/documents/new-meeting', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Response received:', response);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success && data.documentId) {
+            console.log('Redirecting to todo with ID:', data.documentId);
+            window.location.href = `/meeting/${data.documentId}`;
+        } else {
+            throw new Error('Failed to get document ID');
+        }
+    } catch (error) {
+        console.error('Error creating Meeting:', error);
+    }
+}
+
 document.querySelector('.create-card').addEventListener('click', (e) => {
     e.preventDefault();
     window.location.href = '/journal';
