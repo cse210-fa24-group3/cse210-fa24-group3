@@ -21,7 +21,6 @@ darkModeToggle.addEventListener('click', () => {
     darkModeToggle.querySelector('.light-mode').style.display = document.body.classList.contains('dark-mode') ? 'none' : 'block';
     darkModeToggle.querySelector('.dark-mode').style.display = document.body.classList.contains('dark-mode') ? 'block' : 'none';
     
-    // Save preference
     localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
 });
 
@@ -37,7 +36,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Format relative time for entries
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -55,7 +53,6 @@ function formatRelativeTime(dateString) {
     });
 }
 
-// Create HTML for a single entry card
 function createEntryCard(entry) {
     const truncatedContent = entry.content 
         ? entry.content.length > 100 
@@ -63,9 +60,15 @@ function createEntryCard(entry) {
             : entry.content
         : 'No content';
 
+    // Update paths to include the correct folder structure
+    const link = entry.template_type === 'Todo' 
+        ? `todo template/todo.html?id=${entry.id}`
+        : `new-page/editor.html?id=${entry.id}`;
+
     return `
         <div class="card entry-card">
-            <a href="new-page/editor.html?id=${entry.id}" class="entry-link">
+            <a href="${link}" class="entry-link">
+                <div class="entry-type">${entry.template_type}</div>
                 <h3 class="entry-title">${entry.title || 'Untitled'}</h3>
                 <p class="entry-preview">${truncatedContent}</p>
                 <div class="entry-meta">
@@ -75,9 +78,7 @@ function createEntryCard(entry) {
         </div>
     `;
 }
-
-// Load recent entries
-let showAllEntries = false; // Track whether to show all entries
+let showAllEntries = false;
 
 async function loadRecentEntries() {
     const container = document.getElementById('recently-edited-container');
@@ -88,8 +89,8 @@ async function loadRecentEntries() {
         return;
     }
 
-    const limit = showAllEntries ? null : 3; // Limit to 3 for initial load
-    const url = limit ? `http://localhost:3000/api/entries?limit=${limit}` : `http://localhost:3000/api/entries`;
+    const limit = showAllEntries ? null : 3;
+    const url = limit ? `http://localhost:3000/api/entries?limit=${limit}` : 'http://localhost:3000/api/entries';
 
     try {
         const response = await fetch(url);
@@ -98,23 +99,21 @@ async function loadRecentEntries() {
         }
 
         const entries = await response.json();
-        const seenIds = new Set(); // Track rendered entry IDs
+        const seenIds = new Set();
 
         if (!entries || entries.length === 0) {
             container.innerHTML = '<div class="card no-entries">No entries yet. Create your first entry!</div>';
             return;
         }
 
-        // Generate HTML for entries
         container.innerHTML = entries
-            .filter(entry => !seenIds.has(entry.id)) // Filter out duplicate entries
+            .filter(entry => !seenIds.has(entry.id))
             .map(entry => {
-                seenIds.add(entry.id); // Track rendered entries
+                seenIds.add(entry.id);
                 return createEntryCard(entry);
             })
             .join('');
 
-        // Show or hide the "See More" button
         if (entries.length >= 3 && !showAllEntries) {
             seeMoreButton.style.display = 'block';
         } else {
@@ -126,7 +125,6 @@ async function loadRecentEntries() {
     }
 }
 
-// Toggle showAllEntries and reload
 function toggleSeeMore() {
     showAllEntries = !showAllEntries;
     loadRecentEntries();
@@ -135,7 +133,7 @@ function toggleSeeMore() {
 // Add event listener to "See More" button
 document.getElementById('see-more-button').addEventListener('click', toggleSeeMore);
 
-// Initialize on page load with debug logging
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     loadRecentEntries();
     
@@ -145,5 +143,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('dark-mode', savedTheme === 'dark');
         darkModeToggle.querySelector('.light-mode').style.display = savedTheme === 'dark' ? 'none' : 'block';
         darkModeToggle.querySelector('.dark-mode').style.display = savedTheme === 'dark' ? 'block' : 'none';
+    }
+
+    // Add click handler for new todo list
+    const todoLink = document.querySelector('a[href="todo template/todo.html"]');
+    if (todoLink) {
+        todoLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'todo template/todo.html';
+        });
     }
 });
