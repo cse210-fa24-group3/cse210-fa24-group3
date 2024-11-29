@@ -57,9 +57,9 @@
 // loadSavedTheme();
 
 // Menu toggle
-const menuBtn = document.querySelector('.navbar-left div:first-child');
-const sidebar = document.querySelector('.sidebar');
-const overlay = document.querySelector('.overlay');
+// const menuBtn = document.querySelector('.navbar-left div:first-child');
+// const sidebar = document.querySelector('.sidebar');
+// const overlay = document.querySelector('.overlay');
 
 menuBtn.addEventListener('click', toggleSidebar);
 overlay.addEventListener('click', toggleSidebar);
@@ -70,7 +70,7 @@ function toggleSidebar() {
 }
 
 // Dark mode toggle
-const darkModeToggle = document.querySelector('.navbar-right div:nth-child(2)');
+// const darkModeToggle = document.querySelector('.navbar-right div:nth-child(2)');
 const moon = '🌙';
 const sun = '☀️';
 
@@ -80,8 +80,8 @@ darkModeToggle.addEventListener('click', () => {
 });
 
 // User menu toggle
-const userBtn = document.querySelector('.navbar-right div:last-child');
-const userMenu = document.querySelector('.user-menu');
+// const userBtn = document.querySelector('.navbar-right div:last-child');
+// const userMenu = document.querySelector('.user-menu');
 
 userBtn.addEventListener('click', (e) => {
     e.stopPropagation();

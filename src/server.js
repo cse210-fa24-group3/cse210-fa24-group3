@@ -10,23 +10,97 @@ const port = 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Serve static files from the src directory
-// app.use(express.static(path.join(__dirname)));
 app.use(express.static(__dirname));
 
 console.log('Server running from directory:', __dirname);
 
-// Path to the entries.json file
-const ENTRIES_FILE = path.join(__dirname, 'entries.json');
-
 // Database setup
-const db = new sqlite3.Database(':memory:');
-
-// Initialize database
-db.serialize(() => {
-    db.run("CREATE TABLE entries (id TEXT PRIMARY KEY, title TEXT, content TEXT, created_at TEXT, updated_at TEXT)");
+const db = new sqlite3.Database(':memory:', (err) => {
+    if (err) {
+        console.error('Database creation error:', err);
+    } else {
+        console.log('Database created successfully');
+        initializeDatabase();
+    }
 });
+
+// Initialize database with all required tables
+function initializeDatabase() {
+    console.log('Initializing database...');
+    
+    db.serialize(() => {
+        // Drop existing tables if they exist
+        db.run('DROP TABLE IF EXISTS history');
+        db.run('DROP TABLE IF EXISTS documents');
+        db.run('DROP TABLE IF EXISTS entries');
+        
+        // Create tables in correct order
+        db.run(`
+            CREATE TABLE documents (
+                id TEXT PRIMARY KEY,
+                title TEXT,
+                content TEXT,
+                template_type TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+        `, [], (err) => {
+            if (err) console.error('Error creating documents table:', err);
+            else console.log('Documents table created successfully');
+        });
+
+        db.run(`
+            CREATE TABLE entries (
+                id TEXT PRIMARY KEY,
+                title TEXT,
+                content TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+        `, [], (err) => {
+            if (err) console.error('Error creating entries table:', err);
+            else console.log('Entries table created successfully');
+        });
+
+        db.run(`
+            CREATE TABLE history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                document_id TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (document_id) REFERENCES documents(id)
+            )
+        `, [], (err) => {
+            if (err) console.error('Error creating history table:', err);
+            else console.log('History table created successfully');
+        });
+
+        // Verify tables after creation
+        verifyTables();
+    });
+}
+
+// Helper function to verify tables exist
+function verifyTables() {
+    db.all(`SELECT name FROM sqlite_master WHERE type='table'`, [], (err, tables) => {
+        if (err) {
+            console.error('Error checking tables:', err);
+            return;
+        }
+        console.log('Existing tables:', tables.map(t => t.name));
+        
+        // Verify each table's structure
+        tables.forEach(({name}) => {
+            db.all(`PRAGMA table_info(${name})`, [], (err, columns) => {
+                if (err) {
+                    console.error(`Error checking columns for ${name}:`, err);
+                    return;
+                }
+                console.log(`Table ${name} columns:`, columns.map(c => c.name));
+            });
+        });
+    });
+}
 
 // Helper function to export DB entries to JSON
 async function exportToJson() {
@@ -101,9 +175,6 @@ app.post('/api/entries', (req, res) => {
     });
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
 
 // Import entries from JSON file
 app.post('/api/import', async (req, res) => {
@@ -236,65 +307,84 @@ app.post('/api/documents/new-todo', (req, res) => {
     
     console.log('Creating new todo document...');
 
-    const emptyTodo = {
-        title: "Untitled Todo List",
-        content: JSON.stringify({
-            tasks: [],
-            lastUpdated: now
-        }),
-        template_type: 'todo'
-    };
+    // First verify the documents table exists
+    db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='documents'", [], (err, table) => {
+        if (err) {
+            console.error('Error checking documents table:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Database error' 
+            });
+        }
 
-    db.serialize(() => {
-        db.run('BEGIN TRANSACTION');
+        if (!table) {
+            console.error('Documents table does not exist');
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Database not properly initialized' 
+            });
+        }
 
-        db.run(
-            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-            [id, emptyTodo.title, emptyTodo.content, emptyTodo.template_type, now, now],
-            function(err) {
-                if (err) {
-                    console.error('Document creation error:', err);
-                    db.run('ROLLBACK');
-                    return res.status(500).json({ 
-                        success: false, 
-                        error: err.message 
-                    });
-                }
+        const emptyTodo = {
+            title: "Untitled Todo List",
+            content: JSON.stringify({
+                tasks: [],
+                lastUpdated: now
+            }),
+            template_type: 'todo'
+        };
 
-                db.run(
-                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
-                    [id, now, now],
-                    function(err) {
-                        if (err) {
-                            console.error('History creation error:', err);
-                            db.run('ROLLBACK');
-                            return res.status(500).json({ 
-                                success: false, 
-                                error: err.message 
-                            });
-                        }
+        db.serialize(() => {
+            db.run('BEGIN TRANSACTION');
 
-                        db.run('COMMIT', (err) => {
+            db.run(
+                'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+                [id, emptyTodo.title, emptyTodo.content, emptyTodo.template_type, now, now],
+                function(err) {
+                    if (err) {
+                        console.error('Document creation error:', err);
+                        db.run('ROLLBACK');
+                        return res.status(500).json({ 
+                            success: false, 
+                            error: err.message 
+                        });
+                    }
+
+                    db.run(
+                        'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                        [id, now, now],
+                        function(err) {
                             if (err) {
-                                console.error('Commit error:', err);
+                                console.error('History creation error:', err);
                                 db.run('ROLLBACK');
                                 return res.status(500).json({ 
                                     success: false, 
                                     error: err.message 
                                 });
                             }
-                            
-                            console.log('Todo created successfully with ID:', id);
-                            return res.status(200).json({ 
-                                success: true, 
-                                documentId: id,
-                                message: 'Todo created successfully'
+
+                            db.run('COMMIT', (err) => {
+                                if (err) {
+                                    console.error('Commit error:', err);
+                                    db.run('ROLLBACK');
+                                    return res.status(500).json({ 
+                                        success: false, 
+                                        error: err.message 
+                                    });
+                                }
+                                
+                                console.log('Todo created successfully with ID:', id);
+                                return res.status(200).json({ 
+                                    success: true, 
+                                    documentId: id,
+                                    message: 'Todo created successfully'
+                                });
                             });
-                        });
-                    }
-                );
-            }
-        );
+                        }
+                    );
+                }
+            );
+        });
     });
 });
 
@@ -352,18 +442,6 @@ app.put('/api/documents/:id', (req, res) => {
     });
 });
 
-db.run(`
-    CREATE TABLE IF NOT EXISTS history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        document_id TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (document_id) REFERENCES documents(id)
-    )
-`);
-
-
-
 // Serve todo.html for the todo route
 app.get('/todo', (req, res) => {
     res.sendFile(path.join(__dirname, 'todo.html'));
@@ -404,4 +482,8 @@ app.get('/journal', (req, res) => {
 
 app.get('/journal/:id', (req, res) => {
     res.sendFile(path.join(__dirname, 'journal.html'));
+});
+
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
 });
