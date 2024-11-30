@@ -21,6 +21,7 @@ darkModeToggle.addEventListener('click', () => {
     darkModeToggle.querySelector('.light-mode').style.display = document.body.classList.contains('dark-mode') ? 'none' : 'block';
     darkModeToggle.querySelector('.dark-mode').style.display = document.body.classList.contains('dark-mode') ? 'block' : 'none';
     
+    // Save preference
     localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
 });
 
@@ -36,6 +37,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Format relative time for entries
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -53,6 +55,7 @@ function formatRelativeTime(dateString) {
     });
 }
 
+// Create HTML for a single entry card
 function createEntryCard(entry) {
     const truncatedContent = entry.content 
         ? entry.content.length > 100 
@@ -78,7 +81,11 @@ function createEntryCard(entry) {
         </div>
     `;
 }
-let showAllEntries = false;
+
+// Load recent entries
+let showAllEntries = false; // Track whether to show all entries
+
+
 
 async function loadRecentEntries() {
     const container = document.getElementById('recently-edited-container');
@@ -89,32 +96,34 @@ async function loadRecentEntries() {
         return;
     }
 
-    const limit = showAllEntries ? null : 3;
-    const url = limit ? `http://localhost:3000/api/entries?limit=${limit}` : 'http://localhost:3000/api/entries';
-
     try {
-        const response = await fetch(url);
+        const response = await fetch('http://localhost:3000/api/documents');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const entries = await response.json();
-        const seenIds = new Set();
+        const seenIds = new Set(); // Track rendered entry IDs
 
         if (!entries || entries.length === 0) {
             container.innerHTML = '<div class="card no-entries">No entries yet. Create your first entry!</div>';
             return;
         }
 
-        container.innerHTML = entries
-            .filter(entry => !seenIds.has(entry.id))
+        // Filter and limit entries if needed
+        const displayEntries = showAllEntries ? entries : entries.slice(0, 3);
+
+        // Generate HTML for entries
+        container.innerHTML = displayEntries
+            .filter(entry => !seenIds.has(entry.id)) // Filter out duplicate entries
             .map(entry => {
-                seenIds.add(entry.id);
+                seenIds.add(entry.id); // Track rendered entries
                 return createEntryCard(entry);
             })
             .join('');
 
-        if (entries.length >= 3 && !showAllEntries) {
+        // Show or hide the "See More" button
+        if (entries.length > 3 && !showAllEntries) {
             seeMoreButton.style.display = 'block';
         } else {
             seeMoreButton.style.display = 'none';
@@ -125,15 +134,13 @@ async function loadRecentEntries() {
     }
 }
 
+// Toggle showAllEntries and reload
 function toggleSeeMore() {
     showAllEntries = !showAllEntries;
     loadRecentEntries();
 }
 
-// Add event listener to "See More" button
-document.getElementById('see-more-button').addEventListener('click', toggleSeeMore);
-
-// Initialize
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadRecentEntries();
     
@@ -152,5 +159,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             window.location.href = 'todo template/todo.html';
         });
+    }
+
+    // Add event listener to "See More" button
+    const seeMoreButton = document.getElementById('see-more-button');
+    if (seeMoreButton) {
+        seeMoreButton.addEventListener('click', toggleSeeMore);
     }
 });

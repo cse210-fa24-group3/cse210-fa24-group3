@@ -464,6 +464,12 @@
         }
         
         function loadDocument(documentId) {
+            if (!documentId) {
+                console.error('No document ID provided');
+                initializeNewTodoList();
+                return;
+            }
+        
             const baseUrl = 'http://localhost:3000';
         
             console.log('Attempting to load document with ID:', documentId);
@@ -498,7 +504,7 @@
                     }
         
                     // Populate the UI with the loaded data
-                    populateTodoList(document.title, content.tasks);
+                    populateTodoList(document.title, content.tasks, documentId);
                 })
                 .catch(error => {
                     console.error('Failed to load document:', error);
@@ -525,7 +531,7 @@
                 });
         }
         
-        function populateTodoList(title, tasks) {
+        function populateTodoList(title, tasks, documentId) {
             // Update the list name
             const listNameElement = document.querySelector('#listName');
             if (listNameElement) {
@@ -550,8 +556,35 @@
             }
         
             // Store document ID in localStorage
-            localStorage.setItem('todoDocumentId', documentId);
+            if (documentId) {
+                localStorage.setItem('todoDocumentId', documentId);
+                
+                // Update URL with document ID
+                const url = new URL(window.location);
+                url.searchParams.set('id', documentId);
+                window.history.replaceState({}, '', url);
+            }
         }
+        
+        // Modify the DOMContentLoaded event listener to handle document ID more robustly
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDate();
+            const documentId = getDocumentIdFromUrl();
+            
+            // If there's no document ID, this is a new todo list
+            if (!documentId) {
+                initializeNewTodoList();
+            } else {
+                loadDocument(documentId);
+            }
+        
+            // Add enter key support for task input
+            document.getElementById('taskInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTask();
+                }
+            });
+        });
         let autoSaveTimeout;
         function scheduleAutoSave() {
             clearTimeout(autoSaveTimeout);

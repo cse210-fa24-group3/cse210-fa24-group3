@@ -97,7 +97,8 @@ async function loadEntry() {
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/entries/${editingId}`);
+        // FIXED: Changed from /api/entries/ to /api/documents/
+        const response = await fetch(`http://localhost:3000/api/documents/${editingId}`);
         if (!response.ok) {
             throw new Error(`Failed to load entry: ${response.status}`);
         }
