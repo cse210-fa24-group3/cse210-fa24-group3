@@ -237,7 +237,7 @@ app.post('/api/documents/new-todo', (req, res) => {
     console.log('Creating new todo document...');
 
     const emptyTodo = {
-        title: "Untitled Todo List",
+        title: "",
         content: JSON.stringify({
             tasks: [],
             lastUpdated: now
@@ -422,7 +422,7 @@ app.post('/api/documents/new-bug-review', (req, res) => {
     console.log('Creating new bug review document...');
 
     const emptyBugReview = {
-        title: "Untitled Bug Review",
+        title: "",
         content: JSON.stringify({
             text: '',
             lastUpdated: now
