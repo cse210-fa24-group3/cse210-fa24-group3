@@ -4,284 +4,34 @@
     <meta charset="UTF-8">
     <title>Todo List Template</title>
     <link rel="stylesheet" href="/styles.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #fff;
-            min-height: 100vh;
-            padding-top: 6rem;
-        }
-
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background: white;
-            width: 800px;
-            max-width: 600px;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        
-        .title {
-            font-size: 2.5rem;
-            color: #166534;
-            margin: 0;
-            line-height: 1.2;
-        }
-        
-        .date {
-            color: #6b7280;
-            font-size: 0.875rem;
-        }
-        
-        .list-name {
-            font-size: 1.5rem;
-            color: #6b7280;
-            margin: 0 0 1.5rem 0;
-            padding: 0.5rem;
-            border: 1px solid transparent;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        
-        .list-name:hover {
-            border-color: #e5e7eb;
-            border-radius: 0.5rem;
-        }
-        
-        .list-name-input {
-            font-size: 1.5rem;
-            padding: 0.5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            width: 100%;
-            color: #111827;
-            margin-bottom: 1.5rem;
-            font-family: inherit;
-        }
-        
-        .add-task {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        input[type="text"] {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            color: #111827;
-        }
-        
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #166534;
-        }
-        
-        button {
-            background: #166534;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: background-color 0.2s ease;
-        }
-        
-        button:hover {
-            background: #14532d;
-        }
-        
-        .task-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: grid;
-            gap: 1rem;
-        }
-        
-        .task-item {
-            display: flex;
-            align-items: center;
-            padding: 1.5rem;
-            gap: 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            background: white;
-        }
-        
-        .task-item input[type="checkbox"] {
-            width: 1.2rem;
-            height: 1.2rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.25rem;
-            cursor: pointer;
-        }
-        
-        .task-item span {
-            flex: 1;
-            color: #111827;
-            font-size: 0.875rem;
-        }
-
-        /* Dark mode styles */
-        body.dark-mode {
-            background: #1a1a1a;
-            color: #ffffff;
-        }
-
-        body.dark-mode .navbar,
-        body.dark-mode .container,
-        body.dark-mode .task-item {
-            background: #2d2d2d;
-        }
-
-        body.dark-mode input[type="text"],
-        body.dark-mode .list-name-input {
-            background: #404040;
-            color: #ffffff;
-            border-color: #404040;
-        }
-
-        body.dark-mode .task-item {
-            border-color: #404040;
-        }
-
-        body.dark-mode .list-name,
-        body.dark-mode .task-item span {
-            color: #ffffff;
-        }
-
-        body.dark-mode .list-name:hover {
-            border-color: #404040;
-        }
-        /* Add these new styles to your existing CSS */
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.save-btn {
-    background: #64748b; /* Secondary color */
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.save-btn:hover {
-    background: #475569;
-}
-
-.save-btn:disabled {
-    background: #94a3b8;
-    cursor: not-allowed;
-}
-
-.save-status {
-    color: #64748b;
-    font-size: 0.875rem;
-    min-width: 120px;
-    text-align: right;
-}
-
-.loading-spinner {
-    display: none;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    border-top-color: transparent;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Update the dark mode styles */
-body.dark-mode .save-btn {
-    background: #64748b;
-}
-
-body.dark-mode .save-btn:hover {
-    background: #475569;
-}
-
-body.dark-mode .save-btn:disabled {
-    background: #94a3b8;
-}
-
-body.dark-mode .save-status {
-    color: #94a3b8;
-}
-    </style>
+    <link rel="stylesheet" href="/template.css">
+    <!-- For HTML Only styles -->
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./template.css">
 </head>
 <body>
     
     <nav class="navbar">
         <div class="navbar-left">
             <div>☰</div>
-            <div><a href="/index.html">DevLog</a></div>
+            <div><a class="logo" href="/">DevLog</a></div>
         </div>
         <div class="navbar-right">
             <div class="search-container">
-                <input type="text" class="search-input" placeholder="Hinted search text">
+                <input type="text" class="search-input" placeholder="Search entries">
                 <span class="search-icon">🔍</span>
             </div>
-            <div>🌙</div>
-            <div>👤</div>
+            <div class="theme-toggle">
+                <span class="light-mode">🌙</span>
+                <span class="dark-mode" style="display:none;">☀️</span>
+            </div>
+            <div class="user-btn">👤</div>
         </div>
     </nav>
 
     <div class="sidebar">
         <div class="sidebar-links">
-            <a href="/index.html">Home</a>
+            <a href="/">Home</a>
             <a href="#">My Documents</a>
             <a href="#">Templates</a>
             <a href="#">Settings</a>
@@ -295,25 +45,25 @@ body.dark-mode .save-status {
         <a href="#" class="block p-2">Settings</a>
         <a href="#" class="block p-2">Logout</a>
     </div>
-    <main>
+    <main class="main-content">
         <div class="container">
-            <div class="header-container">
-                <h2>Todo List</h2>
+            <div class="header">
+                <input type="text" class="list-name" placeholder="Untitled Todo List" id="listName">
+                <!-- <h2 class="list-name" id="listName" onclick="editListName()">Untitled Todo List</h2> -->
                 <div class="header-right">
                     <div class="save-status" id="saveStatus"></div>
-                    <button class="save-btn secondary" id="saveButton" onclick="saveToDatabase()">
+                    <button class="save-button secondary" id="saveButton" onclick="saveToDatabase()">
                         <span class="loading-spinner" id="saveSpinner"></span>
                         <span>Save</span>
                     </button>
                 </div>
             </div>
             
-            <h2 class="list-name" id="listName" onclick="editListName()">Click to add list name</h2>
             <div class="date" id="currentDate"></div>
             
             <div class="add-task">
-                <input type="text" id="taskInput" placeholder="Add a new task..." />
-                <button onclick="addTask()">Add Task</button>
+                <input class="task-input" type="text" id="taskInput" placeholder="Add a new task..." />
+                <button class="add-button" onclick="addTask()">Add Task</button>
             </div>
             
             <ul class="task-list" id="taskList"></ul>
@@ -340,14 +90,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                 throw new Error('Failed to load document');
             }
             
-            const document = await response.json();
-            console.log('Loaded document:', document);
+            const loadedEocument = await response.json();
+            console.log('Loaded document:', loadedEocument);
             
             // Parse the content
-            const content = JSON.parse(document.content);
+            const content = JSON.parse(loadedEocument.content);
             
             // Set the list name
-            document.getElementById('listName').textContent = document.title;
+            document.getElementById('listName').value = loadedEocument.title;
             
             // Clear existing tasks
             const taskList = document.getElementById('taskList');
@@ -401,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
 
         const todoData = {
-            title: document.getElementById('listName').textContent,
+            title: document.getElementById('listName').value,
             content: JSON.stringify({
                 tasks: tasks,
                 lastUpdated: new Date().toISOString()
@@ -439,17 +189,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 }
 
-        function saveListName(name) {
-            const input = document.querySelector('.list-name-input');
-            const h2 = document.createElement('h2');
-            h2.id = 'listName';
-            h2.className = 'list-name';
-            h2.onclick = editListName;
-            h2.textContent = name.trim() || 'Click to add list name';
+        // function saveListName(name) {
+        //     const input = document.querySelector('.list-name-input');
+        //     const h2 = document.createElement('h2');
+        //     h2.id = 'listName';
+        //     h2.className = 'list-name';
+        //     h2.onclick = editListName;
+        //     h2.textContent = name.trim() || 'Click to add list name';
             
-            localStorage.setItem('listName', h2.textContent);
-            input.parentNode.replaceChild(h2, input);
-        }
+        //     localStorage.setItem('listName', h2.textContent);
+        //     input.parentNode.replaceChild(h2, input);
+        // }
 
         // ============= TASK MANAGEMENT FUNCTIONS =============
         function addTask() {
@@ -511,27 +261,27 @@ function getAllTasks() {
 }
 
         // ============= LIST NAME FUNCTIONS =============
-        function editListName() {
-            const listNameElement = document.getElementById('listName');
-            const currentName = listNameElement.textContent;
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'list-name-input';
-            input.value = currentName === 'Click to add list name' ? '' : currentName;
+        // function editListName() {
+        //     const listNameElement = document.getElementById('listName');
+        //     const currentName = listNameElement.textContent;
+        //     const input = document.createElement('input');
+        //     input.type = 'text';
+        //     input.className = 'list-name-input';
+        //     input.value = currentName === 'Click to add list name' ? '' : currentName;
             
-            input.onblur = function() {
-                saveListName(this.value);
-            };
+        //     input.onblur = function() {
+        //         saveListName(this.value);
+        //     };
             
-            input.onkeypress = function(e) {
-                if (e.key === 'Enter') {
-                    saveListName(this.value);
-                }
-            };
+        //     input.onkeypress = function(e) {
+        //         if (e.key === 'Enter') {
+        //             saveListName(this.value);
+        //         }
+        //     };
             
-            listNameElement.parentNode.replaceChild(input, listNameElement);
-            input.focus();
-        }
+        //     listNameElement.parentNode.replaceChild(input, listNameElement);
+        //     input.focus();
+        // }
 
         // ============= LOADING FUNCTIONS =============
         async function loadDocument(documentId) {
@@ -543,11 +293,11 @@ function getAllTasks() {
                 throw new Error('Document not found');
             }
             
-            const document = await response.json();
-            const content = JSON.parse(document.content);
+            const loadedDocument = await response.json();
+            const content = JSON.parse(loadedDocument.content);
             
             // Update list name
-            document.getElementById('listName').textContent = document.title;
+            document.getElementById('listName').value = loadedDocument.title;
             
             // Load tasks
             const taskList = document.getElementById('taskList');

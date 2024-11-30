@@ -74,10 +74,31 @@ const darkModeToggle = document.querySelector('.navbar-right div:nth-child(2)');
 const moon = '🌙';
 const sun = '☀️';
 
+// Loading saved theme, likely to change
+function loadSavedTheme() {
+    const savedTheme = localStorage.getItem('darkMode');
+    if (savedTheme === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.textContent = sun;
+    }
+    else {
+        darkModeToggle.textContent = moon;
+    }
+}
+
 darkModeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? sun : moon;
+    // Likely to change, consider user ids
+    if (darkModeToggle.textContent === sun) {
+        localStorage.setItem('darkMode', 'enabled');
+    } else {
+        localStorage.setItem('darkMode', 'disabled');
+    }
 });
+
+// Loading saved theme, likely to change
+loadSavedTheme();
 
 // User menu toggle
 const userBtn = document.querySelector('.navbar-right div:last-child');
