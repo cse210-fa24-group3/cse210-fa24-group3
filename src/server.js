@@ -11,142 +11,47 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the src directory
-// app.use(express.static(path.join(__dirname)));
+// Serve static files from the directories
 app.use(express.static(__dirname));
-
-console.log('Server running from directory:', __dirname);
-
-// Path to the entries.json file
-const ENTRIES_FILE = path.join(__dirname, 'entries.json');
+app.use(express.static(path.join(__dirname)));
+app.use('/todo_template', express.static(path.join(__dirname, 'todo_template')));
+app.use('/new-page', express.static(path.join(__dirname, 'new-page')));
 
 // Database setup
-const db = new sqlite3.Database(':memory:');
-
-// Initialize database
-db.serialize(() => {
-    db.run("CREATE TABLE documents (id TEXT PRIMARY KEY, title TEXT, content TEXT, template_type TEXT, created_at TEXT, updated_at TEXT)");
+const db = new sqlite3.Database('documents.db', (err) => {
+    if (err) {
+        console.error('Error opening database:', err);
+    } else {
+        console.log('Connected to the documents database.');
+    }
 });
 
-// Helper function to export DB entries to JSON
-async function exportToJson() {
-    return new Promise((resolve, reject) => {
-        db.all('SELECT * FROM entries ORDER BY created_at DESC', [], async (err, rows) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            try {
-                await fs.writeFile(ENTRIES_FILE, JSON.stringify(rows, null, 2));
-                resolve();
-            } catch (error) {
-                reject(error);
-            }
-        });
-    });
-}
+// Initialize database schema
+db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS documents (
+        id TEXT PRIMARY KEY, 
+        title TEXT, 
+        content TEXT, 
+        template_type TEXT, 
+        created_at TEXT, 
+        updated_at TEXT
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        document_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (document_id) REFERENCES documents(id)
+    )`);
+});
 
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
     next();
 });
 
-
 // API Routes
-// Get all entries
-app.get('/api/entries', (req, res) => {
-    const limit = req.query.limit ? parseInt(req.query.limit, 10) : null;
-    let sql = 'SELECT * FROM entries ORDER BY updated_at DESC';
-    if (limit) {
-        sql += ` LIMIT ${limit}`;
-    }
-    db.all(sql, [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(rows);
-    });
-});
-
-app.post('/api/entries', (req, res) => {
-    const { id, title, content, created_at, updated_at } = req.body;
-
-    db.get('SELECT id FROM entries WHERE id = ?', [id], async (err, row) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        if (row) {
-            res.status(400).json({ error: 'Entry with the same ID already exists' });
-            return;
-        }
-
-        db.run(
-            'INSERT INTO entries (id, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
-            [id, title, content, created_at, updated_at],
-            async function(err) {
-                if (err) {
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-
-                try {
-                    await exportToJson();
-                    res.json({ id, message: 'Entry created successfully' });
-                } catch (error) {
-                    res.status(500).json({ message: 'Entry created in database but JSON export failed' });
-                }
-            }
-        );
-    });
-});
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
-
-// Import entries from JSON file
-app.post('/api/import', async (req, res) => {
-    try {
-        const jsonData = await fs.readFile(ENTRIES_FILE, 'utf8');
-        const entries = JSON.parse(jsonData);
-        
-        // Begin transaction
-        db.serialize(() => {
-            db.run('BEGIN TRANSACTION');
-            
-            // Clear existing entries
-            db.run('DELETE FROM entries', [], (err) => {
-                if (err) {
-                    db.run('ROLLBACK');
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-                
-                // Insert all entries from JSON
-                const stmt = db.prepare('INSERT INTO entries (id, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?)');
-                
-                entries.forEach((entry) => {
-                    stmt.run([entry.id, entry.title, entry.content, entry.created_at, entry.updated_at]);
-                });
-                
-                stmt.finalize();
-                
-                db.run('COMMIT', (err) => {
-                    if (err) {
-                        db.run('ROLLBACK');
-                        res.status(500).json({ error: err.message });
-                        return;
-                    }
-                    res.json({ message: 'Entries imported successfully' });
-                });
-            });
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
 // Get all documents
 app.get('/api/documents', (req, res) => {
     db.all('SELECT * FROM documents ORDER BY created_at DESC', [], (err, rows) => {
@@ -180,7 +85,13 @@ app.get('/api/documents/:id', (req, res) => {
 // Create new document
 app.post('/api/documents', (req, res) => {
     console.log('Received POST request for document:', req.body);
-    const { title, content, template_type } = req.body;
+    const { title, content, template_type = 'New Document' } = req.body;
+    
+    // Validate input
+    if (!title) {
+        return res.status(400).json({ error: 'Title is required' });
+    }
+
     const id = Date.now().toString(); // Generate unique ID
     const now = new Date().toISOString();
 
@@ -230,6 +141,68 @@ app.post('/api/documents', (req, res) => {
     });
 });
 
+// Update document
+app.put('/api/documents/:id', (req, res) => {
+    const { id } = req.params;
+    const { title, content } = req.body;
+    
+    // Validate input
+    if (!title) {
+        return res.status(400).json({ error: 'Title is required' });
+    }
+
+    const now = new Date().toISOString();
+
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+
+        // Update documents table
+        db.run(
+            'UPDATE documents SET title = ?, content = ?, updated_at = ? WHERE id = ?',
+            [title, content, now, id],
+            function(err) {
+                if (err) {
+                    db.run('ROLLBACK');
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
+
+                if (this.changes === 0) {
+                    db.run('ROLLBACK');
+                    res.status(404).json({ error: 'Document not found' });
+                    return;
+                }
+
+                // Insert into history
+                db.run(
+                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                    [id, now, now],
+                    function(err) {
+                        if (err) {
+                            db.run('ROLLBACK');
+                            res.status(500).json({ error: err.message });
+                            return;
+                        }
+
+                        db.run('COMMIT', (err) => {
+                            if (err) {
+                                db.run('ROLLBACK');
+                                res.status(500).json({ error: err.message });
+                                return;
+                            }
+                            res.json({ 
+                                success: true, 
+                                message: 'Document updated successfully' 
+                            });
+                        });
+                    }
+                );
+            }
+        );
+    });
+});
+
+// Special routes for specific document types
 app.post('/api/documents/new-todo', (req, res) => {
     const id = Date.now().toString();
     const now = new Date().toISOString();
@@ -296,123 +269,6 @@ app.post('/api/documents/new-todo', (req, res) => {
             }
         );
     });
-});
-
-// Update document
-app.put('/api/documents/:id', (req, res) => {
-    const { title, content } = req.body;
-    const now = new Date().toISOString();
-
-    db.serialize(() => {
-        db.run('BEGIN TRANSACTION');
-
-        // Update documents table
-        db.run(
-            'UPDATE documents SET title = ?, content = ?, updated_at = ? WHERE id = ?',
-            [title, content, now, req.params.id],
-            function(err) {
-                if (err) {
-                    db.run('ROLLBACK');
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-
-                if (this.changes === 0) {
-                    db.run('ROLLBACK');
-                    res.status(404).json({ error: 'Document not found' });
-                    return;
-                }
-
-                // Modified: Include created_at in history insert
-                db.run(
-                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
-                    [req.params.id, now, now], // Added now as created_at
-                    function(err) {
-                        if (err) {
-                            db.run('ROLLBACK');
-                            res.status(500).json({ error: err.message });
-                            return;
-                        }
-
-                        db.run('COMMIT', (err) => {
-                            if (err) {
-                                db.run('ROLLBACK');
-                                res.status(500).json({ error: err.message });
-                                return;
-                            }
-                            res.json({ 
-                                success: true, 
-                                message: 'Document updated successfully' 
-                            });
-                        });
-                    }
-                );
-            }
-        );
-    });
-});
-
-db.run(`
-    CREATE TABLE IF NOT EXISTS history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        document_id TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (document_id) REFERENCES documents(id)
-    )
-`);
-
-
-
-// Serve todo.html for the todo route
-app.get('/todo', (req, res) => {
-    res.sendFile(path.join(__dirname, 'todo.html'));
-});
-
-
-// Serve index.html for the root route
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Serve editor.html for the editor route
-app.get('/editor', (req, res) => {
-    res.sendFile(path.join(__dirname, 'new-page', 'editor.html'));
-});
-
-app.get('/todo/:id', (req, res) => {
-    console.log('Loading todo with ID:', req.params.id);
-    // Use absolute path to todo.html
-    const todoPath = path.join(__dirname, 'todo.html');
-    console.log('Serving file from:', todoPath); // Debug log
-    res.sendFile(todoPath);
-});
-
-app.get('/todo', (req, res) => {
-    const indexPath = path.join(__dirname, 'index.html');
-    res.sendFile(indexPath);
-});
-
-app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    res.status(500).send('Something broke!');
-});
-
-app.get('/journal', (req, res) => {
-    res.sendFile(path.join(__dirname, 'journal.html'));
-});
-
-app.get('/journal/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'journal.html'));
-});
-
-// Bug Review
-app.get('/bug-review', (req, res) => {
-    res.sendFile(path.join(__dirname, 'bug-review.html'));
-});
-
-app.get('/bug-review/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'bug-review.html'));
 });
 
 app.post('/api/documents/new-bug-review', (req, res) => {
@@ -483,6 +339,55 @@ app.post('/api/documents/new-bug-review', (req, res) => {
     });
 });
 
+app.get(['/todo_template/todo.html'], (req, res) => {
+    const todoTemplatePath = path.join(__dirname, 'todo_template', 'todo.html');
+    console.log('Attempting to serve todo_template');
+    console.log('Full path:', todoTemplatePath);
+    
+    // Use fs to check if file exists before sending
+    fs.access(todoTemplatePath, fs.constants.F_OK, (err) => {
+        if (err) {
+            console.error('Todo template file not found:', err);
+            return res.status(404).send('Todo template not found');
+        }
+        res.sendFile(todoTemplatePath);
+    });
+});
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/editor', (req, res) => {
+    res.sendFile(path.join(__dirname, 'new-page', 'editor.html'));
+});
+
+
+
+app.get('/journal', (req, res) => {
+    res.sendFile(path.join(__dirname, 'journal.html'));
+});
+
+app.get('/journal/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'journal.html'));
+});
+
+app.get('/bug-review', (req, res) => {
+    res.sendFile(path.join(__dirname, 'bug-review.html'));
+});
+
+app.get('/bug-review/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'bug-review.html'));
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).send('Something broke!');
+});
+
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
 
 // Feature
 app.get('/feature', (req, res) => {

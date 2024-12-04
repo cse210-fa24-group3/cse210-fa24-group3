@@ -36,39 +36,38 @@ async function saveContent(isAutoSave = false) {
 
     const urlParams = new URLSearchParams(window.location.search);
     const editingId = urlParams.get('id');
-    const timestamp = new Date().toISOString();
-
-    const entry = {
-        id: editingId || Date.now().toString(),
-        title: title || 'Untitled',
-        content,
-        created_at: editingId ? undefined : timestamp,
-        updated_at: timestamp
-    };
 
     try {
         const url = editingId 
-            ? `http://localhost:3000/api/entries/${editingId}`
-            : 'http://localhost:3000/api/entries';
+            ? `http://localhost:3000/api/documents/${editingId}`
+            : 'http://localhost:3000/api/documents';
 
         const response = await fetch(url, {
             method: editingId ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(entry),
+            body: JSON.stringify({
+                title: title || 'Untitled',
+                content
+            }),
         });
 
-        if (!response.ok) throw new Error('Failed to save entry');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to save entry');
+        }
 
+        const data = await response.json();
         showNotification(isAutoSave ? 'Auto-saved!' : 'Saved successfully!', 'success');
 
-        if (!isAutoSave) {
+        if (!isAutoSave && !editingId) {
+            // Only redirect if it's a manual save of a new document
             setTimeout(() => {
                 window.location.href = '../index.html';
             }, 1000);
         }
     } catch (error) {
         console.error('Error saving entry:', error);
-        showNotification('Failed to save entry', 'error');
+        showNotification(error.message || 'Failed to save entry', 'error');
     }
 }
 
@@ -98,7 +97,8 @@ async function loadEntry() {
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/entries/${editingId}`);
+        // FIXED: Changed from /api/entries/ to /api/documents/
+        const response = await fetch(`http://localhost:3000/api/documents/${editingId}`);
         if (!response.ok) {
             throw new Error(`Failed to load entry: ${response.status}`);
         }
@@ -108,10 +108,7 @@ async function loadEntry() {
         titleInput.value = entry.title || '';
         contentInput.value = entry.content || '';
         
-        document.title = `Editing: ${entry.title || 'Untitled'} | Code Journey`;
-        
-        const editorContainer = document.querySelector('.editor-container');
-        editorContainer.classList.add('editing-existing');
+        document.title = `Editing: ${entry.title || 'Untitled'} | DevLog`;
         
     } catch (error) {
         console.error('Error loading entry:', error);
@@ -126,3 +123,21 @@ async function loadEntry() {
 // Event Listeners
 saveButton.addEventListener('click', () => saveContent(false));
 window.addEventListener('load', loadEntry);
+
+// Auto-save functionality
+let autoSaveTimeout;
+function setupAutoSave() {
+    const AUTO_SAVE_DELAY = 3000; // 3 seconds
+
+    function triggerAutoSave() {
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(() => {
+            saveContent(true);
+        }, AUTO_SAVE_DELAY);
+    }
+
+    titleInput.addEventListener('input', triggerAutoSave);
+    contentInput.addEventListener('input', triggerAutoSave);
+}
+
+setupAutoSave();

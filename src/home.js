@@ -63,9 +63,14 @@ function createEntryCard(entry) {
             : entry.content
         : 'No content';
 
+        const link = entry.template_type === 'Todo' 
+        ? `todo%20template/todo.html?id=${entry.id}`
+        : `new-page/editor.html?id=${entry.id}`;
+
     return `
         <div class="card entry-card">
-            <a href="new-page/editor.html?id=${entry.id}" class="entry-link">
+            <a href="${link}" class="entry-link">
+                <div class="entry-type">${entry.template_type}</div>
                 <h3 class="entry-title">${entry.title || 'Untitled'}</h3>
                 <p class="entry-preview">${truncatedContent}</p>
                 <div class="entry-meta">
@@ -79,6 +84,8 @@ function createEntryCard(entry) {
 // Load recent entries
 let showAllEntries = false; // Track whether to show all entries
 
+
+
 async function loadRecentEntries() {
     const container = document.getElementById('recently-edited-container');
     const seeMoreButton = document.getElementById('see-more-button');
@@ -88,11 +95,8 @@ async function loadRecentEntries() {
         return;
     }
 
-    const limit = showAllEntries ? null : 3; // Limit to 3 for initial load
-    const url = limit ? `http://localhost:3000/api/entries?limit=${limit}` : `http://localhost:3000/api/entries`;
-
     try {
-        const response = await fetch(url);
+        const response = await fetch('http://localhost:3000/api/documents');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -105,8 +109,11 @@ async function loadRecentEntries() {
             return;
         }
 
+        // Filter and limit entries if needed
+        const displayEntries = showAllEntries ? entries : entries.slice(0, 3);
+
         // Generate HTML for entries
-        container.innerHTML = entries
+        container.innerHTML = displayEntries
             .filter(entry => !seenIds.has(entry.id)) // Filter out duplicate entries
             .map(entry => {
                 seenIds.add(entry.id); // Track rendered entries
@@ -115,7 +122,7 @@ async function loadRecentEntries() {
             .join('');
 
         // Show or hide the "See More" button
-        if (entries.length >= 3 && !showAllEntries) {
+        if (entries.length > 3 && !showAllEntries) {
             seeMoreButton.style.display = 'block';
         } else {
             seeMoreButton.style.display = 'none';
@@ -132,10 +139,7 @@ function toggleSeeMore() {
     loadRecentEntries();
 }
 
-// Add event listener to "See More" button
-document.getElementById('see-more-button').addEventListener('click', toggleSeeMore);
-
-// Initialize on page load with debug logging
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadRecentEntries();
     
@@ -145,5 +149,20 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('dark-mode', savedTheme === 'dark');
         darkModeToggle.querySelector('.light-mode').style.display = savedTheme === 'dark' ? 'none' : 'block';
         darkModeToggle.querySelector('.dark-mode').style.display = savedTheme === 'dark' ? 'block' : 'none';
+    }
+
+    // Add click handler for new todo list
+    const todoLink = document.querySelector('a[href="todo_template/todo.html"]');
+    if (todoLink) {
+        todoLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'todo_template/todo.html';
+        });
+    }
+
+    // Add event listener to "See More" button
+    const seeMoreButton = document.getElementById('see-more-button');
+    if (seeMoreButton) {
+        seeMoreButton.addEventListener('click', toggleSeeMore);
     }
 });

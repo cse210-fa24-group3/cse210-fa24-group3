@@ -24,7 +24,6 @@
             <div class="user-btn">👤</div>
         </div>
     </nav>
-
     <div class="sidebar">
         <div class="sidebar-links">
             <a href="#">Home</a>
@@ -33,37 +32,32 @@
             <a href="#">Settings</a>
         </div>
     </div>
-
     <div class="overlay"></div>
-
     <div class="user-menu">
         <a href="#" class="block p-2">Profile</a>
         <a href="#" class="block p-2">Settings</a>
         <a href="#" class="block p-2">Logout</a>
     </div>
-
     <main class="main-content">
         <div class="hero-text">
             Chronicle your code journey.<br>
             One commit at a time.
         </div>
-
         <section>
             <h2 class="section-title">Start a new document</h2>
             <div class="card-grid">
                 <a href="new-page/editor.html" class="card create-card">
                     <span class="plus-icon">+</span>
                 </a>
-
-                <div class="card" onclick="createNewTodoFromTemplate()">To-do list</div>
+                <a href="todo_template/todo.html" class="card">To-do list</a>
                 <div class="card">Engineering Review Doc</div>
                 <div class="card" onclick="createNewBugReviewFromTemplate()">Bug - Root Cause Analysis</div>
                 <div class="card" onclick="createNewFeatureFromTemplate()">Feature Specification</div>
                 <div class="card" onclick="createNewMeetingFromTemplate()">Minutes of Meeting</div>
             </div>
             <a href="#" class="see-more">See more templates</a>
+            <a href="#" class="see-more">See more templates</a>
         </section>
-
         <section class="recently-edited">
             <h2 class="section-title">Recently edited pages</h2>
             <div id="recently-edited-container" class="card-grid">
@@ -72,26 +66,6 @@
             <button id="see-more-button" style="display: none;">See More</button>
         </section>
     </main>
-    <script>
-        async function handleTodoCreation() {
-            try {
-                // Optional: Show loading state
-                // const card = event.currentTarget;
-                // card.style.opacity = '0.7';
-                // card.style.pointerEvents = 'none';
-        
-                await createNewTodoFromTemplate();
-            } catch (error) {
-                console.error('Creation handling error:', error);
-            } finally {
-                // Optional: Reset loading state if needed
-                // const card = event.currentTarget;
-                // card.style.opacity = '1';
-                // card.style.pointerEvents = 'auto';
-            }
-        }
-        </script>
-    <script src="script.js"></script>
     <script src="home.js"></script>
 </body>
 </html>
