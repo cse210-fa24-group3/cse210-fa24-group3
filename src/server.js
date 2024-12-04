@@ -14,7 +14,7 @@ app.use(express.json());
 // Serve static files from the directories
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname)));
-app.use('/todo template', express.static(path.join(__dirname, 'todo template')));
+app.use('/todo_template', express.static(path.join(__dirname, 'todo_template')));
 app.use('/new-page', express.static(path.join(__dirname, 'new-page')));
 
 // Database setup
@@ -339,11 +339,20 @@ app.post('/api/documents/new-bug-review', (req, res) => {
     });
 });
 
-// Routes for serving HTML pages
-app.get('/todo', (req, res) => {
-    res.sendFile(path.join(__dirname, 'todo.html'));
+app.get(['/todo_template/todo.html'], (req, res) => {
+    const todoTemplatePath = path.join(__dirname, 'todo_template', 'todo.html');
+    console.log('Attempting to serve todo_template');
+    console.log('Full path:', todoTemplatePath);
+    
+    // Use fs to check if file exists before sending
+    fs.access(todoTemplatePath, fs.constants.F_OK, (err) => {
+        if (err) {
+            console.error('Todo template file not found:', err);
+            return res.status(404).send('Todo template not found');
+        }
+        res.sendFile(todoTemplatePath);
+    });
 });
-
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -352,12 +361,7 @@ app.get('/editor', (req, res) => {
     res.sendFile(path.join(__dirname, 'new-page', 'editor.html'));
 });
 
-app.get('/todo/:id', (req, res) => {
-    console.log('Loading todo with ID:', req.params.id);
-    const todoPath = path.join(__dirname, 'todo.html');
-    console.log('Serving file from:', todoPath);
-    res.sendFile(todoPath);
-});
+
 
 app.get('/journal', (req, res) => {
     res.sendFile(path.join(__dirname, 'journal.html'));

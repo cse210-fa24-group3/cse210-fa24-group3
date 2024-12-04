@@ -63,9 +63,8 @@ function createEntryCard(entry) {
             : entry.content
         : 'No content';
 
-    // Update paths to include the correct folder structure
-    const link = entry.template_type === 'Todo' 
-        ? `todo template/todo.html?id=${entry.id}`
+        const link = entry.template_type === 'Todo' 
+        ? `todo%20template/todo.html?id=${entry.id}`
         : `new-page/editor.html?id=${entry.id}`;
 
     return `
@@ -153,11 +152,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Add click handler for new todo list
-    const todoLink = document.querySelector('a[href="todo template/todo.html"]');
+    const todoLink = document.querySelector('a[href="todo_template/todo.html"]');
     if (todoLink) {
         todoLink.addEventListener('click', (e) => {
             e.preventDefault();
-            window.location.href = 'todo template/todo.html';
+            window.location.href = 'todo_template/todo.html';
         });
     }
 
