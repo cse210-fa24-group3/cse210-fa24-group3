@@ -74,10 +74,31 @@ const darkModeToggle = document.querySelector('.navbar-right div:nth-child(2)');
 const moon = '🌙';
 const sun = '☀️';
 
+// Loading saved theme, likely to change
+function loadSavedTheme() {
+    const savedTheme = localStorage.getItem('darkMode');
+    if (savedTheme === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.textContent = sun;
+    }
+    else {
+        darkModeToggle.textContent = moon;
+    }
+}
+
 darkModeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? sun : moon;
+    // Likely to change, consider user ids
+    if (darkModeToggle.textContent === sun) {
+        localStorage.setItem('darkMode', 'enabled');
+    } else {
+        localStorage.setItem('darkMode', 'disabled');
+    }
 });
+
+// Loading saved theme, likely to change
+loadSavedTheme();
 
 // User menu toggle
 const userBtn = document.querySelector('.navbar-right div:last-child');
@@ -145,6 +166,61 @@ async function createNewBugReviewFromTemplate() {
         console.error('Error creating bug review:', error);
     }
 }
+
+// feature and meeting
+async function createNewFeatureFromTemplate() {
+    try {
+        console.log('Starting Feature Specification creation...');
+        
+        const response = await fetch('/api/documents/new-feature', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Response received:', response);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success && data.documentId) {
+            console.log('Redirecting to todo with ID:', data.documentId);
+            window.location.href = `/feature/${data.documentId}`;
+        } else {
+            throw new Error('Failed to get document ID');
+        }
+    } catch (error) {
+        console.error('Error creating Feature:', error);
+    }
+}
+
+async function createNewMeetingFromTemplate() {
+    try {
+        console.log('Starting Minutes of Meeting creation...');
+        
+        const response = await fetch('/api/documents/new-meeting', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Response received:', response);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success && data.documentId) {
+            console.log('Redirecting to todo with ID:', data.documentId);
+            window.location.href = `/meeting/${data.documentId}`;
+        } else {
+            throw new Error('Failed to get document ID');
+        }
+    } catch (error) {
+        console.error('Error creating Meeting:', error);
+    }
+}
+
+
 
 document.querySelector('.create-card').addEventListener('click', (e) => {
     e.preventDefault();

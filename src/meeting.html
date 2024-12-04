@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Journal - DevLog</title>
+    <title>Minutes of Meeting</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/template.css">
     <!-- For HTML Only styles -->
     <link rel="stylesheet" href="./styles.css">
     <link rel="stylesheet" href="./template.css">
+    
+
 </head>
 <body>
     <nav class="navbar">
@@ -49,7 +51,7 @@
     <main class="main-content">
         <div class="container">
             <div class="header">
-                <input type="text" class="title-input" placeholder="Untitled Journal Entry" id="titleInput">
+                <input type="text" class="title-input" placeholder="Untitled Minutes of Meeting ###" id="meetingName">
                 <div class="header-right">
                     <div class="save-status" id="saveStatus"></div>
                     <button class="save-button" id="saveButton" onclick="saveDocument()">
@@ -57,11 +59,62 @@
                     </button>
                 </div>
             </div>
-            <textarea class="content-area" placeholder="Start writing..." id="contentArea"></textarea>
+            <div class="section">
+                <h3>Meeting description</h3>
+                <textarea class="content-area" id="meeting-content" contenteditable="true">
+Meeting Title: [Descriptive title of the meeting]
+Meeting Date: [YYYY-MM-DD]
+Meeting Time: [Start Time - End Time]
+Location/Platform: [Physical location or virtual platform]
+    
+Participants
+Chairperson: [Name]
+Attendees: [List of participant names]
+Absent: [List of absent members]
+    
+Agenda
+• [Agenda item 1]
+• [Agenda item 2]
+• [Agenda item 3]
+• [Continue as needed]
+    
+Discussion Points
+    
+[Agenda Item 1 Title]
+• Key Points Discussed: [Summary of discussion]
+• Decisions Made: [Any decisions made regarding this item]
+• Action Items: [Actions to be taken, by whom, and deadlines]
+    
+[Agenda Item 2 Title]
+• Key Points Discussed: [Summary of discussion]
+• Decisions Made: [Any decisions made regarding this item]
+• Action Items: [Actions to be taken, by whom, and deadlines]
+    
+[Agenda item 3 Title]
+• Key Points Discussed: [Summary of discussion]
+• Decisions Made: [Any decisions made regarding this item]
+• Action Items: [Actions to be taken, by whom, and deadlines]
+    
+Action Items Summary
+• [Action Item 1]: [Responsible person], Deadline: [YYYY-MM-DD]
+• [Action Item 2]: [Responsible person], Deadline: [YYYY-MM-DD]
+    
+Next Meeting
+Date: [YYYY-MM-DD]
+Time: [Start Time]
+Location/Platform: [Physical location or virtual platform]
+    
+Sign-off
+Prepared By: [Note taker name]
+Approved By: [Chairperson name]
+    
+Minutes Circulated Date: [YYYY-MM-DD]
+            </textarea>
+            </div>
         </div>
     </main>
 
+    <script src="/meeting.js"></script>
     <script src="/script.js"></script>
-    <script src="/journal.js"></script>
 </body>
 </html>

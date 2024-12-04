@@ -210,7 +210,7 @@ app.post('/api/documents/new-todo', (req, res) => {
     console.log('Creating new todo document...');
 
     const emptyTodo = {
-        title: "Untitled Todo List",
+        title: "",
         content: JSON.stringify({
             tasks: [],
             lastUpdated: now
@@ -278,7 +278,7 @@ app.post('/api/documents/new-bug-review', (req, res) => {
     console.log('Creating new bug review document...');
 
     const emptyBugReview = {
-        title: "Untitled Bug Review",
+        title: "",
         content: JSON.stringify({
             text: '',
             lastUpdated: now
@@ -387,4 +387,158 @@ app.use((err, req, res, next) => {
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
+});
+
+// Feature
+app.get('/feature', (req, res) => {
+    res.sendFile(path.join(__dirname, 'feature.html'));
+});
+
+app.get('/feature/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'feature.html'));
+});
+
+app.post('/api/documents/new-feature', (req, res) => {
+    const id = Date.now().toString();
+    const now = new Date().toISOString();
+    
+    console.log('Creating new feature document...');
+
+    const emptyFeature = {
+        title: "",
+        content: JSON.stringify({
+            text: '',
+            lastUpdated: now
+        }),
+        template_type: 'feature'
+    };
+
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+
+        db.run(
+            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+            [id, emptyFeature.title, emptyFeature.content, emptyFeature.template_type, now, now],
+            function(err) {
+                if (err) {
+                    console.error('Document creation error:', err);
+                    db.run('ROLLBACK');
+                    return res.status(500).json({ 
+                        success: false, 
+                        error: err.message 
+                    });
+                }
+
+                db.run(
+                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                    [id, now, now],
+                    function(err) {
+                        if (err) {
+                            console.error('History creation error:', err);
+                            db.run('ROLLBACK');
+                            return res.status(500).json({ 
+                                success: false, 
+                                error: err.message 
+                            });
+                        }
+
+                        db.run('COMMIT', (err) => {
+                            if (err) {
+                                console.error('Commit error:', err);
+                                db.run('ROLLBACK');
+                                return res.status(500).json({ 
+                                    success: false, 
+                                    error: err.message 
+                                });
+                            }
+                            
+                            console.log('Feature created successfully with ID:', id);
+                            return res.status(200).json({ 
+                                success: true, 
+                                documentId: id,
+                                message: 'Feature created successfully'
+                            });
+                        });
+                    }
+                );
+            }
+        );
+    });
+});
+
+// Meeting
+app.get('/meeting', (req, res) => {
+    res.sendFile(path.join(__dirname, 'meeting.html'));
+});
+
+app.get('/meeting/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'meeting.html'));
+});
+
+app.post('/api/documents/new-meeting', (req, res) => {
+    const id = Date.now().toString();
+    const now = new Date().toISOString();
+    
+    console.log('Creating new meeting document...');
+
+    const emptyMeeting = {
+        title: "",
+        content: JSON.stringify({
+            text: '',
+            lastUpdated: now
+        }),
+        template_type: 'meeting'
+    };
+
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+
+        db.run(
+            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+            [id, emptyMeeting.title, emptyMeeting.content, emptyMeeting.template_type, now, now],
+            function(err) {
+                if (err) {
+                    console.error('Document creation error:', err);
+                    db.run('ROLLBACK');
+                    return res.status(500).json({ 
+                        success: false, 
+                        error: err.message 
+                    });
+                }
+
+                db.run(
+                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                    [id, now, now],
+                    function(err) {
+                        if (err) {
+                            console.error('History creation error:', err);
+                            db.run('ROLLBACK');
+                            return res.status(500).json({ 
+                                success: false, 
+                                error: err.message 
+                            });
+                        }
+
+                        db.run('COMMIT', (err) => {
+                            if (err) {
+                                console.error('Commit error:', err);
+                                db.run('ROLLBACK');
+                                return res.status(500).json({ 
+                                    success: false, 
+                                    error: err.message 
+                                });
+                            }
+                            
+                            console.log('Meeting created successfully with ID:', id);
+                            return res.status(200).json({ 
+                                success: true, 
+                                documentId: id,
+                                message: 'Meeting created successfully'
+                            });
+                        });
+                    }
+                );
+            }
+        );
+    });
 });
