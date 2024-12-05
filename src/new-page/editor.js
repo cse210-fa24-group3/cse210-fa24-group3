@@ -57,6 +57,7 @@ async function saveContent(isAutoSave = false) {
         }
 
         const data = await response.json();
+        console.log(data)
         showNotification(isAutoSave ? 'Auto-saved!' : 'Saved successfully!', 'success');
 
         if (!isAutoSave && !editingId) {
