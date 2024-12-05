@@ -202,6 +202,73 @@ app.put('/api/documents/:id', (req, res) => {
     });
 });
 
+
+// **New DELETE Route Added Below**
+// Delete document
+app.delete('/api/documents/:id', (req, res) => {
+    const { id } = req.params;
+
+    console.log('Received DELETE request for document:', id);
+
+    // Basic validation
+    if (!id) {
+        return res.status(400).json({ success: false, message: 'Document ID is required.' });
+    }
+
+    db.serialize(() => {
+        console.log('Starting document deletion transaction');
+
+        db.run('BEGIN TRANSACTION');
+
+        // Delete related history entries first to maintain referential integrity
+        db.run(
+            'DELETE FROM history WHERE document_id = ?',
+            [id],
+            function(err) {
+                if (err) {
+                    console.error('Error deleting history:', err);
+                    db.run('ROLLBACK');
+                    return res.status(500).json({ success: false, message: 'Failed to delete document history.' });
+                }
+
+                // Delete the document
+                db.run(
+                    'DELETE FROM documents WHERE id = ?',
+                    [id],
+                    function(err) {
+                        if (err) {
+                            console.error('Error deleting document:', err);
+                            db.run('ROLLBACK');
+                            return res.status(500).json({ success: false, message: 'Failed to delete document.' });
+                        }
+
+                        if (this.changes === 0) {
+                            db.run('ROLLBACK');
+                            return res.status(404).json({ success: false, message: 'Document not found.' });
+                        }
+
+                        // Commit the transaction
+                        db.run('COMMIT', (err) => {
+                            if (err) {
+                                console.error('Error committing transaction:', err);
+                                db.run('ROLLBACK');
+                                return res.status(500).json({ success: false, message: 'Failed to delete document.' });
+                            }
+
+                            console.log('Document deleted successfully:', id);
+                            res.json({ success: true, message: 'Document deleted successfully.' });
+                        });
+                    }
+                );
+            }
+        );
+    });
+});
+// **End of DELETE Route**
+
+
+
+
 // Special routes for specific document types
 app.post('/api/documents/new-todo', (req, res) => {
     const id = Date.now().toString();
