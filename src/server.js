@@ -385,6 +385,49 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something broke!');
 });
 
+app.get('/api/print-db', (req, res) => {
+    const result = {
+        documents: [],
+        history: []
+    };
+
+    // Function to run queries and collect results
+    const runQuery = (query, table) => {
+        return new Promise((resolve, reject) => {
+            db.all(query, [], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    result[table] = rows;
+                    resolve();
+                }
+            });
+        });
+    };
+
+    // Run queries for both tables
+    Promise.all([
+        runQuery('SELECT * FROM documents ORDER BY created_at DESC', 'documents'),
+        runQuery('SELECT * FROM history ORDER BY created_at DESC', 'history')
+    ])
+    .then(() => {
+        // Send the results as JSON response
+        res.json({
+            success: true,
+            database_contents: result,
+            total_documents: result.documents.length,
+            total_history_entries: result.history.length
+        });
+    })
+    .catch((err) => {
+        console.error('Error printing database:', err);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to retrieve database contents',
+            details: err.message 
+        });
+    });
+});
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
