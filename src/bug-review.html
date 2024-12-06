@@ -5,160 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bug Review Template - DevLog</title>
     <link rel="stylesheet" href="/styles.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #fff;
-            min-height: 100vh;
-            padding-top: 2rem;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            width: 800px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .logo {
-            text-decoration: none;
-            color: #000000;
-        }
-        .title-input {
-            font-size: 1.5rem;
-            color: #000000;
-            padding: 0.5rem;
-            border: 1px solid transparent;
-            cursor: pointer;
-            font-weight: 500;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        .content-area {
-            width: 100%;
-            min-height: 500px;
-            padding: 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.375rem;
-            resize: vertical;
-            background: transparent;
-        }
-        .save-button {
-            background: #166534; /* Secondary color */
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 0rem;
-        }
-        .save-button:hover {
-            background: #14532d;
-        }
-        .save-status {
-            color: #64748b;
-            font-size: 0.875rem;
-            min-width: 120px;
-            text-align: right;
-        }
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-            text-decoration: none;
-        }
-        textarea {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #111827;
-        }
-
-        /* Dark mode styles */
-        body.dark-mode .title-input,
-        body.dark-mode .content-area {
-            color: white;
-            border-color: #404040;
-        }
-
-        body.dark-mode .title-input::placeholder,
-        body.dark-mode .content-area::placeholder {
-            color: #9ca3af;
-        }
-        body.dark-mode .save-button {
-            background: #64748b;
-        }
-
-        body.dark-mode .save-button:hover {
-            background: #475569;
-        }
-
-        body.dark-mode .save-button:disabled {
-            background: #94a3b8;
-        }
-
-        body.dark-mode .save-status {
-            color: #94a3b8;
-        }
-        body.dark-mode .title-input {
-            color: white;
-            background: transparent;
-        }
-        body.dark-mode .logo {
-            color: white;
-        }
-    
-    </style>
+    <link rel="stylesheet" href="/template.css">
+    <!-- For HTML Only styles -->
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./template.css">
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-left">
             <div>☰</div>
-            <div><a class="logo" href="/index.html">DevLog</a></div>
+            <div><a class="logo" href="/">DevLog</a></div>
         </div>
         <div class="navbar-right">
             <div class="search-container">
-                <input type="text" class="search-input" placeholder="Search">
+                <input type="text" class="search-input" placeholder="Search entries">
                 <span class="search-icon">🔍</span>
             </div>
-            <div>🌙</div>
-            <div>👤</div>
+            <div class="theme-toggle">
+                <span class="light-mode">🌙</span>
+                <span class="dark-mode" style="display:none;">☀️</span>
+            </div>
+            <div class="user-btn">👤</div>
         </div>
     </nav>
 
     <div class="sidebar">
         <div class="sidebar-links">
-            <a href="/index.html">Home</a>
+            <a href="/">Home</a>
             <a href="#">My Documents</a>
-            <a href="/index.html">Templates</a>
+            <a href="/">Templates</a>
             <a href="#">Settings</a>
         </div>
     </div>
