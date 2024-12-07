@@ -1,178 +1,77 @@
-// // DOM Elements
-// const menuIcon = document.querySelector('.menu-icon');
-// const sidebar = document.querySelector('.sidebar');
-// const overlay = document.querySelector('.overlay');
-// const themeToggle = document.querySelector('.theme-toggle');
-// const lightModeIcon = document.querySelector('.light-mode');
-// const darkModeIcon = document.querySelector('.dark-mode');
+// Replace <FLASK_SERVER_IP> with the actual Flask server's IP address or domain
+const FLASK_BASE_URL = "http://104.155.190.17:8080"; 
 
-// // Sidebar Toggle
-// menuIcon.addEventListener('click', () => {
-//     sidebar.classList.toggle('active');
-//     overlay.classList.toggle('active');
-// });
-
-// overlay.addEventListener('click', () => {
-//     sidebar.classList.remove('active');
-//     overlay.classList.remove('active');
-// });
-
-// // Theme Toggle Function
-// function toggleTheme() {
-//     const html = document.documentElement;
-//     const currentTheme = html.getAttribute('data-theme');
-//     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    
-//     html.setAttribute('data-theme', newTheme);
-    
-//     // Toggle icon visibility
-//     if (newTheme === 'dark') {
-//         lightModeIcon.style.display = 'none';
-//         darkModeIcon.style.display = 'block';
-//     } else {
-//         lightModeIcon.style.display = 'block';
-//         darkModeIcon.style.display = 'none';
-//     }
-
-//     // Save theme preference
-//     localStorage.setItem('theme', newTheme);
-// }
-
-// // Theme Toggle Event Listener
-// themeToggle.addEventListener('click', toggleTheme);
-
-// // Load Saved Theme
-// function loadSavedTheme() {
-//     const savedTheme = localStorage.getItem('theme');
-//     if (savedTheme) {
-//         document.documentElement.setAttribute('data-theme', savedTheme);
-//         if (savedTheme === 'dark') {
-//             lightModeIcon.style.display = 'none';
-//             darkModeIcon.style.display = 'block';
-//         }
-//     }
-// }
-
-// // Initialize theme on page load
-// loadSavedTheme();
-
-// Menu toggle
-const menuBtn = document.querySelector('.navbar-left div:first-child');
-const sidebar = document.querySelector('.sidebar');
-const overlay = document.querySelector('.overlay');
-
-menuBtn.addEventListener('click', toggleSidebar);
-overlay.addEventListener('click', toggleSidebar);
-
-function toggleSidebar() {
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
-}
-
-// Dark mode toggle
-const darkModeToggle = document.querySelector('.navbar-right div:nth-child(2)');
-const moon = '🌙';
-const sun = '☀️';
-
-// Loading saved theme, likely to change
-function loadSavedTheme() {
-    const savedTheme = localStorage.getItem('darkMode');
-    if (savedTheme === 'enabled') {
-        document.body.classList.add('dark-mode');
-        darkModeToggle.textContent = sun;
-    }
-    else {
-        darkModeToggle.textContent = moon;
-    }
-}
-
-darkModeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? sun : moon;
-    // Likely to change, consider user ids
-    if (darkModeToggle.textContent === sun) {
-        localStorage.setItem('darkMode', 'enabled');
-    } else {
-        localStorage.setItem('darkMode', 'disabled');
-    }
-});
-
-// Loading saved theme, likely to change
-loadSavedTheme();
-
-// User menu toggle
-const userBtn = document.querySelector('.navbar-right div:last-child');
-const userMenu = document.querySelector('.user-menu');
-
-userBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    userMenu.classList.toggle('active');
-});
-
-document.addEventListener('click', (e) => {
-    if (!userMenu.contains(e.target)) {
-        userMenu.classList.remove('active');
-    }
-});
-
-async function createNewTodoFromTemplate() {
+// Fetch all documents
+async function fetchAllDocuments() {
     try {
-        console.log('Starting todo creation...');
-        
-        const response = await fetch('/api/documents/new-todo', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        const response = await fetch(`${FLASK_BASE_URL}/api/documents`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
         });
-
-        console.log('Response received:', response);
-        const data = await response.json();
-        console.log('Response data:', data);
-
-        if (data.success && data.documentId) {
-            console.log('Redirecting to todo with ID:', data.documentId);
-            window.location.href = `/todo/${data.documentId}`;
-        } else {
-            throw new Error('Failed to get document ID');
-        }
+        if (!response.ok) throw new Error(`Error fetching documents: ${response.status}`);
+        const documents = await response.json();
+        console.log("Fetched documents:", documents);
+        return documents;
     } catch (error) {
-        console.error('Error creating todo:', error);
+        console.error("Error:", error);
     }
 }
 
-async function createNewBugReviewFromTemplate() {
+// Fetch a specific document by ID
+async function fetchDocumentById(documentId) {
     try {
-        console.log('Starting bug review creation...');
-        
-        const response = await fetch('/api/documents/new-bug-review', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        const response = await fetch(`${FLASK_BASE_URL}/api/documents/${documentId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
         });
-
-        console.log('Response received:', response);
-        const data = await response.json();
-        console.log('Response data:', data);
-
-        if (data.success && data.documentId) {
-            console.log('Redirecting to todo with ID:', data.documentId);
-            window.location.href = `/bug-review/${data.documentId}`;
-        } else {
-            throw new Error('Failed to get document ID');
-        }
+        if (!response.ok) throw new Error(`Error fetching document: ${response.status}`);
+        const document = await response.json();
+        console.log("Fetched document:", document);
+        return document;
     } catch (error) {
-        console.error('Error creating bug review:', error);
+        console.error("Error:", error);
     }
 }
 
-// feature and meeting
+// Create a new document
+async function createDocument(title, content, templateType = "default") {
+    try {
+        const response = await fetch(`${FLASK_BASE_URL}/api/documents`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, content, template_type: templateType }),
+        });
+        if (!response.ok) throw new Error(`Error creating document: ${response.status}`);
+        const result = await response.json();
+        console.log("Document created:", result);
+        return result;
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+// Update an existing document
+async function updateDocument(documentId, title, content) {
+    try {
+        const response = await fetch(`${FLASK_BASE_URL}/api/documents/${documentId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, content }),
+        });
+        if (!response.ok) throw new Error(`Error updating document: ${response.status}`);
+        const result = await response.json();
+        console.log("Document updated:", result);
+        return result;
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
 async function createNewFeatureFromTemplate() {
     try {
         console.log('Starting Feature Specification creation...');
         
-        const response = await fetch('/api/documents/new-feature', {
+        // Use FLASK_BASE_URL to construct the full URL for the API
+        const response = await fetch(`${FLASK_BASE_URL}/api/documents/new-feature`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -180,25 +79,32 @@ async function createNewFeatureFromTemplate() {
         });
 
         console.log('Response received:', response);
+
+        // Check if the response is OK
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         console.log('Response data:', data);
 
+        // Check if the response indicates success and contains a documentId
         if (data.success && data.documentId) {
-            console.log('Redirecting to todo with ID:', data.documentId);
+            console.log('Redirecting to feature page with ID:', data.documentId);
             window.location.href = `/feature/${data.documentId}`;
         } else {
-            throw new Error('Failed to get document ID');
+            throw new Error('Failed to get document ID from response');
         }
     } catch (error) {
         console.error('Error creating Feature:', error);
     }
 }
-
-async function createNewMeetingFromTemplate() {
+async function createNewBugReviewFromTemplate() {
     try {
-        console.log('Starting Minutes of Meeting creation...');
-        
-        const response = await fetch('/api/documents/new-meeting', {
+        console.log('Starting bug review creation...');
+
+        // Use FLASK_BASE_URL for the full endpoint URL
+        const response = await fetch(`${FLASK_BASE_URL}/api/documents/new-bug-review`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -206,23 +112,63 @@ async function createNewMeetingFromTemplate() {
         });
 
         console.log('Response received:', response);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         console.log('Response data:', data);
 
+        // Redirect if successful
         if (data.success && data.documentId) {
-            console.log('Redirecting to todo with ID:', data.documentId);
-            window.location.href = `/meeting/${data.documentId}`;
+            console.log('Redirecting to bug review with ID:', data.documentId);
+            window.location.href = `http://104.155.190.17:8080/bug-review/${data.documentId}`;
         } else {
-            throw new Error('Failed to get document ID');
+            throw new Error('Failed to get document ID from response');
         }
     } catch (error) {
-        console.error('Error creating Meeting:', error);
+        console.error('Error creating bug review:', error);
+    }
+}
+async function deleteDocument(documentId) {
+    try {
+        const response = await fetch(`${FLASK_BASE_URL}/api/documents/${documentId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (!response.ok) throw new Error(`Error deleting document: ${response.status}`);
+        const result = await response.json();
+        console.log("Document deleted:", result);
+        return result;
+    } catch (error) {
+        console.error("Error:", error);
     }
 }
 
+// Example Usage
+document.addEventListener("DOMContentLoaded", async () => {
+    console.log("Fetching all documents...");
+    const documents = await fetchAllDocuments();
+    console.log("All documents:", documents);
 
+    // Create a new document
+    console.log("Creating a new document...");
+    const newDoc = await createDocument("Test Document", "This is a test document.");
+    console.log("New document created:", newDoc);
 
-document.querySelector('.create-card').addEventListener('click', (e) => {
-    e.preventDefault();
-    window.location.href = '/journal';
+    // Fetch the newly created document
+    console.log("Fetching the newly created document...");
+    const fetchedDoc = await fetchDocumentById(newDoc.documentId);
+    console.log("Fetched document:", fetchedDoc);
+
+    // Update the document
+    console.log("Updating the document...");
+    const updatedDoc = await updateDocument(newDoc.documentId, "Updated Title", "Updated content.");
+    console.log("Document updated:", updatedDoc);
+
+    // Delete the document
+    console.log("Deleting the document...");
+    const deleteResult = await deleteDocument(newDoc.documentId);
+    console.log("Document deleted:", deleteResult);
 });

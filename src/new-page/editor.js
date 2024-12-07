@@ -39,8 +39,8 @@ async function saveContent(isAutoSave = false) {
 
     try {
         const url = editingId 
-            ? `http://localhost:3000/api/documents/${editingId}`
-            : 'http://localhost:3000/api/documents';
+            ? ` http://104.155.190.17:8080/api/documents/${editingId}`
+            : ' http://104.155.190.17:8080/api/documents';
 
         const response = await fetch(url, {
             method: editingId ? 'PUT' : 'POST',
@@ -99,7 +99,7 @@ async function loadEntry() {
 
     try {
         // FIXED: Changed from /api/entries/ to /api/documents/
-        const response = await fetch(`http://localhost:3000/api/documents/${editingId}`);
+        const response = await fetch(` http://104.155.190.17:8080/api/documents/${editingId}`);
         if (!response.ok) {
             throw new Error(`Failed to load entry: ${response.status}`);
         }

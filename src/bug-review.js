@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         if (documentId && documentId !== 'bug-review') {
             // Load document by ID
-            const response = await fetch(`/api/documents/${documentId}`);
+            const response = await fetch(`${FLASK_BASE_URL}/api/documents/${documentId}`);
             console.log('Load response:', response);
 
             if (!response.ok) {
@@ -67,7 +67,7 @@ async function saveDocument() {
 
         console.log(bugData);
 
-        const response = await fetch(`/api/documents/${documentId}`, {
+        const response = await fetch(`${FLASK_BASE_URL}/api/documents/${documentId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -99,8 +99,8 @@ async function saveDocument() {
 // ============= LOADING FUNCTIONS =============
 async function loadDocument(documentId) {
     try {
-        const baseUrl = 'http://localhost:3000';
-        const response = await fetch(`${baseUrl}/api/documents/${documentId}`);
+        const baseUrl = 'http://104.155.190.17:8080';
+        const response = await fetch(`${baseUrl}${FLASK_BASE_URL}/api/documents/${documentId}`);
 
         if (!response.ok) {
             throw new Error('Document not found');

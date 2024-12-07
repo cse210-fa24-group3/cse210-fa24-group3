@@ -409,7 +409,7 @@
         
             try {
                 const documentId = getDocumentIdFromUrl();
-                const baseUrl = 'http://localhost:3000';
+                const baseUrl = 'http://104.155.190.17:8080';
                 const url = documentId ? 
                     `${baseUrl}/api/documents/${documentId}` : 
                     `${baseUrl}/api/documents`;
@@ -464,7 +464,7 @@
         }
         
         function loadDocument(documentId) {
-            const baseUrl = 'http://localhost:3000';
+            const baseUrl = ' http://104.155.190.17:8080';
         
             console.log('Attempting to load document with ID:', documentId);
         

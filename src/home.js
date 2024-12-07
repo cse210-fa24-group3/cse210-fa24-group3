@@ -96,7 +96,7 @@ async function loadRecentEntries() {
     }
 
     try {
-        const response = await fetch('http://localhost:3000/api/documents');
+        const response = await fetch('http://104.155.190.17:8080/api/documents');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -108,7 +108,6 @@ async function loadRecentEntries() {
             container.innerHTML = '<div class="card no-entries">No entries yet. Create your first entry!</div>';
             return;
         }
-
         // Filter and limit entries if needed
         const displayEntries = showAllEntries ? entries : entries.slice(0, 3);
 
