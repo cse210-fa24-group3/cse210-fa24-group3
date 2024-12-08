@@ -7,14 +7,11 @@ import { extractDataFromPerformanceTiming } from "./navigationTimingAPI.js";
 import { createReadStream } from "node:fs";
 
 // variables - UI test bot
-// const fileName = "./mochawesome-report/mochawesome.html";
+const fileName = "./mochawesome-report/mochawesome.html";
 // /Users/andrew/Documents/uitest/mochawesome-report/mochawesome.html
 
 export default class Utility {
   constructor(page) {
-    if (!page || typeof page.$x !== "function") {
-      throw new Error("Invalid Puppeteer Page object passed to Utility");
-    }
     this.page = page;
   }
 
@@ -60,6 +57,8 @@ export default class Utility {
   }
 
   async getText(locator) {
+    // this.waitForXPath(locator, true);
+
     try {
       let element = await this.page.$x(locator);
       element = element[0];
@@ -69,5 +68,5 @@ export default class Utility {
       console.log("xpath error", e);
       return false;
     }
-  }  
+  }
 }

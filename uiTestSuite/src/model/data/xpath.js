@@ -7,7 +7,7 @@ export default class xpath {
   /* DevLog */
   main_devlog_xp = "//*[text()='DevLog']"
   main_home_xp = "//*[text()='Home']"
-  main_about_xp = "//*[text()='About']"
+  main_settings_xp = "//*[text()='Settings']"
 
   /* google.com test */
   // google_about_xp = "//*[text()='About']"

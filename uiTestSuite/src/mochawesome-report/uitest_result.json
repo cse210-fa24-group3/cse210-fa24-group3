@@ -1,24 +1,24 @@
 {
   "stats": {
     "suites": 1,
-    "tests": 0,
+    "tests": 3,
     "passes": 0,
     "pending": 0,
-    "failures": 0,
-    "start": "2024-11-24T19:45:42.298Z",
-    "end": "2024-11-24T19:45:43.036Z",
-    "duration": 738,
+    "failures": 3,
+    "start": "2024-11-24T20:56:58.626Z",
+    "end": "2024-11-24T20:56:59.760Z",
+    "duration": 1134,
     "testsRegistered": 3,
     "passPercent": 0,
     "pendingPercent": 0,
-    "other": 2,
+    "other": 1,
     "hasOther": true,
-    "skipped": 3,
-    "hasSkipped": true
+    "skipped": 0,
+    "hasSkipped": false
   },
   "results": [
     {
-      "uuid": "7434bec9-90f2-4a1d-acae-4e9999d425e9",
+      "uuid": "c10ab7fc-5a82-405e-a9b2-18c6dbc11a30",
       "title": "",
       "fullFile": "/Users/andrew/Documents/UCSD/Fall 2024 (Local)/CSE 210/cse210-fa24-group3/uiTestSuite/src/testSuite/uitest.js",
       "file": "/testSuite/uitest.js",
@@ -27,38 +27,34 @@
       "tests": [],
       "suites": [
         {
-          "uuid": "34caebec-704a-47c0-b879-bd3a593a6905",
+          "uuid": "8d837715-9319-4c50-97b9-0483ab997b7c",
           "title": "UI Test",
           "fullFile": "/Users/andrew/Documents/UCSD/Fall 2024 (Local)/CSE 210/cse210-fa24-group3/uiTestSuite/src/testSuite/uitest.js",
           "file": "/testSuite/uitest.js",
           "beforeHooks": [
             {
-              "title": "\"before all\" hook for \"UT - 1 : 'DevLog' Text\"",
-              "fullTitle": "UI Test \"before all\" hook for \"UT - 1 : 'DevLog' Text\"",
+              "title": "\"before all\" hook in \"UI Test\"",
+              "fullTitle": "UI Test \"before all\" hook in \"UI Test\"",
               "timedOut": false,
-              "duration": 735,
-              "state": "failed",
+              "duration": 1127,
+              "state": null,
               "speed": null,
               "pass": false,
-              "fail": true,
+              "fail": false,
               "pending": false,
               "context": null,
-              "code": "// console.info(\"before\")\nbrowser = await puppeteer.launch({\n  headless: true,  // true: run test without window opening / false: window opens\n  args: [\"--no-sandbox\", defaultSetting.WINODW_SIZE_UITEST],\n  slowMo: 30, // 30ms delay\n});\npage = await browser.newPage();\n// page.setDefaultTimeout(150000);\npage.setDefaultNavigationTimeout(0);\nconsole.log(\"Page object:\", page);\nconsole.log(\"Available methods on page:\", Object.keys(page));\nconsole.log(\"Testing page.$x method:\", typeof page.$x === \"function\");\nutil = new Utility(page);\nawait page.setViewport({\n  width: defaultSetting.WIDTH_UITEST,\n  height: defaultSetting.HEIGHT_UITEST,\n});\nawait Promise.all([page.goto(defaultSetting.TEST_URL), page.waitForNavigation()]);\nconsole.info(`* Starting UI Test`);\n// util = new Utility(page);\ncurrent_time = util.getTimezone();\n  \n// this.timeout(0);\n// done();",
-              "err": {
-                "message": "Error: Invalid Puppeteer Page object passed to Utility",
-                "estack": "Error: Invalid Puppeteer Page object passed to Utility\n    at new Utility (file:///Users/andrew/Documents/UCSD/Fall%202024%20(Local)/CSE%20210/cse210-fa24-group3/uiTestSuite/src/controller/util/utility.js:16:13)\n    at Context.<anonymous> (file:///Users/andrew/Documents/UCSD/Fall%202024%20(Local)/CSE%20210/cse210-fa24-group3/uiTestSuite/src/testSuite/uitest.js:41:12)",
-                "diff": null
-              },
-              "uuid": "b79e312a-08ab-4433-a5e6-325cbf9be91a",
-              "parentUUID": "34caebec-704a-47c0-b879-bd3a593a6905",
+              "code": "// console.info(\"before\")\nbrowser = await puppeteer.launch({\n  headless: true,  // true: run test without window opening / false: window opens\n  args: [\"--no-sandbox\", defaultSetting.WINODW_SIZE_UITEST],\n  slowMo: 30, // 30ms delay\n});\npage = await browser.newPage();\n// page.setDefaultTimeout(150000);\npage.setDefaultNavigationTimeout(0);\nconsole.log(\"Page object:\", page);\nconsole.log(\"Available methods on page:\", Object.keys(page));\nconsole.log(\"Testing page.$x method:\", typeof page.$x === \"function\");\n// util = new Utility(page);\nawait page.setViewport({\n  width: defaultSetting.WIDTH_UITEST,\n  height: defaultSetting.HEIGHT_UITEST,\n});\nawait Promise.all([page.goto(defaultSetting.TEST_URL), page.waitForNavigation()]);\nconsole.info(`* Starting UI Test`);\ncurrent_time = util.getTimezone();\n  \n// this.timeout(0);\n// done();",
+              "err": {},
+              "uuid": "ad0c66cc-bf4b-418c-8ae6-590ed20674cb",
+              "parentUUID": "8d837715-9319-4c50-97b9-0483ab997b7c",
               "isHook": true,
               "skipped": false
             }
           ],
           "afterHooks": [
             {
-              "title": "\"after all\" hook for \"UT - 3 : 'About' Text\"",
-              "fullTitle": "UI Test \"after all\" hook for \"UT - 3 : 'About' Text\"",
+              "title": "\"after all\" hook for \"UT - 3 : 'Settings' Text\"",
+              "fullTitle": "UI Test \"after all\" hook for \"UT - 3 : 'Settings' Text\"",
               "timedOut": false,
               "duration": 0,
               "state": "failed",
@@ -69,18 +65,18 @@
               "context": null,
               "code": "console.info(`\\n* UI Test Completed `);\nlet util = new Utility(page);\ncurrent_time = util.getTimezone();\n// Save mochawesome report \nconsole.log(\"Generating Mochawesome report...\");\nconst { generate } = require(\"mochawesome-report-generator\");\nawait generate({\n  reportDir: \"mochawesome-report\",\n  reportFilename: \"uitest-result\",\n});\nawait page.waitForTimeout(2000);\nawait page.close();\nawait browser.close();\n// done();",
               "err": {
-                "message": "Error: Invalid Puppeteer Page object passed to Utility",
-                "estack": "Error: Invalid Puppeteer Page object passed to Utility\n    at new Utility (file:///Users/andrew/Documents/UCSD/Fall%202024%20(Local)/CSE%20210/cse210-fa24-group3/uiTestSuite/src/controller/util/utility.js:16:13)\n    at Context.<anonymous> (file:///Users/andrew/Documents/UCSD/Fall%202024%20(Local)/CSE%20210/cse210-fa24-group3/uiTestSuite/src/testSuite/uitest.js:122:16)\n    at process.processImmediate (node:internal/timers:491:21)",
+                "message": "ReferenceError: require is not defined",
+                "estack": "ReferenceError: require is not defined\n    at Context.<anonymous> (file:///Users/andrew/Documents/UCSD/Fall%202024%20(Local)/CSE%20210/cse210-fa24-group3/uiTestSuite/src/testSuite/uitest.js:127:26)\n    at process.processImmediate (node:internal/timers:491:21)",
                 "diff": null
               },
-              "uuid": "7b996c0a-008f-4125-834d-f898d6219668",
-              "parentUUID": "34caebec-704a-47c0-b879-bd3a593a6905",
+              "uuid": "af0d0ac2-3fe4-4144-870d-f7ab8d96b3ea",
+              "parentUUID": "8d837715-9319-4c50-97b9-0483ab997b7c",
               "isHook": true,
               "skipped": false
             },
             {
-              "title": "\"after each\" hook",
-              "fullTitle": "UI Test \"after each\" hook",
+              "title": "\"after each\" hook in \"UI Test\"",
+              "fullTitle": "UI Test \"after each\" hook in \"UI Test\"",
               "timedOut": false,
               "duration": 0,
               "state": null,
@@ -91,8 +87,8 @@
               "context": null,
               "code": "// console.log(`Test Result: ${this.currentTest.state}`);\nif (this.currentTest.state == \"failed\") {\n  // To-do : Build list for saving Failed cases {failed_list}\n}",
               "err": {},
-              "uuid": "fd34ae4c-4b3c-4893-8304-dd2086b79f87",
-              "parentUUID": "34caebec-704a-47c0-b879-bd3a593a6905",
+              "uuid": "116049eb-6dcf-4909-a36f-d5ebc069c6c0",
+              "parentUUID": "8d837715-9319-4c50-97b9-0483ab997b7c",
               "isHook": true,
               "skipped": false
             }
@@ -102,67 +98,79 @@
               "title": "UT - 1 : 'DevLog' Text",
               "fullTitle": "UI Test UT - 1 : 'DevLog' Text",
               "timedOut": false,
-              "duration": 0,
-              "state": null,
+              "duration": 2,
+              "state": "failed",
               "speed": null,
               "pass": false,
-              "fail": false,
+              "fail": true,
               "pending": false,
               "context": null,
               "code": "util = new Utility(page);\nconsole.info(`\\n** UI Test #1 - DevLog Test -------------------------`);\ncurrent_time = util.getTimezone();\nmsg = `Test #1 : DevLog Main Page| ${current_time}`;\nconst text_result = await util.getText(XP.main_devlog_xp);\nexpect(text_result).to.equal(\"DevLog\"); // Test for 'About' text\nawait this.timeout(3000)",
-              "err": {},
-              "uuid": "4a4e3f49-0d05-4ce5-bb7a-aad4b860b86b",
-              "parentUUID": "34caebec-704a-47c0-b879-bd3a593a6905",
+              "err": {
+                "message": "AssertionError: expected false to equal 'DevLog'",
+                "estack": "AssertionError: expected false to equal 'DevLog'\n    at Context.<anonymous> (file:///Users/andrew/Documents/UCSD/Fall%202024%20(Local)/CSE%20210/cse210-fa24-group3/uiTestSuite/src/testSuite/uitest.js:78:28)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)",
+                "diff": null
+              },
+              "uuid": "c7cc32b0-49bd-47fa-bf30-7af68118b41a",
+              "parentUUID": "8d837715-9319-4c50-97b9-0483ab997b7c",
               "isHook": false,
-              "skipped": true
+              "skipped": false
             },
             {
               "title": "UT - 2 : 'Home' Text",
               "fullTitle": "UI Test UT - 2 : 'Home' Text",
               "timedOut": false,
               "duration": 0,
-              "state": null,
+              "state": "failed",
               "speed": null,
               "pass": false,
-              "fail": false,
+              "fail": true,
               "pending": false,
               "context": null,
               "code": "const text_result = await util.getText(XP.main_home_xp);\nexpect(text_result).to.equal(\"Home\"); // Test for 'Store' text\nawait this.timeout(5000)",
-              "err": {},
-              "uuid": "4b791ef4-37f1-43aa-bf7e-c1dbcbe027fa",
-              "parentUUID": "34caebec-704a-47c0-b879-bd3a593a6905",
+              "err": {
+                "message": "AssertionError: expected false to equal 'Home'",
+                "estack": "AssertionError: expected false to equal 'Home'\n    at Context.<anonymous> (file:///Users/andrew/Documents/UCSD/Fall%202024%20(Local)/CSE%20210/cse210-fa24-group3/uiTestSuite/src/testSuite/uitest.js:86:28)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)",
+                "diff": null
+              },
+              "uuid": "605093b9-ba0d-4236-be91-b8b4ea23e6cb",
+              "parentUUID": "8d837715-9319-4c50-97b9-0483ab997b7c",
               "isHook": false,
-              "skipped": true
+              "skipped": false
             },
             {
-              "title": "UT - 3 : 'About' Text",
-              "fullTitle": "UI Test UT - 3 : 'About' Text",
+              "title": "UT - 3 : 'Settings' Text",
+              "fullTitle": "UI Test UT - 3 : 'Settings' Text",
               "timedOut": false,
-              "duration": 0,
-              "state": null,
+              "duration": 1,
+              "state": "failed",
               "speed": null,
               "pass": false,
-              "fail": false,
+              "fail": true,
               "pending": false,
               "context": null,
-              "code": "const text_result = await util.getText(XP.main_about_xp);\nexpect(text_result).to.equal(\"About\"); // Test for 'Store' text\nawait this.timeout(3000)",
-              "err": {},
-              "uuid": "16221db5-b009-43c8-8799-b00ff6124e11",
-              "parentUUID": "34caebec-704a-47c0-b879-bd3a593a6905",
+              "code": "const text_result = await util.getText(XP.main_settings_xp);\nexpect(text_result).to.equal(\"Settings\"); // Test for 'Store' text\nawait this.timeout(3000)",
+              "err": {
+                "message": "AssertionError: expected false to equal 'Settings'",
+                "estack": "AssertionError: expected false to equal 'Settings'\n    at Context.<anonymous> (file:///Users/andrew/Documents/UCSD/Fall%202024%20(Local)/CSE%20210/cse210-fa24-group3/uiTestSuite/src/testSuite/uitest.js:94:28)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)",
+                "diff": null
+              },
+              "uuid": "453dc954-fa89-411b-862e-b7f94c9bac30",
+              "parentUUID": "8d837715-9319-4c50-97b9-0483ab997b7c",
               "isHook": false,
-              "skipped": true
+              "skipped": false
             }
           ],
           "suites": [],
           "passes": [],
-          "failures": [],
-          "pending": [],
-          "skipped": [
-            "4a4e3f49-0d05-4ce5-bb7a-aad4b860b86b",
-            "4b791ef4-37f1-43aa-bf7e-c1dbcbe027fa",
-            "16221db5-b009-43c8-8799-b00ff6124e11"
+          "failures": [
+            "c7cc32b0-49bd-47fa-bf30-7af68118b41a",
+            "605093b9-ba0d-4236-be91-b8b4ea23e6cb",
+            "453dc954-fa89-411b-862e-b7f94c9bac30"
           ],
-          "duration": 0,
+          "pending": [],
+          "skipped": [],
+          "duration": 3,
           "root": false,
           "rootEmpty": false,
           "_timeout": 60000

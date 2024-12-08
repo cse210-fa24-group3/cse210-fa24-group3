@@ -18,7 +18,7 @@ describe("UI Test", function () {
   let msg;
   let current_time;
 
-  // let util = new Utility(page);
+  let util = new Utility(page);
   // let LP = new LoginPage(page);
   let XP = new xp(page);
 
@@ -38,7 +38,7 @@ describe("UI Test", function () {
     console.log("Available methods on page:", Object.keys(page));
     console.log("Testing page.$x method:", typeof page.$x === "function");
 
-    util = new Utility(page);
+    // util = new Utility(page);
     await page.setViewport({
       width: defaultSetting.WIDTH_UITEST,
       height: defaultSetting.HEIGHT_UITEST,
@@ -46,7 +46,6 @@ describe("UI Test", function () {
     await Promise.all([page.goto(defaultSetting.TEST_URL), page.waitForNavigation()]);
 
     console.info(`* Starting UI Test`);
-    // util = new Utility(page);
     current_time = util.getTimezone();
   
     // this.timeout(0);
@@ -89,13 +88,14 @@ describe("UI Test", function () {
     await this.timeout(5000)
   });
 
-  /* Test #1-3 : 'About' Text */
-  it(`UT - ${++i} : 'About' Text`, async function () {
-    const text_result = await util.getText(XP.main_about_xp);
-    expect(text_result).to.equal("About"); // Test for 'Store' text
+  /* Test #1-3 : 'Settings' Text */
+  it(`UT - ${++i} : 'Settings' Text`, async function () {
+    const text_result = await util.getText(XP.main_settings_xp);
+    expect(text_result).to.equal("Settings"); // Test for 'Store' text
 
     await this.timeout(3000)
   });
+
 
   //   /* Test #2-1 : About Tab */
   // it(`UT - ${++i} : About Page`, async function () {
