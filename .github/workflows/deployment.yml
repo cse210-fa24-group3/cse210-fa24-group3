@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up SSH key and permission
+      # Step 2: Set up SSH key and pe
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
