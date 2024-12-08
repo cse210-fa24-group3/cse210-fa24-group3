@@ -6,45 +6,9 @@
     <title>Journal - DevLog</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/template.css">
-    <!-- For HTML Only styles -->
-    <link rel="stylesheet" href="./styles.css">
-    <link rel="stylesheet" href="./template.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-left">
-            <div>☰</div>
-            <div><a class="logo" href="/">DevLog</a></div>
-        </div>
-        <div class="navbar-right">
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Search entries">
-                <span class="search-icon">🔍</span>
-            </div>
-            <div class="theme-toggle">
-                <span class="light-mode">🌙</span>
-                <span class="dark-mode" style="display:none;">☀️</span>
-            </div>
-            <div class="user-btn">👤</div>
-        </div>
-    </nav>
-
-    <div class="sidebar">
-        <div class="sidebar-links">
-            <a href="/">Home</a>
-            <a href="#">My Documents</a>
-            <a href="/">Templates</a>
-            <a href="#">Settings</a>
-        </div>
-    </div>
-
-    <div class="overlay"></div>
-    
-    <div class="user-menu">
-        <a href="#" class="block p-2">Profile</a>
-        <a href="#" class="block p-2">Settings</a>
-        <a href="#" class="block p-2">Logout</a>
-    </div>
+    <!-- Your existing HTML content -->
 
     <main class="main-content">
         <div class="container">
@@ -52,7 +16,7 @@
                 <input type="text" class="title-input" placeholder="Untitled Journal Entry" id="titleInput">
                 <div class="header-right">
                     <div class="save-status" id="saveStatus"></div>
-                    <button class="save-button" id="saveButton" onclick="saveDocument()">
+                    <button class="save-button" id="saveButton">
                         <span>Save</span>
                     </button>
                 </div>
@@ -61,7 +25,6 @@
         </div>
     </main>
 
-    <script src="src/script.js"></script>
     <script src="src/new-page/editor.js"></script>
 </body>
 </html>
