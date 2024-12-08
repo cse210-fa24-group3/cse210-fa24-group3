@@ -57,8 +57,17 @@ async function saveContent(isAutoSave = false) {
         }
 
         const data = await response.json();
-        console.log(data)
+        console.log(data);
         showNotification(isAutoSave ? 'Auto-saved!' : 'Saved successfully!', 'success');
+
+        // Dispatch a custom event when document is saved
+        window.dispatchEvent(new CustomEvent('document-saved', { 
+            detail: { 
+                id: data.documentId || editingId, 
+                title, 
+                content 
+            } 
+        }));
 
         if (!isAutoSave && !editingId) {
             // Only redirect if it's a manual save of a new document
@@ -98,7 +107,6 @@ async function loadEntry() {
     }
 
     try {
-        // FIXED: Changed from /api/entries/ to /api/documents/
         const response = await fetch(`http://localhost:3000/api/documents/${editingId}`);
         if (!response.ok) {
             throw new Error(`Failed to load entry: ${response.status}`);
@@ -141,4 +149,84 @@ function setupAutoSave() {
     contentInput.addEventListener('input', triggerAutoSave);
 }
 
+// Get query parameters from URL
+const getQueryParam = (param) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+};
+
+// Save or update a document
+const saveDocument = async () => {
+    const title = document.getElementById('document-title').value;
+    const content = document.getElementById('document-content').value;
+    const id = getQueryParam('id');
+    
+    if (!title) {
+        alert('Title is required.');
+        return;
+    }
+
+    try {
+        if (id) {
+            // Update existing document
+            const response = await fetch(`/api/documents/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content })
+            });
+
+            if (response.ok) {
+                alert('Document updated successfully.');
+                window.location.href = '/home.html';
+            } else {
+                alert('Failed to update document.');
+            }
+        } else {
+            // Create new document
+            const response = await fetch('/api/documents', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content })
+            });
+
+            if (response.ok) {
+                alert('Document created successfully.');
+                window.location.href = '/home.html';
+            } else {
+                alert('Failed to create document.');
+            }
+        }
+    } catch (error) {
+        console.error('Error saving document:', error);
+        alert('Failed to save document. Please try again later.');
+    }
+};
+
+// Load document content into editor if editing
+const loadDocument = async () => {
+    const id = getQueryParam('id');
+    if (!id) return;
+
+    try {
+        const response = await fetch(`/api/documents/${id}`);
+        if (response.status === 404) {
+            alert('Document not found.');
+            window.location.href = '/home.html';
+            return;
+        }
+
+        const document = await response.json();
+        document.getElementById('document-title').value = document.title;
+        document.getElementById('document-content').value = document.content;
+    } catch (error) {
+        console.error('Error loading document:', error);
+        alert('Failed to load document. Please try again later.');
+    }
+};
+
+// Initialize editor on page load
+document.addEventListener('DOMContentLoaded', loadDocument);
+
+// Attach event listener to save button
+document.getElementById('save-button').addEventListener('click', saveDocument);
 setupAutoSave();

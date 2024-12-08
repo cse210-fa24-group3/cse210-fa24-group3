@@ -19,7 +19,7 @@ function formatRelativeTime(dateString) {
 // Map template types to their respective page links
 const TEMPLATE_LINKS = {
     'New Document': 'new-page/editor.html',
-    'todo': 'todo_template/todo.html',
+    'Todo': 'todo_template/todo.html',
     'Bug Report': 'bug-review.html',
     'Feature Specification': 'feature.html',
     'Minutes of Meeting': 'meeting.html'
@@ -27,197 +27,186 @@ const TEMPLATE_LINKS = {
 
 // Create HTML for a single entry card
 function createEntryCard(entry) {
-    // Attempt to parse content for better preview
-    let parsedContent = entry.content;
-    try {
-        // For JSON-based templates, try to parse and extract meaningful content
-        const parsedContentObj = JSON.parse(entry.content);
-        parsedContent = parsedContentObj.text || 
-                        parsedContentObj.tasks?.map(task => task.text).join(' ') || 
-                        entry.content;
-    } catch (error) {
-        // If parsing fails, use original content
-    }
-
-    const truncatedContent = parsedContent 
-        ? parsedContent.length > 100 
-            ? parsedContent.substring(0, 100) + '...'
-            : parsedContent
-        : 'No content';
-
-    // Determine link based on template type, defaulting to editor if not found
-    const link = `${TEMPLATE_LINKS[entry.template_type] || 'new-page/editor.html'}?id=${entry.id}`;
+    const contentPreview = entry.content.length > 100 ? `${entry.content.substring(0, 100)}...` : entry.content;
+    const link = TEMPLATE_LINKS[entry.template_type] || 'new-page/editor.html';
 
     return `
-        <div class="card entry-card">
-            <a href="${link}" class="entry-link">
-                <div class="entry-type">${entry.template_type}</div>
-                <h3 class="entry-title">${entry.title || 'Untitled'}</h3>
-                <p class="entry-preview">${truncatedContent}</p>
-                <div class="entry-meta">
-                    <span class="entry-time">Last edited: ${formatRelativeTime(entry.updated_at)}</span>
-                </div>
-            </a>
+        <div class="entry-card">
+            <h3>${entry.title || 'Untitled'}</h3>
+            <p>${contentPreview}</p>
+            <small>Last updated: ${formatRelativeTime(entry.updated_at)}</small>
+            <a href="${link}?id=${entry.id}" class="btn">Open</a>
         </div>
     `;
 }
 
-// Load recent entries
-let showAllEntries = false; // Track whether to show all entries
-let displayLimit = 6; // Default number of entries to show
-
-async function loadRecentEntries() {
-    const container = document.getElementById('recently-edited-container');
-    const seeMoreButton = document.getElementById('see-more-button');
-    
+// Fetch and display all documents
+async function fetchAndDisplayDocuments() {
     try {
-        const response = await fetch('http://localhost:3000/api/documents');
-        const entries = await response.json();
+        console.log('Fetching documents...');
+        const response = await fetch('/api/documents');
+        
+        // Log the full response for debugging
+        console.log('Response status:', response.status);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
-        // Sort entries by most recently updated
-        const sortedEntries = entries.sort((a, b) => 
-            new Date(b.updated_at) - new Date(a.updated_at)
-        );
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
 
-        // Determine entries to display
-        const entriesToDisplay = showAllEntries 
-            ? sortedEntries 
-            : sortedEntries.slice(0, displayLimit);
+        const documents = await response.json();
+        console.log('Fetched documents:', documents);
 
-        if (!entriesToDisplay || entriesToDisplay.length === 0) {
-            container.innerHTML = '<div class="card no-entries">No entries yet. Create your first entry!</div>';
-            if (seeMoreButton) seeMoreButton.style.display = 'none';
+        const container = document.getElementById('entries');
+        container.innerHTML = '';
+
+        documents.forEach(doc => {
+            container.innerHTML += createEntryCard(doc);
+        });
+    } catch (error) {
+        console.error('Detailed error fetching documents:', error);
+        const container = document.getElementById('entries');
+        container.innerHTML = `Error loading entries: ${error.message}`;
+    }
+}
+
+// Fetch and display recently edited documents
+async function fetchAndDisplayRecentlyEdited() {
+    try {
+        console.log('Fetching recently edited documents...');
+        const response = await fetch('/api/documents');
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+
+        const documents = await response.json();
+        console.log('Fetched recently edited documents:', documents);
+
+        const container = document.getElementById('recently-edited-container');
+        container.innerHTML = '';
+
+        documents.forEach(doc => {
+            container.innerHTML += createEntryCard(doc);
+        });
+    } catch (error) {
+        console.error('Detailed error fetching recently edited documents:', error);
+        const container = document.getElementById('recently-edited-container');
+        container.innerHTML = `Error loading recent entries: ${error.message}`;
+    }
+}
+
+// Function to refresh recently edited section
+function refreshRecentlyEdited() {
+    fetchAndDisplayRecentlyEdited();
+    const event = new CustomEvent('document-saved');
+    window.dispatchEvent(event);
+}
+
+const fetchDocuments = async () => {
+    try {
+        console.log('Fetching documents list...');
+        const response = await fetch('/api/documents');
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+
+        const documents = await response.json();
+        console.log('Fetched documents:', documents);
+
+        const container = document.getElementById('document-list');
+        container.innerHTML = '';
+
+        if (documents.length === 0) {
+            container.innerHTML = '<p>No documents found.</p>';
             return;
         }
 
-        // Generate HTML for entries
-        const entriesHTML = entriesToDisplay
-            .map(entry => createEntryCard(entry))
-            .join('');
-
-        container.innerHTML = entriesHTML;
-
-        // Update See More button visibility
-        if (seeMoreButton) {
-            seeMoreButton.textContent = showAllEntries ? 'Show Less' : 'See More';
-            seeMoreButton.style.display = sortedEntries.length > displayLimit ? 'block' : 'none';
-        }
-
-    } catch (error) {
-        console.error('Error loading entries:', error);
-        container.innerHTML = `
-            <div class="card error-card">
-                Failed to load entries. Please try again later.
-                Error details: ${error.message}
-            </div>
-        `;
-    }
-}
-
-// Toggle showAllEntries and reload
-function toggleSeeMore() {
-    showAllEntries = !showAllEntries;
-    loadRecentEntries();
-}
-
-// Create new document for a specific template
-async function createNewDocument(templateType) {
-    try {
-        // Map template types to their respective API endpoints
-        const templateEndpoints = {
-            'New Document': '/api/documents',
-            'todo': '/api/documents/new-todo',
-            'Bug Report': '/api/documents/new-bug-review',
-            'Feature Specification': '/api/documents/new-feature',
-            'Minutes of Meeting': '/api/documents/new-meeting'
-        };
-
-        const endpoint = templateEndpoints[templateType];
-        if (!endpoint) {
-            console.error('Unknown template type:', templateType);
-            return null;
-        }
-
-        const response = await fetch(`http://localhost:3000${endpoint}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        documents.forEach(doc => {
+            const documentDiv = document.createElement('div');
+            documentDiv.className = 'document-item';
+            documentDiv.innerHTML = `
+                <h3>${doc.title}</h3>
+                <p>${new Date(doc.created_at).toLocaleString()}</p>
+                <button onclick="openDocument('${doc.id}')">Open</button>
+                <button onclick="deleteDocument('${doc.id}')">Delete</button>
+            `;
+            container.appendChild(documentDiv);
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const newDocument = await response.json();
-        
-        // Redirect to the appropriate template page
-        const links = {
-            'New Document': `new-page/editor.html?id=${newDocument.documentId}`,
-            'todo': `todo_template/todo.html?id=${newDocument.documentId}`,
-            'Bug Report': `bug-review.html?id=${newDocument.documentId}`,
-            'Feature Specification': `feature.html?id=${newDocument.documentId}`,
-            'Minutes of Meeting': `meeting.html?id=${newDocument.documentId}`
-        };
-
-        window.location.href = links[templateType];
-
     } catch (error) {
-        console.error('Error creating new document:', error);
-        alert('Failed to create new document. Please try again.');
+        console.error('Detailed error fetching documents:', error);
+        const alertMessage = error.message || 'Failed to fetch documents. Please try again later.';
+        alert(alertMessage);
     }
-}
+};
 
-// Template-specific creation functions
+// Open document in the correct page
+const openDocument = async (id) => {
+    try {
+        const response = await fetch(`/api/documents/${id}`);
+        if (response.status === 404) {
+            alert('Document not found.');
+            return;
+        }
+        const document = await response.json();
+        const link = TEMPLATE_LINKS[document.template_type] || 'new-page/editor.html';
+        window.location.href = `${link}?id=${document.id}`;
+    } catch (error) {
+        console.error('Error opening document:', error);
+        alert('Failed to open document. Please try again later.');
+    }
+};
+
+// Delete document
+const deleteDocument = async (id) => {
+    if (!confirm('Are you sure you want to delete this document?')) {
+        return;
+    }
+    try {
+        const response = await fetch(`/api/documents/${id}`, { method: 'DELETE' });
+        if (response.ok) {
+            alert('Document deleted successfully.');
+            fetchDocuments(); // Refresh document list
+        } else {
+            alert('Failed to delete document.');
+        }
+    } catch (error) {
+        console.error('Error deleting document:', error);
+        alert('Failed to delete document. Please try again later.');
+    }
+};
+
+// Initialize document list on page load
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing document fetching...');
+    fetchDocuments();
+    fetchAndDisplayDocuments();
+    fetchAndDisplayRecentlyEdited();
+
+    // Listen for custom event from editor page
+    window.addEventListener('document-saved', refreshRecentlyEdited);
+});
+
+// Utility functions for page navigation
 function createNewBugReviewFromTemplate() {
-    createNewDocument('Bug Report');
+    window.location.href = 'bug-review.html';
 }
 
 function createNewFeatureFromTemplate() {
-    createNewDocument('Feature Specification');
+    window.location.href = 'feature.html';
 }
 
 function createNewMeetingFromTemplate() {
-    createNewDocument('Minutes of Meeting');
+    window.location.href = 'meeting.html';
 }
 
-function createNewTodoFromTemplate() {
-    createNewDocument('todo');
+function openTodoPage() {
+    window.location.href = 'todo_template/todo.html';
 }
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-    // Load recent entries
-    loadRecentEntries();
-
-    // Add click handlers for template creation buttons
-    const templateCards = document.querySelectorAll('.card-grid .card');
-    templateCards.forEach(card => {
-        card.addEventListener('click', (e) => {
-            // Get template type from text
-            const templateText = e.target.textContent.trim();
-            const templateTypeMap = {
-                'To-do list': 'todo',
-                'Bug - Root Cause Analysis': 'Bug Report',
-                'Feature Specification': 'Feature Specification',
-                'Minutes of Meeting': 'Minutes of Meeting'
-            };
-
-            const templateType = templateTypeMap[templateText];
-            if (templateType) {
-                createNewDocument(templateType);
-            }
-        });
-    });
-
-    // Add event listener to "See More" button
-    const seeMoreButton = document.getElementById('see-more-button');
-    if (seeMoreButton) {
-        seeMoreButton.addEventListener('click', toggleSeeMore);
-    }
-
-    // Create Journal Entry card
-    document.querySelector('.create-card').addEventListener('click', (e) => {
-        createNewDocument('New Document');
-    });
-});

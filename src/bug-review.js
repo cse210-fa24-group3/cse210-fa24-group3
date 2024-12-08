@@ -1,71 +1,135 @@
+// Update date on page load
+function updateDate() {
+    const dateElement = document.getElementById('currentDate');
+    if (dateElement) {
+        const now = new Date();
+        dateElement.textContent = now.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+}
 
+// Auto-save functionality
+let autoSaveTimeout;
+function scheduleAutoSave() {
+    clearTimeout(autoSaveTimeout);
+    autoSaveTimeout = setTimeout(saveDocument, 30000);
+}
+
+// Load existing document or prepare for new document
 document.addEventListener('DOMContentLoaded', async function () {
-    try {
-        // Get document ID from URL path
-        const pathParts = window.location.pathname.split('/');
-        const documentId = pathParts[pathParts.length - 1];
+    updateDate();
 
-        console.log('Current document ID:', documentId);
+    // Ensure all necessary elements exist before adding event listeners
+    const titleInput = document.getElementById('titleInput');
+    const contentArea = document.getElementById('contentArea');
+    const saveButton = document.getElementById('saveButton');
 
-        if (documentId && documentId !== 'bug-review') {
-            // Load document by ID
+    // Check if there's an existing document ID in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const documentId = urlParams.get('id');
+
+    // Add input listeners for auto-save
+    if (titleInput) {
+        titleInput.addEventListener('input', scheduleAutoSave);
+    }
+    if (contentArea) {
+        contentArea.addEventListener('input', scheduleAutoSave);
+    }
+
+    if (documentId) {
+        try {
+            // Load existing document
             const response = await fetch(`/api/documents/${documentId}`);
-            console.log('Load response:', response);
-
-            if (!response.ok) {
-                throw new Error('Failed to load document');
+            
+            if (response.ok) {
+                const loadDocument = await response.json();
+                
+                // Parse the content (handle potential string or object)
+                const content = typeof loadDocument.content === 'string' 
+                    ? JSON.parse(loadDocument.content) 
+                    : loadDocument.content;
+                
+                // Populate form fields if elements exist
+                if (titleInput) titleInput.value = loadDocument.title || '';
+                if (contentArea) contentArea.value = content.text || content || '';
+                
+                // Store current document ID for saving
+                localStorage.setItem('currentDocumentId', documentId);
             }
-
-            const loadDocument = await response.json();
-            console.log('Loaded document:', loadDocument);
-
-
-            const content = JSON.parse(loadDocument.content);
-            console.log(content);
-
-            // Set the document
-            document.getElementById('titleInput').value = loadDocument.title;
-            if (content.text != ''){
-                document.getElementById('contentArea').value = content.text;
-            }
-    
-
-            // Store the ID for future saves
-            localStorage.setItem('currentId', documentId);
+        } catch (error) {
+            console.error('Error loading document:', error);
         }
-    } catch (error) {
-        console.error('Error loading document:', error);
+    } else {
+        // Create a new document
+        try {
+            const response = await fetch('/api/documents', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: 'New Bug Report',
+                    content: JSON.stringify({ text: '' }),
+                    template_type: 'Bug Report'
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                localStorage.setItem('currentDocumentId', result.documentId);
+                // Update URL with new document ID
+                history.replaceState(null, '', `bug-review.html?id=${result.documentId}`);
+            }
+        } catch (error) {
+            console.error('Error creating new document:', error);
+        }
+    }
+
+    // Add save button click event listener
+    if (saveButton) {
+        saveButton.addEventListener('click', saveDocument);
     }
 });
 
-// ============= SAVE FUNCTION =============
-// Update your saveDocument function to properly save tasks
 async function saveDocument() {
+    console.log('Save document called');
     const saveButton = document.getElementById('saveButton');
     const saveStatus = document.getElementById('saveStatus');
+    const titleInput = document.getElementById('titleInput');
+    const contentArea = document.getElementById('contentArea');
+
+    // Ensure all required elements exist
+    if (!saveButton || !saveStatus || !titleInput || !contentArea) {
+        console.error('Required DOM elements are missing');
+        return;
+    }
+
+    const documentId = localStorage.getItem('currentDocumentId');
+
+    console.log('Current document ID:', documentId);
+
+    if (!documentId) {
+        console.error('No document ID found');
+        saveStatus.textContent = 'Error: No document ID';
+        return;
+    }
 
     try {
         saveButton.disabled = true;
         saveStatus.textContent = 'Saving...';
 
-        // Get current document ID from URL
-        const pathParts = window.location.pathname.split('/');
-        const documentId = pathParts[pathParts.length - 1];
-
-        if (!documentId || documentId === 'bug-review') {
-            throw new Error('Invalid document ID');
-        }
-
         const bugData = {
-            id: documentId,
-            title: document.getElementById('titleInput').value,
+            title: titleInput.value,
             content: JSON.stringify({
-                text: document.getElementById('contentArea').value,
+                text: contentArea.value,
             }),
-            template_type: 'bug-review'
+            template_type: 'Bug Report'
         };
 
-        console.log(bugData);
+        console.log('Saving document data:', bugData);
 
         const response = await fetch(`/api/documents/${documentId}`, {
             method: 'PUT',
@@ -75,74 +139,32 @@ async function saveDocument() {
             body: JSON.stringify(bugData)
         });
 
+        console.log('Save response status:', response.status);
+
         if (!response.ok) {
-            throw new Error('Failed to save document');
+            const errorText = await response.text();
+            console.error('Save failed:', errorText);
+            throw new Error(`Failed to save document: ${errorText}`);
         }
 
-        const result = await response.json();
-        console.log('Save result:', result);
+        // Trigger document-saved event for other parts of the app
+        const event = new CustomEvent('document-saved');
+        window.dispatchEvent(event);
 
-        saveStatus.textContent = 'Saved successfully';
-
-        setTimeout(() => {
-            saveStatus.textContent = '';
-        }, 3000);
+        // Clear local storage and redirect to index.html
+        localStorage.removeItem('currentDocumentId');
+        window.location.href = 'index.html';
 
     } catch (error) {
-        console.error('Save failed:', error);
+        console.error('Detailed save error:', error);
         saveStatus.textContent = `Failed to save: ${error.message}`;
     } finally {
         saveButton.disabled = false;
     }
 }
 
-// ============= LOADING FUNCTIONS =============
-async function loadDocument(documentId) {
-    try {
-        const baseUrl = 'http://localhost:3000';
-        const response = await fetch(`${baseUrl}/api/documents/${documentId}`);
-
-        if (!response.ok) {
-            throw new Error('Document not found');
-        }
-
-        const loadDocument = await response.json();
-        const content = JSON.parse(loadDocument.content);
-        console.log(content);
-
-        // Update document
-        document.getElementById('titleInput').textContent = loadDocument.title;
-        if (content.text != ''){
-            document.getElementById('contentArea').textContent = content.text;
-        }
-
-        // Store the ID
-        localStorage.setItem('currentId', documentId);
-
-    } catch (error) {
-        console.error('Failed to load document:', error);
-        // If document not found, redirect to home
-        if (error.message === 'Document not found') {
-            window.location.href = '/';
-        }
-    }
-}
-
-// ============= UTILITY FUNCTIONS =============
-// Update the date
-function updateDate() {
-    const dateElement = document.getElementById('currentDate');
-    const now = new Date();
-    dateElement.textContent = now.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-}
-
-// Auto-save functionality
-let autoSaveTimeout;
-function scheduleAutoSave() {
-    clearTimeout(autoSaveTimeout);
-    autoSaveTimeout = setTimeout(saveDocument, 30000);
-}
+// Additional error handling for page load issues
+window.addEventListener('error', function(event) {
+    console.error('Unhandled error:', event.error);
+    alert('An unexpected error occurred. Please check the console for details.');
+});
