@@ -13,24 +13,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Deploy to GCP VM
-        env:
-          SSH_PRIVATE_KEY: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtZQ+J0wUF4z0gNWYLka//PtJYOgpUfc901qV1010IPUClFR7As97cOpQGscVwQEaj7C6jstNBYkir2oG1s6SBl6dkw3dmCN8u6J0cjpcPGTBYAIvFNWLiPBXQ5jgxy6wOZOA3GT1gUCE8J5oBx+zH3fLxbdHg11vfADYMJI3TCp2B45qZ16JBaeDqTL7EOpylNVEmORwnTKEG0rxnScFet7fbo9Iz3RATTUL9qa7y4cTUQhz/zyYtzkCnSsu7LiH4DTLC57Yh/uGRUG6UWZBT5DT02HbE1KPKJx4vphidCPCXnbmIX08/Z1E7GLNyjgDQB5WDodbBXjuivhsBudEC0rDQWcSRwu6Xy/GUy0//6q9cPWwtMaptTQuq+FRjO3r7Km/BVcmHh3o+Awok+Dg+ddzFZf4v8Drgxf2RiQa99hsW24K/OPUBPsqJCoJoqoPGMSvz7CGGDbxWhF2843OghkQOJIrtV14k9oeemInxyiwTcOoZQa/RqaLVz2kVBek= gcp
-          GCP_VM_IP: 104.155.190.17
-          GCP_VM_USER: gcp
+      - name: Add SSH Key
         run: |
-          # Add SSH key
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-          # Copy project files to GCP VM
+      - name: Deploy to GCP VM
+        run: |
           scp -o StrictHostKeyChecking=no -r ./ $GCP_VM_USER@$GCP_VM_IP:/home/$GCP_VM_USER/app
-
-          # Run deployment commands on the VM
           ssh -o StrictHostKeyChecking=no $GCP_VM_USER@$GCP_VM_IP << 'EOF'
-          cd /home/$USER/app
+          cd /home/$GCP_VM_USER/app
           npm install
           pm2 stop server || true
           pm2 start server.js --name "node-app"
           EOF
+        env:
+          GCP_VM_IP: <GCP_VM_EXTERNAL_IP>
+          GCP_VM_USER: <VM_USERNAME>
