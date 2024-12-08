@@ -256,7 +256,6 @@ app.put('/api/documents/:id', (req, res) => {
             }
         );
     });
-});
 
 
 // **New DELETE Route Added Below**
