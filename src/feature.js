@@ -28,8 +28,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             localStorage.setItem('featureDocumentId', documentId);
         }
 
-        // Add event listener to save button
-        document.getElementById('saveButton').addEventListener('click', saveFeatureDocument);
+        // Add event listener for the delete button
+        const deleteButton = document.getElementById('deleteButton');
+        deleteButton.addEventListener('click', deleteDocument);
+
     } catch (error) {
         console.error('Error loading document:', error);
     }
@@ -134,11 +136,100 @@ async function saveFeatureDocument() {
         console.error('Error stack:', error.stack);
         saveStatus.textContent = `Failed to save: ${error.message}`;
     } finally {
-        if (saveButton) saveButton.disabled = false;
+        saveButton.disabled = false;
     }
 }
 
-// Utility function to update the current date
+
+// ============= DELETE FUNCTION =============
+async function deleteDocument() {
+    const deleteButton = document.getElementById('deleteButton');
+    const deleteStatus = document.getElementById('deleteStatus');
+
+    // Confirmation Dialog
+    const confirmDelete = confirm('Are you sure you want to delete this feature specification? This action cannot be undone.');
+    if (!confirmDelete) {
+        return; // User canceled the deletion
+    }
+
+    try {
+        deleteButton.disabled = true;
+        deleteStatus.textContent = 'Deleting...';
+
+        // Get current document ID from URL
+        const pathParts = window.location.pathname.split('/');
+        const documentId = pathParts[pathParts.length - 1];
+
+        if (!documentId || documentId === 'feature') {
+            throw new Error('Invalid document ID');
+        }
+
+        const response = await fetch(`/api/documents/${documentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to delete document');
+        }
+
+        const result = await response.json();
+        console.log('Delete result:', result);
+
+        deleteStatus.textContent = 'Deleted successfully. Redirecting...';
+
+        // Redirect to Home or another appropriate page after deletion
+        setTimeout(() => {
+            window.location.href = '/'; // Change this URL if you want to redirect elsewhere
+        }, 2000);
+
+    } catch (error) {
+        console.error('Delete failed:', error);
+        deleteStatus.textContent = `Failed to delete: ${error.message}`;
+    } finally {
+        deleteButton.disabled = false;
+    }
+}
+
+
+
+// ============= LOADING FUNCTIONS =============
+async function loadDocument(documentId) {
+    try {
+        const baseUrl = 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/documents/${documentId}`);
+
+        if (!response.ok) {
+            throw new Error('Document not found');
+        }
+
+        const loadDocument = await response.json();
+        const content = JSON.parse(loadDocument.content);
+        console.log(content);
+
+        // Update document
+        document.getElementById('featureName').textContent = loadDocument.title;
+        if (content.text != ''){
+            document.getElementById('feature-content').textContent = content.text;
+        }
+
+        // Store the ID
+        localStorage.setItem('featureDocumentId', documentId);
+
+    } catch (error) {
+        console.error('Failed to load document:', error);
+        // If document not found, redirect to home
+        if (error.message === 'Document not found') {
+            window.location.href = '/';
+        }
+    }
+}
+
+// ============= UTILITY FUNCTIONS =============
+// Update the current date
 function updateDate() {
     const dateElement = document.getElementById('currentDate');
     const now = new Date();
