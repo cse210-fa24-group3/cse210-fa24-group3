@@ -21,7 +21,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H $GCP_VM_IP >> ~/.ssh/known_hosts
+          echo "104.155.190.17 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDiu3RP40WplGARD7sw2GDmvlV6/XHB3dkx4JHbT+PwB" >> ~/.ssh/known_hosts
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           GCP_VM_IP: ${{ secrets.GCP_VM_IP }}
