@@ -203,7 +203,7 @@ app.put('/api/documents/:id', (req, res) => {
 });
 
 
-// **New DELETE Route Added Below**
+
 // Delete document
 app.delete('/api/documents/:id', (req, res) => {
     const { id } = req.params;
@@ -264,8 +264,6 @@ app.delete('/api/documents/:id', (req, res) => {
         );
     });
 });
-// **End of DELETE Route**
-
 
 
 
