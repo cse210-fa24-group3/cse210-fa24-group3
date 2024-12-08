@@ -19,8 +19,8 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 777 ~/.ssh/id_ed25519
           ssh-keyscan -H $GCP_VM_IP >> ~/.ssh/known_hosts
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -29,7 +29,7 @@ jobs:
       # Step 3: Copy application code to the GCP VM
       - name: Transfer application to GCP VM
         run: |
-          scp -o StrictHostKeyChecking=no -r ./ gcp@$GCP_VM_IP:/home/gcp/app
+          scp -o StrictHostKeyChecking=no -r ./ aryan@$GCP_VM_IP:/home/aryan/app
         env:
           GCP_VM_IP: ${{ secrets.GCP_VM_IP }}
           GCP_VM_USER: ${{ secrets.GCP_VM_USER }}
@@ -37,8 +37,8 @@ jobs:
       # Step 4: Install dependencies and restart server on the GCP VM
       - name: Deploy application on GCP VM
         run: |
-          ssh -o StrictHostKeyChecking=no gcp@$GCP_VM_IP << 'EOF'
-          cd /home/gcp/app
+          ssh -o StrictHostKeyChecking=no aryan@$GCP_VM_IP << 'EOF'
+          cd /home/aryan/app
           npm install
           pm2 stop server || true
           pm2 start server.js --name "node-app"
