@@ -7,29 +7,42 @@ on:
 
 jobs:
   deploy:
+    name: Deploy to GCP VM
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Add SSH Key
+      # Step 2: Set up SSH key and permissions
+      - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $GCP_VM_IP >> ~/.ssh/known_hosts
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          GCP_VM_IP: ${{ secrets.GCP_VM_IP }}
 
-      - name: Deploy to GCP VM
+      # Step 3: Copy application code to the GCP VM
+      - name: Transfer application to GCP VM
         run: |
-          scp -o StrictHostKeyChecking=no -r ./ $GCP_VM_USER@$GCP_VM_IP:/home/$GCP_VM_USER/app
-          ssh -o StrictHostKeyChecking=no $GCP_VM_USER@$GCP_VM_IP << 'EOF'
-          cd /home/$GCP_VM_USER/app
+          scp -o StrictHostKeyChecking=no -r ./ gcp@$GCP_VM_IP:/home/gcp/app
+        env:
+          GCP_VM_IP: ${{ secrets.GCP_VM_IP }}
+          GCP_VM_USER: ${{ secrets.GCP_VM_USER }}
+
+      # Step 4: Install dependencies and restart server on the GCP VM
+      - name: Deploy application on GCP VM
+        run: |
+          ssh -o StrictHostKeyChecking=no gcp@$GCP_VM_IP << 'EOF'
+          cd /home/gcp/app
           npm install
           pm2 stop server || true
           pm2 start server.js --name "node-app"
           EOF
         env:
-          GCP_VM_IP: 104.155.190.17
-          GCP_VM_USER: gcp
+          GCP_VM_IP: ${{ secrets.GCP_VM_IP }}
+          GCP_VM_USER: ${{ secrets.GCP_VM_USER }}
