@@ -498,7 +498,7 @@
                     }
         
                     // Populate the UI with the loaded data
-                    populateTodoList(document.title, content.tasks);
+                    populateTodoList(document.title, content.tasks, documentId);
                 })
                 .catch(error => {
                     console.error('Failed to load document:', error);
@@ -525,7 +525,7 @@
                 });
         }
         
-        function populateTodoList(title, tasks) {
+        function populateTodoList(title, tasks, documentId) {
             // Update the list name
             const listNameElement = document.querySelector('#listName');
             if (listNameElement) {
@@ -550,8 +550,35 @@
             }
         
             // Store document ID in localStorage
-            localStorage.setItem('todoDocumentId', documentId);
+            if (documentId) {
+                localStorage.setItem('todoDocumentId', documentId);
+                
+                // Update the URL with the document ID
+                history.replaceState(null, '', `?id=${documentId}`);
+            }
         }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDate();
+            const documentId = getDocumentIdFromUrl();
+            
+            // If there's a document ID, load the document
+            if (documentId) {
+                loadDocument(documentId);
+            } else {
+                // If no document ID, initialize a new todo list
+                initializeNewTodoList();
+            }
+        
+            // Add enter key support for task input
+            document.getElementById('taskInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTask();
+                }
+            });
+        });
+         
+            
         let autoSaveTimeout;
         function scheduleAutoSave() {
             clearTimeout(autoSaveTimeout);
