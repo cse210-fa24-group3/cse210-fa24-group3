@@ -31,5 +31,5 @@ jobs:
           pm2 start server.js --name "node-app"
           EOF
         env:
-          GCP_VM_IP: <GCP_VM_EXTERNAL_IP>
-          GCP_VM_USER: <VM_USERNAME>
+          GCP_VM_IP: 104.155.190.17
+          GCP_VM_USER: gcp
