@@ -1,42 +1,3 @@
-// DOM Elements
-const menuBtn = document.querySelector('.navbar-left div:first-child');
-const sidebar = document.querySelector('.sidebar');
-const overlay = document.querySelector('.overlay');
-const darkModeToggle = document.querySelector('.theme-toggle');
-const userBtn = document.querySelector('.user-btn');
-const userMenu = document.querySelector('.user-menu');
-
-// Sidebar Toggle
-menuBtn.addEventListener('click', toggleSidebar);
-overlay.addEventListener('click', toggleSidebar);
-
-function toggleSidebar() {
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
-}
-
-// Dark mode toggle
-darkModeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    darkModeToggle.querySelector('.light-mode').style.display = document.body.classList.contains('dark-mode') ? 'none' : 'block';
-    darkModeToggle.querySelector('.dark-mode').style.display = document.body.classList.contains('dark-mode') ? 'block' : 'none';
-    
-    // Save preference
-    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-});
-
-// User menu toggle
-userBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    userMenu.classList.toggle('active');
-});
-
-document.addEventListener('click', (e) => {
-    if (!userMenu.contains(e.target)) {
-        userMenu.classList.remove('active');
-    }
-});
-
 // Format relative time for entries
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
@@ -55,114 +16,197 @@ function formatRelativeTime(dateString) {
     });
 }
 
+// Map template types to their respective page links
+const TEMPLATE_LINKS = {
+    'New Document': 'new-page/editor.html',
+    'Todo': 'todo_template/todo.html',
+    'Bug Report': 'bug-review.html',
+    'Feature Specification': 'feature.html',
+    'Minutes of Meeting': 'meeting.html'
+};
+
 // Create HTML for a single entry card
 function createEntryCard(entry) {
-    const truncatedContent = entry.content 
-        ? entry.content.length > 100 
-            ? entry.content.substring(0, 100) + '...'
-            : entry.content
-        : 'No content';
-
-        const link = entry.template_type === 'Todo' 
-        ? `todo%20template/todo.html?id=${entry.id}`
-        : `new-page/editor.html?id=${entry.id}`;
+    const contentPreview = entry.content.length > 100 ? `${entry.content.substring(0, 100)}...` : entry.content;
+    const link = TEMPLATE_LINKS[entry.template_type] || 'new-page/editor.html';
 
     return `
-        <div class="card entry-card">
-            <a href="${link}" class="entry-link">
-                <div class="entry-type">${entry.template_type}</div>
-                <h3 class="entry-title">${entry.title || 'Untitled'}</h3>
-                <p class="entry-preview">${truncatedContent}</p>
-                <div class="entry-meta">
-                    <span class="entry-time">Last edited: ${formatRelativeTime(entry.updated_at)}</span>
-                </div>
-            </a>
+        <div class="entry-card">
+            <h3>${entry.title || 'Untitled'}</h3>
+            <p>${contentPreview}</p>
+            <small>Last updated: ${formatRelativeTime(entry.updated_at)}</small>
+            <a href="${link}?id=${entry.id}" class="btn">Open</a>
         </div>
     `;
 }
 
-// Load recent entries
-let showAllEntries = false; // Track whether to show all entries
-
-
-
-async function loadRecentEntries() {
-    const container = document.getElementById('recently-edited-container');
-    const seeMoreButton = document.getElementById('see-more-button');
-    
-    if (!container) {
-        console.error('Recently edited container not found');
-        return;
-    }
-
+// Fetch and display all documents
+async function fetchAndDisplayDocuments() {
     try {
-        const response = await fetch('http://localhost:3000/api/documents');
+        console.log('Fetching documents...');
+        const response = await fetch('/api/documents');
+        
+        // Log the full response for debugging
+        console.log('Response status:', response.status);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
         }
 
-        const entries = await response.json();
-        const seenIds = new Set(); // Track rendered entry IDs
+        const documents = await response.json();
+        console.log('Fetched documents:', documents);
 
-        if (!entries || entries.length === 0) {
-            container.innerHTML = '<div class="card no-entries">No entries yet. Create your first entry!</div>';
+        const container = document.getElementById('entries');
+        container.innerHTML = '';
+
+        documents.forEach(doc => {
+            container.innerHTML += createEntryCard(doc);
+        });
+    } catch (error) {
+        console.error('Detailed error fetching documents:', error);
+        const container = document.getElementById('entries');
+        container.innerHTML = `Error loading entries: ${error.message}`;
+    }
+}
+
+// Fetch and display recently edited documents
+async function fetchAndDisplayRecentlyEdited() {
+    try {
+        console.log('Fetching recently edited documents...');
+        const response = await fetch('/api/documents');
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+
+        const documents = await response.json();
+        console.log('Fetched recently edited documents:', documents);
+
+        const container = document.getElementById('recently-edited-container');
+        container.innerHTML = '';
+
+        documents.forEach(doc => {
+            container.innerHTML += createEntryCard(doc);
+        });
+    } catch (error) {
+        console.error('Detailed error fetching recently edited documents:', error);
+        const container = document.getElementById('recently-edited-container');
+        container.innerHTML = `Error loading recent entries: ${error.message}`;
+    }
+}
+
+// Function to refresh recently edited section
+function refreshRecentlyEdited() {
+    fetchAndDisplayRecentlyEdited();
+    const event = new CustomEvent('document-saved');
+    window.dispatchEvent(event);
+}
+
+const fetchDocuments = async () => {
+    try {
+        console.log('Fetching documents list...');
+        const response = await fetch('/api/documents');
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+
+        const documents = await response.json();
+        console.log('Fetched documents:', documents);
+
+        const container = document.getElementById('document-list');
+        container.innerHTML = '';
+
+        if (documents.length === 0) {
+            container.innerHTML = '<p>No documents found.</p>';
             return;
         }
 
-        // Filter and limit entries if needed
-        const displayEntries = showAllEntries ? entries : entries.slice(0, 3);
+        documents.forEach(doc => {
+            const documentDiv = document.createElement('div');
+            documentDiv.className = 'document-item';
+            documentDiv.innerHTML = `
+                <h3>${doc.title}</h3>
+                <p>${new Date(doc.created_at).toLocaleString()}</p>
+                <button onclick="openDocument('${doc.id}')">Open</button>
+                <button onclick="deleteDocument('${doc.id}')">Delete</button>
+            `;
+            container.appendChild(documentDiv);
+        });
+    } catch (error) {
+        console.error('Detailed error fetching documents:', error);
+        const alertMessage = error.message || 'Failed to fetch documents. Please try again later.';
+        alert(alertMessage);
+    }
+};
 
-        // Generate HTML for entries
-        container.innerHTML = displayEntries
-            .filter(entry => !seenIds.has(entry.id)) // Filter out duplicate entries
-            .map(entry => {
-                seenIds.add(entry.id); // Track rendered entries
-                return createEntryCard(entry);
-            })
-            .join('');
+// Open document in the correct page
+const openDocument = async (id) => {
+    try {
+        const response = await fetch(`/api/documents/${id}`);
+        if (response.status === 404) {
+            alert('Document not found.');
+            return;
+        }
+        const document = await response.json();
+        const link = TEMPLATE_LINKS[document.template_type] || 'new-page/editor.html';
+        window.location.href = `${link}?id=${document.id}`;
+    } catch (error) {
+        console.error('Error opening document:', error);
+        alert('Failed to open document. Please try again later.');
+    }
+};
 
-        // Show or hide the "See More" button
-        if (entries.length > 3 && !showAllEntries) {
-            seeMoreButton.style.display = 'block';
+// Delete document
+const deleteDocument = async (id) => {
+    if (!confirm('Are you sure you want to delete this document?')) {
+        return;
+    }
+    try {
+        const response = await fetch(`/api/documents/${id}`, { method: 'DELETE' });
+        if (response.ok) {
+            alert('Document deleted successfully.');
+            fetchDocuments(); // Refresh document list
         } else {
-            seeMoreButton.style.display = 'none';
+            alert('Failed to delete document.');
         }
     } catch (error) {
-        console.error('Error loading entries:', error);
-        container.innerHTML = '<div class="card error-card">Failed to load entries. Please try again later.</div>';
+        console.error('Error deleting document:', error);
+        alert('Failed to delete document. Please try again later.');
     }
-}
+};
 
-// Toggle showAllEntries and reload
-function toggleSeeMore() {
-    showAllEntries = !showAllEntries;
-    loadRecentEntries();
-}
-
-// Initialize on page load
+// Initialize document list on page load
 document.addEventListener('DOMContentLoaded', () => {
-    loadRecentEntries();
-    
-    // Load saved theme preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-        document.body.classList.toggle('dark-mode', savedTheme === 'dark');
-        darkModeToggle.querySelector('.light-mode').style.display = savedTheme === 'dark' ? 'none' : 'block';
-        darkModeToggle.querySelector('.dark-mode').style.display = savedTheme === 'dark' ? 'block' : 'none';
-    }
+    console.log('DOM loaded, initializing document fetching...');
+    fetchDocuments();
+    fetchAndDisplayDocuments();
+    fetchAndDisplayRecentlyEdited();
 
-    // Add click handler for new todo list
-    const todoLink = document.querySelector('a[href="todo_template/todo.html"]');
-    if (todoLink) {
-        todoLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = 'todo_template/todo.html';
-        });
-    }
-
-    // Add event listener to "See More" button
-    const seeMoreButton = document.getElementById('see-more-button');
-    if (seeMoreButton) {
-        seeMoreButton.addEventListener('click', toggleSeeMore);
-    }
+    // Listen for custom event from editor page
+    window.addEventListener('document-saved', refreshRecentlyEdited);
 });
+
+// Utility functions for page navigation
+function createNewBugReviewFromTemplate() {
+    window.location.href = 'bug-review.html';
+}
+
+function createNewFeatureFromTemplate() {
+    window.location.href = 'feature.html';
+}
+
+function createNewMeetingFromTemplate() {
+    window.location.href = 'meeting.html';
+}
+
+function openTodoPage() {
+    window.location.href = 'todo_template/todo.html';
+}

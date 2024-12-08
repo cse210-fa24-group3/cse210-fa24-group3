@@ -3,30 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevLog Editor</title>
-    <link rel="stylesheet" href="editor.css">
+    <title>Journal - DevLog</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/template.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-left">
-            <a href="../index.html" class="back-button">☰</a>
-            <a href="../index.html" class="logo">DevLog</a>
-        </div>
-        <div class="navbar-right">
-            <button class="save-button">Save</button>
-            <button class="theme-toggle" id="theme-toggle">
-                <span class="theme-icon">☀️</span>
-            </button>
-        </div>
-    </nav>
+    <!-- Your existing HTML content -->
 
-    <div class="editor-container">
-        <div class="editor-content">
-            <input type="text" id="title-input" class="title-input" placeholder="Title">
-            <textarea id="content-input" class="content-input" placeholder="Write your thoughts..."></textarea>
+    <main class="main-content">
+        <div class="container">
+            <div class="header">
+                <input type="text" class="title-input" placeholder="Untitled Journal Entry" id="titleInput">
+                <div class="header-right">
+                    <div class="save-status" id="saveStatus"></div>
+                    <button class="save-button" id="saveButton">
+                        <span>Save</span>
+                    </button>
+                </div>
+            </div>
+            <textarea class="content-area" placeholder="Start writing..." id="contentArea"></textarea>
         </div>
-    </div>
+    </main>
 
-    <script src="editor.js"></script>
+    <script src="src/new-page/editor.js"></script>
 </body>
 </html>

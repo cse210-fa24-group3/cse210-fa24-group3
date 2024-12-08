@@ -1,144 +1,84 @@
-const titleInput = document.getElementById('title-input');
-const contentInput = document.getElementById('content-input');
-const saveButton = document.querySelector('.save-button');
-const themeToggle = document.getElementById('theme-toggle');
-const themeIcon = document.querySelector('.theme-icon');
+let documentId = new URLSearchParams(window.location.search).get('id') || 
+                 window.location.pathname.split('/').pop();
+let lastSavedContent = '';
+let isNewDocument = !documentId;
 
-// Theme handling
-function initializeTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-}
+// Initialize autosave timer
+let autosaveTimer = null;
 
-function updateThemeIcon(theme) {
-    themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
-}
+async function saveDocument(event) {
+    if (event) event.preventDefault();
+    console.log('Starting save process...');
 
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    updateThemeIcon(newTheme);
-}
+    const titleInput = document.getElementById('titleInput');
+    const contentArea = document.getElementById('contentArea');
+    const saveStatus = document.getElementById('saveStatus');
 
-// Initialize theme
-initializeTheme();
-themeToggle.addEventListener('click', toggleTheme);
+    console.log({
+        title: titleInput?.value,
+        content: contentArea?.value,
+        saveStatusExists: !!saveStatus
+    });
 
-async function saveContent(isAutoSave = false) {
-    const title = titleInput.value.trim();
-    const content = contentInput.value.trim();
-
-    if (!title && !content) return;
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const editingId = urlParams.get('id');
-
-    try {
-        const url = editingId 
-            ? `http://localhost:3000/api/documents/${editingId}`
-            : 'http://localhost:3000/api/documents';
-
-        const response = await fetch(url, {
-            method: editingId ? 'PUT' : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                title: title || 'Untitled',
-                content
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to save entry');
-        }
-
-        const data = await response.json();
-        console.log(data)
-        showNotification(isAutoSave ? 'Auto-saved!' : 'Saved successfully!', 'success');
-
-        if (!isAutoSave && !editingId) {
-            // Only redirect if it's a manual save of a new document
-            setTimeout(() => {
-                window.location.href = '../index.html';
-            }, 1000);
-        }
-    } catch (error) {
-        console.error('Error saving entry:', error);
-        showNotification(error.message || 'Failed to save entry', 'error');
-    }
-}
-
-function showNotification(message, type = 'success') {
-    const existingNotification = document.querySelector('.notification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
-
-    const notification = document.createElement('div');
-    notification.textContent = message;
-    notification.className = `notification ${type}`;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => notification.remove(), 2000);
-}
-
-async function loadEntry() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const editingId = urlParams.get('id');
-
-    if (!editingId) {
-        titleInput.value = '';
-        contentInput.value = '';
+    if (!titleInput || !contentArea || !saveStatus) {
+        console.error('Required elements missing!');
         return;
     }
 
+    const url = isNewDocument ? '/api/documents' : `/api/documents/${documentId}`;
+    console.log(`Saving to URL: ${url}, Method: ${isNewDocument ? 'POST' : 'PUT'}`);
+    
     try {
-        // FIXED: Changed from /api/entries/ to /api/documents/
-        const response = await fetch(`http://localhost:3000/api/documents/${editingId}`);
-        if (!response.ok) {
-            throw new Error(`Failed to load entry: ${response.status}`);
+        const response = await fetch(url, {
+            method: isNewDocument ? 'POST' : 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: titleInput.value,
+                content: contentArea.value
+            })
+        });
+
+        console.log('Response:', response);
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success) {
+            saveStatus.textContent = 'Saved!';
+        } else {
+            throw new Error(data.error || 'Unknown save error');
         }
-
-        const entry = await response.json();
-        
-        titleInput.value = entry.title || '';
-        contentInput.value = entry.content || '';
-        
-        document.title = `Editing: ${entry.title || 'Untitled'} | DevLog`;
-        
     } catch (error) {
-        console.error('Error loading entry:', error);
-        showNotification('Failed to load entry', 'error');
-        
-        setTimeout(() => {
-            window.location.href = '../index.html';
-        }, 2000);
+        console.error('Save failed:', error.message);
+        saveStatus.textContent = 'Error saving';
     }
 }
 
-// Event Listeners
-saveButton.addEventListener('click', () => saveContent(false));
-window.addEventListener('load', loadEntry);
 
-// Auto-save functionality
-let autoSaveTimeout;
-function setupAutoSave() {
-    const AUTO_SAVE_DELAY = 3000; // 3 seconds
+// Rest of the script remains the same as previous version...
 
-    function triggerAutoSave() {
-        clearTimeout(autoSaveTimeout);
-        autoSaveTimeout = setTimeout(() => {
-            saveContent(true);
-        }, AUTO_SAVE_DELAY);
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Loaded');
+
+    const titleInput = document.getElementById('titleInput');
+    const contentArea = document.getElementById('contentArea');
+    const saveButton = document.getElementById('saveButton');
+
+    if (!titleInput || !contentArea || !saveButton) {
+        console.error('Required elements not found');
+        return;
     }
 
-    titleInput.addEventListener('input', triggerAutoSave);
-    contentInput.addEventListener('input', triggerAutoSave);
-}
+    // Load existing document if applicable
+    loadDocument();
 
-setupAutoSave();
+    // Attach save button click event
+    saveButton.addEventListener('click', (event) => {
+        console.log('Save Button Clicked');
+        saveDocument(event);
+    });
+
+    // Setup autosave
+    setupAutosave();
+});

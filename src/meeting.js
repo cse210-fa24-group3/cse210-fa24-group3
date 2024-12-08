@@ -1,10 +1,15 @@
 document.addEventListener('DOMContentLoaded', async function () {
     try {
-        // Get document ID from URL path
-        const pathParts = window.location.pathname.split('/');
-        const documentId = pathParts[pathParts.length - 1];
+        // Get document ID from URL query parameter or create new
+        const urlParams = new URLSearchParams(window.location.search);
+        const documentId = urlParams.get('id') || Date.now().toString();
 
         console.log('Current document ID:', documentId);
+
+        // If no ID exists, create a flag for a new document
+        if (!urlParams.get('id')) {
+            localStorage.setItem('isNewDocument', 'true');
+        }
 
         if (documentId && documentId !== 'meeting') {
             // Load document by ID
@@ -44,24 +49,18 @@ async function saveDocument() {
         saveButton.disabled = true;
         saveStatus.textContent = 'Saving...';
 
-        // Get current document ID from URL
-        const pathParts = window.location.pathname.split('/');
-        const documentId = pathParts[pathParts.length - 1];
-
-        if (!documentId || documentId === 'meeting') {
-            throw new Error('Invalid document ID');
-        }
+        // Get current document ID from URL or localStorage
+        const documentId = localStorage.getItem('meetingDocumentId') || Date.now().toString();
 
         const meetingData = {
-            id: documentId,
-            title: document.getElementById('meetingName').value,
+            title: document.getElementById('meetingName').value || 'Untitled Meeting',
             content: JSON.stringify({
-                text: document.getElementById('meeting-content').value,
+                text: document.getElementById('meeting-content').value || '',
             }),
-            template_type: 'meeting'
+            template_type: 'Minutes of Meeting'
         };
 
-        console.log(meetingData);
+        console.log('Saving document:', meetingData);
 
         const response = await fetch(`/api/documents/${documentId}`, {
             method: 'PUT',
@@ -72,7 +71,9 @@ async function saveDocument() {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to save document');
+            // Try to parse error details
+            const errorResponse = await response.json();
+            throw new Error(errorResponse.details || 'Failed to save document');
         }
 
         const result = await response.json();
@@ -80,13 +81,39 @@ async function saveDocument() {
 
         saveStatus.textContent = 'Saved successfully';
 
+        // Redirect to home page after a short delay
         setTimeout(() => {
-            saveStatus.textContent = '';
-        }, 3000);
+            window.location.href = '/';
+        }, 1000);
 
     } catch (error) {
         console.error('Save failed:', error);
         saveStatus.textContent = `Failed to save: ${error.message}`;
+        
+        // Optional: Attempt to create a new document if PUT fails
+        try {
+            const createResponse = await fetch('/api/documents', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: meetingData.title,
+                    content: meetingData.content,
+                    template_type: 'Minutes of Meeting'
+                })
+            });
+
+            if (createResponse.ok) {
+                const newDoc = await createResponse.json();
+                console.log('Created new document:', newDoc);
+                
+                // Redirect to home page
+                window.location.href = '/';
+            }
+        } catch (createError) {
+            console.error('Failed to create new document:', createError);
+        }
     } finally {
         saveButton.disabled = false;
     }
