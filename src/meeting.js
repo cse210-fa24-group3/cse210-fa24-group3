@@ -1,3 +1,7 @@
+/**
+ * Initializes the application when the DOM content is fully loaded.
+ * @event DOMContentLoaded
+ */
 document.addEventListener('DOMContentLoaded', async function () {
     try {
         // Get document ID from URL path
@@ -41,6 +45,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 // ============= SAVE FUNCTION =============
+/**
+ * Saves the current document to the server.
+ * @async
+ * @function saveDocument
+ */
 async function saveDocument() {
     const saveButton = document.getElementById('saveButton');
     const saveStatus = document.getElementById('saveStatus');
@@ -99,6 +108,11 @@ async function saveDocument() {
 
 
 // ============= DELETE FUNCTION =============
+/**
+ * Deletes the current document from the server.
+ * @async
+ * @function deleteDocument
+ */
 async function deleteDocument() {
     const deleteButton = document.getElementById('deleteButton');
     const deleteStatus = document.getElementById('deleteStatus');
@@ -154,6 +168,12 @@ async function deleteDocument() {
 
 
 // ============= LOADING FUNCTIONS =============
+/**
+ * Loads a document by its unique identifier.
+ * @async
+ * @function loadDocument
+ * @param {string} documentId - The ID of the document to load.
+ */
 async function loadDocument(documentId) {
     try {
         const baseUrl = 'http://localhost:3000';
@@ -186,7 +206,10 @@ async function loadDocument(documentId) {
 }
 
 // ============= UTILITY FUNCTIONS =============
-// Update the current date
+/**
+ * Updates the displayed current date on the webpage.
+ * @function updateDate
+ */
 function updateDate() {
     const dateElement = document.getElementById('currentDate');
     const now = new Date();
@@ -197,7 +220,11 @@ function updateDate() {
     });
 }
 
-// Auto-save functionality
+
+/**
+ * Schedules an automatic save operation after a specified timeout.
+ * @function scheduleAutoSave
+ */
 let autoSaveTimeout;
 function scheduleAutoSave() {
     clearTimeout(autoSaveTimeout);

@@ -64,6 +64,10 @@ const overlay = document.querySelector('.overlay');
 menuBtn.addEventListener('click', toggleSidebar);
 overlay.addEventListener('click', toggleSidebar);
 
+/**
+ * Toggles the visibility of the sidebar and overlay.
+ * @function toggleSidebar
+ */
 function toggleSidebar() {
     sidebar.classList.toggle('active');
     overlay.classList.toggle('active');
@@ -74,7 +78,10 @@ const darkModeToggle = document.querySelector('.navbar-right div:nth-child(2)');
 const moon = '🌙';
 const sun = '☀️';
 
-// Loading saved theme, likely to change
+/**
+ * Loads the saved theme preference from localStorage and applies it.
+ * @function loadSavedTheme
+ */
 function loadSavedTheme() {
     const savedTheme = localStorage.getItem('darkMode');
     if (savedTheme === 'enabled') {
@@ -115,6 +122,11 @@ document.addEventListener('click', (e) => {
     }
 });
 
+/**
+ * Creates a new todo document from a template and redirects to its page.
+ * @async
+ * @function createNewTodoFromTemplate
+ */
 async function createNewTodoFromTemplate() {
     try {
         console.log('Starting todo creation...');
@@ -141,6 +153,11 @@ async function createNewTodoFromTemplate() {
     }
 }
 
+/**
+ * Creates a new bug review document from a template and redirects to its page.
+ * @async
+ * @function createNewBugReviewFromTemplate
+ */
 async function createNewBugReviewFromTemplate() {
     try {
         console.log('Starting bug review creation...');
@@ -167,7 +184,11 @@ async function createNewBugReviewFromTemplate() {
     }
 }
 
-// feature and meeting
+/**
+ * Creates a new feature specification document from a template and redirects to its page.
+ * @async
+ * @function createNewFeatureFromTemplate
+ */
 async function createNewFeatureFromTemplate() {
     try {
         console.log('Starting Feature Specification creation...');
@@ -194,6 +215,11 @@ async function createNewFeatureFromTemplate() {
     }
 }
 
+/**
+ * Creates a new meeting minutes document from a template and redirects to its page.
+ * @async
+ * @function createNewMeetingFromTemplate
+ */
 async function createNewMeetingFromTemplate() {
     try {
         console.log('Starting Minutes of Meeting creation...');

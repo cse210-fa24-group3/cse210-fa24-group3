@@ -1,13 +1,23 @@
+/**
+ * Server-side application using Express.js to manage documents.
+ * Handles Create, Read, Update, and Delete (CRUD) operations, 
+ * serves static files, and manages different document templates.
+ */
+
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs').promises;
 
+// Initialize Express application
 const app = express();
 const port = 3000;
 
-// Middleware
+// ==================== Middleware Setup ====================
+
+// Enable Cross-Origin Resource Sharing, 
+// And Parse incoming JSON requests
 app.use(cors());
 app.use(express.json());
 
@@ -17,7 +27,9 @@ app.use(express.static(path.join(__dirname)));
 app.use('/todo_template', express.static(path.join(__dirname, 'todo_template')));
 app.use('/new-page', express.static(path.join(__dirname, 'new-page')));
 
-// Database setup
+// ==================== Database Setup ====================
+
+// Connect to SQLite database
 const db = new sqlite3.Database('documents.db', (err) => {
     if (err) {
         console.error('Error opening database:', err);
@@ -26,7 +38,7 @@ const db = new sqlite3.Database('documents.db', (err) => {
     }
 });
 
-// Initialize database schema
+// Initialize database schema 
 db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS documents (
         id TEXT PRIMARY KEY, 
@@ -46,13 +58,20 @@ db.serialize(() => {
     )`);
 });
 
+// ==================== Logging Middleware ====================
+
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
     next();
 });
 
-// API Routes
-// Get all documents
+// ==================== API Routes ====================
+
+/**
+ * @route GET /api/documents
+ * @desc Retrieve all documents ordered by creation date descending
+ * @access Public
+ */
 app.get('/api/documents', (req, res) => {
     db.all('SELECT * FROM documents ORDER BY created_at DESC', [], (err, rows) => {
         if (err) {
@@ -63,7 +82,12 @@ app.get('/api/documents', (req, res) => {
     });
 });
 
-// Get single document
+/**
+ * @route GET /api/documents/:id
+ * @desc Retrieve a single document by its ID
+ * @access Public
+ * @param {string} id - Document ID
+ */
 app.get('/api/documents/:id', (req, res) => {
     const { id } = req.params;
     console.log('Fetching document:', id);
@@ -82,7 +106,12 @@ app.get('/api/documents/:id', (req, res) => {
     });
 });
 
-// Create new document
+/**
+ * @route POST /api/documents
+ * @desc Create a new document
+ * @access Public
+ * @body { title, content, template_type }
+ */
 app.post('/api/documents', (req, res) => {
     console.log('Received POST request for document:', req.body);
     const { title, content, template_type = 'New Document' } = req.body;
@@ -141,7 +170,13 @@ app.post('/api/documents', (req, res) => {
     });
 });
 
-// Update document
+/**
+ * @route PUT /api/documents/:id
+ * @desc Update an existing document by its ID
+ * @access Public
+ * @param {string} id - Document ID
+ * @body { title, content }
+ */
 app.put('/api/documents/:id', (req, res) => {
     const { id } = req.params;
     const { title, content } = req.body;
@@ -202,9 +237,12 @@ app.put('/api/documents/:id', (req, res) => {
     });
 });
 
-
-
-// Delete document
+/**
+ * @route DELETE /api/documents/:id
+ * @desc Delete a document and its history by ID
+ * @access Public
+ * @param {string} id - Document ID
+ */
 app.delete('/api/documents/:id', (req, res) => {
     const { id } = req.params;
 
@@ -267,7 +305,83 @@ app.delete('/api/documents/:id', (req, res) => {
 
 
 
-// Special routes for specific document types
+
+app.get(['/todo_template/todo.html'], (req, res) => {
+    const todoTemplatePath = path.join(__dirname, 'todo_template', 'todo.html');
+    console.log('Attempting to serve todo_template');
+    console.log('Full path:', todoTemplatePath);
+    
+    // Use fs to check if file exists before sending
+    fs.access(todoTemplatePath, fs.constants.F_OK, (err) => {
+        if (err) {
+            console.error('Todo template file not found:', err);
+            return res.status(404).send('Todo template not found');
+        }
+        res.sendFile(todoTemplatePath);
+    });
+});
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/editor', (req, res) => {
+    res.sendFile(path.join(__dirname, 'new-page', 'editor.html'));
+});
+
+
+
+app.get('/journal', (req, res) => {
+    res.sendFile(path.join(__dirname, 'journal.html'));
+});
+
+app.get('/journal/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'journal.html'));
+});
+
+app.get('/bug-review', (req, res) => {
+    res.sendFile(path.join(__dirname, 'bug-review.html'));
+});
+
+app.get('/bug-review/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'bug-review.html'));
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).send('Something broke!');
+});
+
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
+
+// Feature
+app.get('/feature', (req, res) => {
+    res.sendFile(path.join(__dirname, 'feature.html'));
+});
+
+app.get('/feature/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'feature.html'));
+});
+
+
+// Meeting
+app.get('/meeting', (req, res) => {
+    res.sendFile(path.join(__dirname, 'meeting.html'));
+});
+
+app.get('/meeting/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'meeting.html'));
+});
+
+// ==================== Template-Specific Routes ====================
+
+/**
+ * @route POST /api/documents/new-todo
+ * @desc Create a new Todo document from a template
+ * @access Public
+ */
 app.post('/api/documents/new-todo', (req, res) => {
     const id = Date.now().toString();
     const now = new Date().toISOString();
@@ -336,6 +450,11 @@ app.post('/api/documents/new-todo', (req, res) => {
     });
 });
 
+/**
+ * @route POST /api/documents/new-bug-review
+ * @desc Create a new Bug Review document from a template
+ * @access Public
+ */
 app.post('/api/documents/new-bug-review', (req, res) => {
     const id = Date.now().toString();
     const now = new Date().toISOString();
@@ -404,65 +523,11 @@ app.post('/api/documents/new-bug-review', (req, res) => {
     });
 });
 
-app.get(['/todo_template/todo.html'], (req, res) => {
-    const todoTemplatePath = path.join(__dirname, 'todo_template', 'todo.html');
-    console.log('Attempting to serve todo_template');
-    console.log('Full path:', todoTemplatePath);
-    
-    // Use fs to check if file exists before sending
-    fs.access(todoTemplatePath, fs.constants.F_OK, (err) => {
-        if (err) {
-            console.error('Todo template file not found:', err);
-            return res.status(404).send('Todo template not found');
-        }
-        res.sendFile(todoTemplatePath);
-    });
-});
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('/editor', (req, res) => {
-    res.sendFile(path.join(__dirname, 'new-page', 'editor.html'));
-});
-
-
-
-app.get('/journal', (req, res) => {
-    res.sendFile(path.join(__dirname, 'journal.html'));
-});
-
-app.get('/journal/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'journal.html'));
-});
-
-app.get('/bug-review', (req, res) => {
-    res.sendFile(path.join(__dirname, 'bug-review.html'));
-});
-
-app.get('/bug-review/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'bug-review.html'));
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    res.status(500).send('Something broke!');
-});
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
-
-// Feature
-app.get('/feature', (req, res) => {
-    res.sendFile(path.join(__dirname, 'feature.html'));
-});
-
-app.get('/feature/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'feature.html'));
-});
-
+/**
+ * @route POST /api/documents/new-feature
+ * @desc Create a new Feature Specification document from a template
+ * @access Public
+ */
 app.post('/api/documents/new-feature', (req, res) => {
     const id = Date.now().toString();
     const now = new Date().toISOString();
@@ -531,15 +596,11 @@ app.post('/api/documents/new-feature', (req, res) => {
     });
 });
 
-// Meeting
-app.get('/meeting', (req, res) => {
-    res.sendFile(path.join(__dirname, 'meeting.html'));
-});
-
-app.get('/meeting/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'meeting.html'));
-});
-
+/**
+ * @route POST /api/documents/new-meeting
+ * @desc Create a new Meeting Minutes document from a template
+ * @access Public
+ */
 app.post('/api/documents/new-meeting', (req, res) => {
     const id = Date.now().toString();
     const now = new Date().toISOString();
