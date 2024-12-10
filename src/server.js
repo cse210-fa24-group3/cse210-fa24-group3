@@ -5,19 +5,14 @@ const path = require('path');
 const fs = require('fs').promises;
 
 const app = express();
-const port = 3000;
+const port = 8080;
 const cors = require('cors');
 app.use(cors({
-    origin: 'http://localhost:3000', // or the exact URL of your frontend
+    origin: '*', // Replace '*' with your frontend's URL in production
     credentials: true
 }));
 
 app.use(express.json());
-
-app.use(cors({
-    origin: 'http://localhost:3000', 
-    credentials: true
-}));
 
 // Serve static files
 app.use(express.static(__dirname));
@@ -456,6 +451,6 @@ app.delete('/api/documents/:id', (req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Server running on port ${port}`);
 });
