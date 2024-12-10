@@ -453,8 +453,4 @@ app.delete('/api/documents/:id', (req, res) => {
 // Start server
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server running on port ${port}`);
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> 4e9d2edad85f2407b677a04098e77343f5ed800a
