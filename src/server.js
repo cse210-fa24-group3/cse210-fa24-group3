@@ -186,12 +186,11 @@ app.post('/run-command', (req, res) => {
             cd /home/aryan/user 
             git init
             git remote remove origin
-            git remote add origin https://imaryandokania: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@github.com/imaryandokania/documents.git
+            git remote add origin git@github.com:imaryandokania/documents.git
             git config user.name "imaryandokania" 
             git add ${fileName} 
             git commit -m "Add ${title}" 
             git push -u origin main
-            git push -u https://imaryandokania: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@github.com/imaryandokania/documents.git main
         `;
 
         console.log(`Executing Git commands:\n${gitCommands}`);
