@@ -212,41 +212,205 @@ app.put('/api/documents/:id', (req, res) => {
 
     console.log('Received update request:', { id, title, content, template_type });
 
-    // Check if document exists first
-    db.get('SELECT * FROM documents WHERE id = ?', [id], (checkErr, existingDoc) => {
-        if (checkErr) {
-            console.error('Error checking document existence:', checkErr);
-            return res.status(500).json({ 
-                error: 'Database error', 
-                details: checkErr.message 
-            });
-        }
+        // Update documents table
+        db.run(
+            'UPDATE documents SET title = ?, content = ?, updated_at = ? WHERE id = ?',
+            [title, content, now, id],
+            function(err) {
+                if (err) {
+                    db.run('ROLLBACK');
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
 
-        if (!existingDoc) {
-            // If document doesn't exist, create a new one
-            const newId = Date.now().toString();
-            db.run(
-                `INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`,
-                [newId, title, content, template_type, now, now],
-                function (insertErr) {
-                    if (insertErr) {
-                        console.error('Error creating new document:', insertErr);
-                        return res.status(500).json({ 
-                            error: 'Failed to create new document', 
-                            details: insertErr.message 
+                if (this.changes === 0) {
+                    db.run('ROLLBACK');
+                    res.status(404).json({ error: 'Document not found' });
+                    return;
+                }
+
+                // Insert into history
+                db.run(
+                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                    [id, now, now],
+                    function(err) {
+                        if (err) {
+                            db.run('ROLLBACK');
+                            res.status(500).json({ error: err.message });
+                            return;
+                        }
+
+                        db.run('COMMIT', (err) => {
+                            if (err) {
+                                db.run('ROLLBACK');
+                                res.status(500).json({ error: err.message });
+                                return;
+                            }
+                            res.json({ 
+                                success: true, 
+                                message: 'Document updated successfully' 
+                            });
                         });
                     }
-                    res.json({
-                        success: true,
-                        documentId: newId,
-                        message: 'New document created successfully'
+                );
+            }
+        );
+    });
+
+
+// **New DELETE Route Added Below**
+// Delete document
+app.delete('/api/documents/:id', (req, res) => {
+    const { id } = req.params;
+
+    console.log('Received DELETE request for document:', id);
+
+    // Basic validation
+    if (!id) {
+        return res.status(400).json({ success: false, message: 'Document ID is required.' });
+    }
+
+    db.serialize(() => {
+        console.log('Starting document deletion transaction');
+
+        db.run('BEGIN TRANSACTION');
+
+        // Delete related history entries first to maintain referential integrity
+        db.run(
+            'DELETE FROM history WHERE document_id = ?',
+            [id],
+            function(err) {
+                if (err) {
+                    console.error('Error deleting history:', err);
+                    db.run('ROLLBACK');
+                    return res.status(500).json({ success: false, message: 'Failed to delete document history.' });
+                }
+
+                // Delete the document
+                db.run(
+                    'DELETE FROM documents WHERE id = ?',
+                    [id],
+                    function(err) {
+                        if (err) {
+                            console.error('Error deleting document:', err);
+                            db.run('ROLLBACK');
+                            return res.status(500).json({ success: false, message: 'Failed to delete document.' });
+                        }
+
+                        if (this.changes === 0) {
+                            db.run('ROLLBACK');
+                            return res.status(404).json({ success: false, message: 'Document not found.' });
+                        }
+
+                        // Commit the transaction
+                        db.run('COMMIT', (err) => {
+                            if (err) {
+                                console.error('Error committing transaction:', err);
+                                db.run('ROLLBACK');
+                                return res.status(500).json({ success: false, message: 'Failed to delete document.' });
+                            }
+
+                            console.log('Document deleted successfully:', id);
+                            res.json({ success: true, message: 'Document deleted successfully.' });
+                        });
+                    }
+                );
+            }
+        );
+    });
+});
+// **End of DELETE Route**
+
+
+
+
+// Special routes for specific document types
+app.post('/api/documents/new-todo', (req, res) => {
+    const id = Date.now().toString();
+    const now = new Date().toISOString();
+    
+    console.log('Creating new todo document...');
+
+    const emptyTodo = {
+        title: "",
+        content: JSON.stringify({
+            tasks: [],
+            lastUpdated: now
+        }),
+        template_type: 'todo'
+    };
+
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+
+        db.run(
+            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+            [id, emptyTodo.title, emptyTodo.content, emptyTodo.template_type, now, now],
+            function(err) {
+                if (err) {
+                    console.error('Document creation error:', err);
+                    db.run('ROLLBACK');
+                    return res.status(500).json({ 
+                        success: false, 
+                        error: err.message 
                     });
                 }
-            );
-            return;
-        }
 
-        // Update existing document
+                db.run(
+                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                    [id, now, now],
+                    function(err) {
+                        if (err) {
+                            console.error('History creation error:', err);
+                            db.run('ROLLBACK');
+                            return res.status(500).json({ 
+                                success: false, 
+                                error: err.message 
+                            });
+                        }
+
+                        db.run('COMMIT', (err) => {
+                            if (err) {
+                                console.error('Commit error:', err);
+                                db.run('ROLLBACK');
+                                return res.status(500).json({ 
+                                    success: false, 
+                                    error: err.message 
+                                });
+                            }
+                            
+                            console.log('Todo created successfully with ID:', id);
+                            return res.status(200).json({ 
+                                success: true, 
+                                documentId: id,
+                                message: 'Todo created successfully'
+                            });
+                        });
+                    }
+                );
+            }
+        );
+    });
+});
+
+app.post('/api/documents/new-bug-review', (req, res) => {
+    const id = Date.now().toString();
+    const now = new Date().toISOString();
+    
+    console.log('Creating new bug review document...');
+
+    const emptyBugReview = {
+        title: "",
+        content: JSON.stringify({
+            text: '',
+            lastUpdated: now
+        }),
+        template_type: 'bug-review'
+    };
+
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+
         db.run(
             `UPDATE documents SET title = ?, content = ?, template_type = ?, updated_at = ? WHERE id = ?`,
             [title, content, template_type, now, id],
@@ -293,5 +457,5 @@ app.delete('/api/documents/:id', (req, res) => {
 
 // Start server
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server running on port ${port}`);
 });
