@@ -126,12 +126,6 @@ body.dark-mode .task-item {
 .delete-button:hover {
     background: #881919;
 }
-.delete-status {
-    color: #64748b;
-    font-size: 0.875rem;
-    min-width: 120px;
-    text-align: right;
-}
 
 textarea {
     flex: 1;
