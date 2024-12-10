@@ -33,7 +33,12 @@ jobs:
       
       - name: Test SSH Connection
         run: |
-         sshpass -p "1234" ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no aryan@104.155.190.17
+         sshpass -p "1234" ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no aryan@104.155.190.17 << 'EOF'
+         cd /home/aryan/
+         npm install
+         pm2 stop server || true
+         pm2 start server.js --name "node-app"
+         EOF
 
 
       # # Step 4: Install dependencies and restart server on the GCP VM
