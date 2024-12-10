@@ -5,6 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DevLog</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Pop-Up Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%;
+            border-radius: 5px;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        form input, form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        form button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -21,7 +84,7 @@
                 <span class="light-mode">🌙</span>
                 <span class="dark-mode" style="display:none;">☀️</span>
             </div>
-            <div class="user-btn">👤</div>
+            <div class="user-btn" onclick="openModal()">👤</div>
         </div>
     </nav>
     <div class="sidebar">
@@ -49,7 +112,6 @@
                 <a href="new-page/editor.html" class="card create-card">
                     <span class="plus-icon">+</span>
                 </a>
-                
                 <div class="card" onclick="openTodoPage()">To-do list</div>
                 <div class="card" onclick="createNewBugReviewFromTemplate()">Bug - Root Cause Analysis</div>
                 <div class="card" onclick="createNewFeatureFromTemplate()">Feature Specification</div>
@@ -65,6 +127,24 @@
             <a href="#" id="see-more-button" class="see-more">See More</a>
         </section>
     </main>
+
+    <!-- Pop-Up Form Modal -->
+    <div id="github-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2>GitHub Configuration</h2>
+            <form id="github-form">
+                <label for="github-username">GitHub Username</label>
+                <input type="text" id="github-username" placeholder="Enter your GitHub username" required>
+                
+                <label for="github-ssh-key">GitHub SSH Key</label>
+                <textarea id="github-ssh-key" placeholder="Paste your SSH key here" rows="5" required></textarea>
+                
+                <button type="button" onclick="saveGithubCredentials()">Save</button>
+            </form>
+        </div>
+    </div>
+
     <script src="script.js"></script>
     <script src="home.js"></script>
 </body>

@@ -78,46 +78,88 @@ const db = new sqlite3.Database('documents.db', (err) => {
 //         });
 //     });
 // });
-// app.post('/run-command', (req, res) => {
-//     const { title, content } = req.body;
 
-//     // Sanitize the title to create a safe file name
-//     const sanitizedTitle = title.replace(/[^a-zA-Z0-9]/g, '_');
-//     const fileName = `${sanitizedTitle}.md`; // Save as Markdown file
-//     const filePath = path.join('/home/aryan/user', fileName); // Adjust path as necessary
 
-//     // Save content to a Markdown file
-//     fs.writeFile(filePath, content, (err) => {
+
+// app.get('/api/get-github-credentials', (req, res) => {
+//     const { username } = req.query;
+
+//     if (!username) {
+//         console.error('Username is missing in the request');
+//         return res.status(400).send('Username is required.');
+//     }
+
+//     console.log('Fetching credentials for username:', username);
+
+//     const filePath = path.join(__dirname, 'github-credentials.json');
+
+//     fs.readFile(filePath, 'utf8', (err, data) => {
 //         if (err) {
-//             console.error('Error writing file:', err);
-//             return res.status(500).send('Failed to save Markdown file.');
+//             console.error('Error reading credentials file:', err);
+//             return res.status(500).send('Failed to read credentials file.');
 //         }
 
-//         // Git commands
-//         const gitCommands = `
-//         cd ..
-//         cd ..
-//         cd user
-//         git init
-//         git config user.name "test"
-//         git branch -M main
-//         git add ${fileName} 
-//         git commit -m "Add ${title}" 
-//         git push origin main
-//         rm -rf ${fileName}
-//         `;
+//         try {
+//             const credentials = JSON.parse(data);
 
-//         // Execute Git commands
-//         exec(gitCommands, (gitError, gitStdout, gitStderr) => {
-//             if (gitError) {
-//                 console.error(`Error with Git commands: ${gitStderr}`);
-//                 return res.status(500).send(gitStderr);
+//             if (credentials.username !== username) {
+//                 console.error('No credentials found for username:', username);
+//                 return res.status(404).send('No credentials found for the specified username.');
 //             }
 
-//             res.send(gitStdout || 'Markdown file committed and pushed to repository successfully!');
-//         });
+//             res.json(credentials);
+//         } catch (parseError) {
+//             console.error('Error parsing credentials:', parseError);
+//             res.status(500).send('Invalid credentials format.');
+//         }
 //     });
 // });
+app.get('/api/get-github-credentials', (req, res) => {
+    const { username } = req.query;
+
+    if (!username) {
+        return res.status(400).send('Username is required.');
+    }
+
+    const query = `SELECT username, ssh_key FROM github_credentials WHERE username = ?`;
+
+    db.get(query, [username], (err, row) => {
+        if (err) {
+            console.error('Error retrieving GitHub credentials:', err);
+            return res.status(500).send('Failed to retrieve GitHub credentials.');
+        }
+
+        if (!row) {
+            return res.status(404).send('No credentials found for the specified username.');
+        }
+
+        res.json(row);
+    });
+});
+app.post('/api/save-github-credentials', (req, res) => {
+    const { username, sshKey } = req.body;
+
+    if (!username || !sshKey) {
+        return res.status(400).send('Both username and SSH key are required.');
+    }
+
+    const query = `
+        INSERT INTO github_credentials (username, ssh_key)
+        VALUES (?, ?)
+        ON CONFLICT(username) DO UPDATE SET ssh_key = excluded.ssh_key
+    `;
+
+    db.run(query, [username, sshKey], function (err) {
+        if (err) {
+            console.error('Error saving GitHub credentials:', err);
+            return res.status(500).send('Failed to save GitHub credentials.');
+        }
+
+        res.send('GitHub credentials saved successfully.');
+    });
+});
+
+
 app.post('/run-command', (req, res) => {
     const { documentId, title, content } = req.body;
 
@@ -141,13 +183,14 @@ app.post('/run-command', (req, res) => {
 
         console.log(`File created successfully at ${filePath}`);
         // Git commands
+            // git push -u origin main 
         const gitCommands = `
             cd /home/aryan/user 
             git config user.name "test" 
             git add ${fileName} 
             git commit -m "Add ${title}" 
-            git push -u origin main 
-            rm -rf ${fileName}
+            git push -u https://imaryandokania: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@github.com/imaryandokania/documents.git main
+         
         `;
 
         console.log(`Executing Git commands:\n${gitCommands}`);
@@ -218,6 +261,13 @@ db.serialize(() => {
         } else {
             console.log('Documents table ensured');
         }
+        db.run(`
+            CREATE TABLE IF NOT EXISTS github_credentials (
+                username TEXT PRIMARY KEY,
+                ssh_key TEXT NOT NULL
+            )
+        `);
+        console.log('GitHub credentials table ensured.');
     });
 });
 

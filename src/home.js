@@ -1,4 +1,5 @@
 // Format relative time for entries
+getGithubCredentials();
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -270,3 +271,96 @@ function createNewMeetingFromTemplate() {
 function openTodoPage() {
     window.location.href = 'todo_template/todo.html';
 }
+// Open the modal and pre-fill the form
+async function openModal() {
+    document.getElementById('github-modal').style.display = 'block';
+
+    // Check localStorage for cached username
+    const cachedUsername = localStorage.getItem('github-username');
+    if (cachedUsername) {
+        console.log('Using cached username:', cachedUsername);
+
+        // Fetch SSH key for cached username
+        await fetchAndFillCredentials(cachedUsername);
+    } else {
+        console.log('No cached username found. Please configure credentials manually.');
+    }
+}
+
+// Fetch credentials from the backend and update the form
+
+async function fetchAndFillCredentials(username) {
+    try {
+        const response = await fetch(`/api/get-github-credentials?username=${encodeURIComponent(username)}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch GitHub credentials.');
+        }
+
+        const { username: fetchedUsername, ssh_key } = await response.json();
+
+        document.getElementById('github-username').value = fetchedUsername || '';
+        document.getElementById('github-ssh-key').value = ssh_key || '';
+    } catch (error) {
+        console.error('Error fetching GitHub credentials:', error);
+        alert('Unable to fetch GitHub credentials.');
+    }
+}
+
+async function saveGithubCredentials() {
+    const username = document.getElementById('github-username').value.trim();
+    const sshKey = document.getElementById('github-ssh-key').value.trim();
+
+    if (!username || !sshKey) {
+        alert('Please fill out both fields.');
+        return;
+    }
+
+    try {
+        console.log('Sending GitHub credentials to the backend:', { username, sshKey });
+
+        const response = await fetch('/api/save-github-credentials', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, sshKey }), // Send data as JSON
+        });
+
+        if (response.ok) {
+            const result = await response.text();
+            console.log('Credentials saved successfully:', result);
+
+            // Update the cache
+            localStorage.setItem('github-username', username);
+
+            alert('GitHub credentials saved successfully!');
+            closeModal();
+        } else {
+            const error = await response.text();
+            console.error('Failed to save credentials:', error);
+            alert(`Failed to save credentials: ${error}`);
+        }
+    } catch (error) {
+        console.error('Error during credentials save operation:', error);
+        alert('An error occurred while saving credentials.');
+    }
+}
+
+// Close the modal
+function closeModal() {
+    document.getElementById('github-modal').style.display = 'none';
+}
+
+// On page load, fetch credentials using cached username
+async function getGithubCredentials() {
+    const cachedUsername = localStorage.getItem('github-username');
+    if (cachedUsername) {
+        console.log('Fetching credentials for cached username:', cachedUsername);
+        await fetchAndFillCredentials(cachedUsername);
+    } else {
+        console.log('No cached username found.');
+    }
+}
+
+// Call this function when the application loads
+// getGithubCredentials();
