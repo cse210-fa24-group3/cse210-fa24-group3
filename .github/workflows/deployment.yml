@@ -1,4 +1,5 @@
 name: Deploy to GCP VM
+name: Deploy to GCP VM
 
 on:
   push:
@@ -8,13 +9,17 @@ on:
 jobs:
   deploy:
     name: Deploy to GCP VM
+  deploy:
+    name: Deploy to GCP VM
     runs-on: ubuntu-latest
 
     steps:
       # Step 1: Check out code
+      # Step 1: Check out code
       - name: Checkout code
         uses: actions/checkout@v2
 
+<<<<<<< HEAD
 <<<<<<< HEAD
       - name: Install sshpass
         run: sudo apt-get install -y sshpass      # Step 2: Set up SSH key and permissions
@@ -25,6 +30,10 @@ jobs:
 
       # Step 3: Set up SSH key and permissions
 >>>>>>> b1bc18d91dcee7ba3693e762119d91de8e8fee42
+=======
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass      # Step 2: Set up SSH key and permissions
+>>>>>>> 4e9d2edad85f2407b677a04098e77343f5ed800a
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -33,6 +42,9 @@ jobs:
           echo -e "Host ${{ secrets.GCP_VM_IP }}\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 4e9d2edad85f2407b677a04098e77343f5ed800a
     
       - name: Set up SSH key
         run: |
@@ -53,6 +65,7 @@ jobs:
       #     set -e  # Exit immediately if any command fails
       #     cd /home/aryan/
       #     npm install
+<<<<<<< HEAD
 =======
       # Step 4: Deploy files to GCP VM
       - name: Deploy application files to GCP VM
@@ -72,6 +85,8 @@ jobs:
           # set -e  # Exit immediately if any command fails
           # cd /home/aryan/github
 >>>>>>> b1bc18d91dcee7ba3693e762119d91de8e8fee42
+=======
+>>>>>>> 4e9d2edad85f2407b677a04098e77343f5ed800a
           # pm2 stop server || true
           # pm2 start server.js --name "node-app"
           # EOF
