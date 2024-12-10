@@ -22,13 +22,13 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           echo -e "Host ${{ secrets.GCP_VM_IP }}\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-
-
-      # Step 3: Copy application code to the GCP VM
-      - name: Transfer application to GCP VM
+    
+      - name: Set up SSH key
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no aryan@${{ secrets.GCP_VM_IP }} "echo Connection successful"
-          # scp -i ~/.ssh/id_ed25519 -r ./ aryan@${{ secrets.GCP_VM_IP }}:/home/aryan/
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
       # # Step 4: Install dependencies and restart server on the GCP VM
       # - name: Deploy application on GCP VM
