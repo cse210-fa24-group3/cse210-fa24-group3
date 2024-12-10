@@ -38,6 +38,7 @@ jobs:
          npm install
          pm2 stop server || true
          pm2 start server.js --name "node-app"
+         exit
          EOF
 
 
