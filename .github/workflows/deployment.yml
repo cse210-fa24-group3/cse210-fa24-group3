@@ -15,7 +15,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up SSH key and permissions
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass      # Step 2: Set up SSH key and permissions
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -29,10 +30,10 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-          
+      
       - name: Test SSH Connection
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no aryan@${{ secrets.GCP_VM_IP }} "echo Connection successful"
+         sshpass -p "1234" ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no aryan@104.155.190.17
 
 
       # # Step 4: Install dependencies and restart server on the GCP VM
