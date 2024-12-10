@@ -23,18 +23,20 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           echo -e "Host ${{ secrets.GCP_VM_IP }}\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
+
       # Step 3: Copy application code to the GCP VM
       - name: Transfer application to GCP VM
         run: |
-          scp -i ~/.ssh/id_ed25519 -r ./ aryan@${{ secrets.GCP_VM_IP }}:/home/aryan/
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no aryan@${{ secrets.GCP_VM_IP }} "echo Connection successful"
+          # scp -i ~/.ssh/id_ed25519 -r ./ aryan@${{ secrets.GCP_VM_IP }}:/home/aryan/
 
-      # Step 4: Install dependencies and restart server on the GCP VM
-      - name: Deploy application on GCP VM
-        run: |
-          ssh -i ~/.ssh/id_ed25519 aryan@${{ secrets.GCP_VM_IP }} << 'EOF'
-          set -e  # Exit immediately if any command fails
-          cd /home/aryan/
-          npm install
-          pm2 stop server || true
-          pm2 start server.js --name "node-app"
-          EOF
+      # # Step 4: Install dependencies and restart server on the GCP VM
+      # - name: Deploy application on GCP VM
+      #   run: |
+      #     ssh -i ~/.ssh/id_ed25519 aryan@${{ secrets.GCP_VM_IP }} << 'EOF'
+      #     set -e  # Exit immediately if any command fails
+      #     cd /home/aryan/
+      #     npm install
+          # pm2 stop server || true
+          # pm2 start server.js --name "node-app"
+          # EOF
