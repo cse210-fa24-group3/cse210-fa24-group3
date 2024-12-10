@@ -147,7 +147,6 @@ app.post('/run-command', (req, res) => {
             git add ${fileName} 
             git commit -m "Add ${title}" 
             git push -u origin main 
-            rm -rf ${fileName}
         `;
 
         console.log(`Executing Git commands:\n${gitCommands}`);
