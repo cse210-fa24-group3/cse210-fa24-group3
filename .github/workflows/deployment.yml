@@ -1,5 +1,4 @@
 name: Deploy to GCP VM
-name: Deploy to GCP VM
 
 on:
   push:
@@ -9,34 +8,24 @@ on:
 jobs:
   deploy:
     name: Deploy to GCP VM
-  deploy:
-    name: Deploy to GCP VM
     runs-on: ubuntu-latest
 
     steps:
       # Step 1: Check out code
-      # Step 1: Check out code
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Step 2: Install sshpass (if required)
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      # Step 3: Set up SSH key and permissions
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           echo -e "Host ${{ secrets.GCP_VM_IP }}\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-      
-      - name: Deploy to GCP VM
-        run: |
-          scp -o StrictHostKeyChecking=no -r ./ aryan@104.155.190.17:/home/aryan/
-
 
       # Step 4: Deploy files to GCP VM
       - name: Deploy application files to GCP VM
@@ -53,8 +42,7 @@ jobs:
           pm2 start server.js --name "node-app"
           pm2 save
           EOF
-
+      # Step 6: Verify deployment status
       - name: Check PM2 status
         run: |
           ssh -i ~/.ssh/id_ed25519 aryan@${{ secrets.GCP_VM_IP }} "pm2 status"
-       
