@@ -1,5 +1,4 @@
 // Format relative time for entries
-getGithubCredentials();
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();
