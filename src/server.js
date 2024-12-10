@@ -182,15 +182,14 @@ app.post('/run-command', (req, res) => {
     });
 
         console.log(`File created successfully at ${filePath}`);
-        // Git commands
-            // git push -u origin main 
-        const gitCommands = `
+          const gitCommands = `
             cd /home/aryan/user 
+            git remote remove origin
+            git remote add origin https://imaryandokania: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@github.com/imaryandokania/documents.git
             git config user.name "test" 
             git add ${fileName} 
             git commit -m "Add ${title}" 
-            git push -u https://imaryandokania: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@github.com/imaryandokania/documents.git main
-         
+            git push -u origin main
         `;
 
         console.log(`Executing Git commands:\n${gitCommands}`);
