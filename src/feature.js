@@ -144,7 +144,7 @@ async function saveFeatureDocument() {
 // ============= DELETE FUNCTION =============
 async function deleteDocument() {
     const deleteButton = document.getElementById('deleteButton');
-    const deleteStatus = document.getElementById('deleteStatus');
+    const deleteStatus = document.getElementById('saveStatus');
 
     // Confirmation Dialog
     const confirmDelete = confirm('Are you sure you want to delete this feature specification? This action cannot be undone.');
