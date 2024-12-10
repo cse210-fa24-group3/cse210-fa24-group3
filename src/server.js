@@ -17,6 +17,13 @@ app.use(express.json());
 // Serve static files
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname)));
+app.use(express.static('public', {
+    setHeaders: (res, path, stat) => {
+        if (path.endsWith('.js')) {
+            res.set('Content-Type', 'application/javascript');
+        }
+    }
+}));
 app.use('/todo_template', express.static(path.join(__dirname, 'todo_template')));
 app.use('/new-page', express.static(path.join(__dirname, 'new-page')));
 
@@ -199,7 +206,7 @@ app.post('/api/documents', async (req, res) => {
 });
 
 
-// Update document route with better error handling
+// Update document route with proper transaction handling
 app.put('/api/documents/:id', (req, res) => {
     const { id } = req.params;
     const { title, content, template_type } = req.body;
@@ -207,50 +214,69 @@ app.put('/api/documents/:id', (req, res) => {
 
     console.log('Received update request:', { id, title, content, template_type });
 
-        // Update documents table
-        db.run(
-            'UPDATE documents SET title = ?, content = ?, updated_at = ? WHERE id = ?',
-            [title, content, now, id],
-            function(err) {
-                if (err) {
-                    db.run('ROLLBACK');
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
+    // Begin transaction explicitly
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION', (beginErr) => {
+            if (beginErr) {
+                console.error('Error beginning transaction:', beginErr);
+                return res.status(500).json({ error: beginErr.message });
+            }
 
-                if (this.changes === 0) {
-                    db.run('ROLLBACK');
-                    res.status(404).json({ error: 'Document not found' });
-                    return;
-                }
+            // Update documents table
+            db.run(
+                'UPDATE documents SET title = ?, content = ?, updated_at = ? WHERE id = ?',
+                [title, content, now, id],
+                function(updateErr) {
+                    if (updateErr) {
+                        console.error('Error updating document:', updateErr);
+                        db.run('ROLLBACK', () => {
+                            res.status(500).json({ error: updateErr.message });
+                        });
+                        return;
+                    }
 
-                // Insert into history
-                db.run(
-                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
-                    [id, now, now],
-                    function(err) {
-                        if (err) {
-                            db.run('ROLLBACK');
-                            res.status(500).json({ error: err.message });
-                            return;
-                        }
+                    if (this.changes === 0) {
+                        db.run('ROLLBACK', () => {
+                            res.status(404).json({ error: 'Document not found' });
+                        });
+                        return;
+                    }
 
-                        db.run('COMMIT', (err) => {
-                            if (err) {
-                                db.run('ROLLBACK');
-                                res.status(500).json({ error: err.message });
+                    // Insert into history
+                    db.run(
+                        'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                        [id, now, now],
+                        function(historyErr) {
+                            if (historyErr) {
+                                console.error('Error updating history:', historyErr);
+                                db.run('ROLLBACK', () => {
+                                    res.status(500).json({ error: historyErr.message });
+                                });
                                 return;
                             }
-                            res.json({ 
-                                success: true, 
-                                message: 'Document updated successfully' 
+
+                            // Commit the transaction
+                            db.run('COMMIT', (commitErr) => {
+                                if (commitErr) {
+                                    console.error('Error committing transaction:', commitErr);
+                                    db.run('ROLLBACK', () => {
+                                        res.status(500).json({ error: commitErr.message });
+                                    });
+                                    return;
+                                }
+
+                                res.json({ 
+                                    success: true, 
+                                    message: 'Document updated successfully' 
+                                });
                             });
-                        });
-                    }
-                );
-            }
-        );
+                        }
+                    );
+                }
+            );
+        });
     });
+});
 
 
 // **New DELETE Route Added Below**
