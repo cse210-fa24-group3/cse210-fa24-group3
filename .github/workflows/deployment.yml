@@ -33,13 +33,7 @@ jobs:
       
       - name: Deploy to GCP VM
         run: |
-          sshpass -p "1234" ssh -tt -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no aryan@104.155.190.17 << 'EOF'
-          cd /home/aryan/
-          npm install
-          pm2 stop server || true
-          pm2 start server.js --name "node-app"
-          exit
-          EOF
+          scp -o StrictHostKeyChecking=no -r ./ aryan@104.155.190.17:/home/aryan/
 
 
       # # Step 4: Install dependencies and restart server on the GCP VM
