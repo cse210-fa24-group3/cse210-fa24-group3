@@ -111,7 +111,7 @@ body.dark-mode .task-item {
 }
 
 .delete-button {
-    background: #1C7D41; /* Secondary color */
+    background: #a72020; /* Secondary color */
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -124,7 +124,7 @@ body.dark-mode .task-item {
     gap: 0rem;
 }
 .delete-button:hover {
-    background: #14532d;
+    background: #881919;
 }
 .delete-status {
     color: #64748b;
