@@ -1,6 +1,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const { exec } = require('child_process');
 
 const fs = require('fs').promises;
 
@@ -24,6 +25,7 @@ app.use(express.static('public', {
         }
     }
 }));
+
 app.use('/todo_template', express.static(path.join(__dirname, 'todo_template')));
 app.use('/new-page', express.static(path.join(__dirname, 'new-page')));
 
@@ -34,6 +36,132 @@ const db = new sqlite3.Database('documents.db', (err) => {
     } else {
         console.log('Connected to the documents database.');
     }
+});
+
+// app.post('/run-command', (req, res) => {
+//     const { title, content } = req.body;
+
+//     // Sanitize the title to create a safe file name
+//     const sanitizedTitle = title.replace(/[^a-zA-Z0-9]/g, '_');
+//     const fileName = `${sanitizedTitle}.txt`;
+//     const filePath = path.join('/home/aryan/user', fileName);
+
+//     // Save content to a file
+//     const saveCommand = `echo "${content}" > ${filePath}`;
+//  // git remote add origin https://github.com/imaryandokania/documents.git
+//     const gitCommands = `
+//         cd ..
+//         cd ..
+//         cd user
+//         git init
+//         git config user.name "test"
+//         git branch -M main
+//         git add ${fileName} 
+//         git commit -m "Add ${title}" 
+//         git push origin main
+//         rm -rf ${fileName} 
+//     `;
+//     // Execute the commands
+//     exec(saveCommand, (saveError, saveStdout, saveStderr) => {
+//         if (saveError) {
+//             console.error(`Error saving file: ${saveStderr}`);
+//             return res.status(500).send(saveStderr);
+//         }
+
+//         exec(gitCommands, (gitError, gitStdout, gitStderr) => {
+//             if (gitError) {
+//                 console.error(`Error with Git commands: ${gitStderr}`);
+//                 return res.status(500).send(gitStderr);
+//             }
+
+//             res.send(gitStdout || 'File saved and changes pushed to repository successfully!');
+//         });
+//     });
+// });
+// app.post('/run-command', (req, res) => {
+//     const { title, content } = req.body;
+
+//     // Sanitize the title to create a safe file name
+//     const sanitizedTitle = title.replace(/[^a-zA-Z0-9]/g, '_');
+//     const fileName = `${sanitizedTitle}.md`; // Save as Markdown file
+//     const filePath = path.join('/home/aryan/user', fileName); // Adjust path as necessary
+
+//     // Save content to a Markdown file
+//     fs.writeFile(filePath, content, (err) => {
+//         if (err) {
+//             console.error('Error writing file:', err);
+//             return res.status(500).send('Failed to save Markdown file.');
+//         }
+
+//         // Git commands
+//         const gitCommands = `
+//         cd ..
+//         cd ..
+//         cd user
+//         git init
+//         git config user.name "test"
+//         git branch -M main
+//         git add ${fileName} 
+//         git commit -m "Add ${title}" 
+//         git push origin main
+//         rm -rf ${fileName}
+//         `;
+
+//         // Execute Git commands
+//         exec(gitCommands, (gitError, gitStdout, gitStderr) => {
+//             if (gitError) {
+//                 console.error(`Error with Git commands: ${gitStderr}`);
+//                 return res.status(500).send(gitStderr);
+//             }
+
+//             res.send(gitStdout || 'Markdown file committed and pushed to repository successfully!');
+//         });
+//     });
+// });
+app.post('/run-command', (req, res) => {
+    const { documentId, title, content } = req.body;
+
+    if (!documentId) {
+        return res.status(400).send('Document ID is required.');
+    }
+
+    // Use documentId as the file name
+    const fileName = `${documentId}.md`; // File name is now based on the document ID
+    const filePath = path.join('/home/aryan/user', fileName); // Adjust path as necessary
+
+    console.log(`Writing file: ${filePath}`);
+
+    // Save content to a Markdown file
+    fs.writeFile(filePath, content, (err) => {
+        if (err) {
+            console.error('Error writing file:', err);
+            return res.status(500).send('Failed to save Markdown file.');
+        }
+    });
+
+        console.log(`File created successfully at ${filePath}`);
+        // Git commands
+        const gitCommands = `
+            cd /home/aryan/user 
+            git config user.name "test" 
+            git add ${fileName} 
+            git commit -m "Add ${title}" 
+            git push -u origin main 
+            rm -rf ${fileName}
+        `;
+
+        console.log(`Executing Git commands:\n${gitCommands}`);
+
+        // Execute Git commands
+        exec(gitCommands, (gitError, gitStdout, gitStderr) => {
+            if (gitError) {
+                console.error(`Error with Git commands: ${gitStderr}`);
+                return res.status(500).send(gitStderr);
+            }
+
+            res.send(gitStdout || 'Markdown file committed and pushed to repository successfully!');
+        });
+
 });
 app.post('/api/documents', async (req, res) => {
     const { title, content, template_type = 'New Document' } = req.body;
