@@ -19,21 +19,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass      # Step 2: Set up SSH key and permissions
-=======
-      # Step 2: Install sshpass (if required)
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass
-
-      # Step 3: Set up SSH key and permissions
->>>>>>> b1bc18d91dcee7ba3693e762119d91de8e8fee42
-=======
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass      # Step 2: Set up SSH key and permissions
->>>>>>> 4e9d2edad85f2407b677a04098e77343f5ed800a
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -41,11 +26,6 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           echo -e "Host ${{ secrets.GCP_VM_IP }}\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 4e9d2edad85f2407b677a04098e77343f5ed800a
-    
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -58,15 +38,6 @@ jobs:
           scp -o StrictHostKeyChecking=no -r ./ aryan@104.155.190.17:/home/aryan/
 
 
-      # # Step 4: Install dependencies and restart server on the GCP VM
-      # - name: Deploy application on GCP VM
-      #   run: |
-      #     ssh -i ~/.ssh/id_ed25519 aryan@${{ secrets.GCP_VM_IP }} << 'EOF'
-      #     set -e  # Exit immediately if any command fails
-      #     cd /home/aryan/
-      #     npm install
-<<<<<<< HEAD
-=======
       # Step 4: Deploy files to GCP VM
       - name: Deploy application files to GCP VM
         run: |
@@ -80,13 +51,10 @@ jobs:
           sudo npm install -g pm2
           pm2 stop node-app
           pm2 start server.js --name "node-app"
+          pm2 save
           EOF
-          # ssh -i ~/.ssh/id_ed25519 aryan@${{ secrets.GCP_VM_IP }} << 'EOF'
-          # set -e  # Exit immediately if any command fails
-          # cd /home/aryan/github
->>>>>>> b1bc18d91dcee7ba3693e762119d91de8e8fee42
-=======
->>>>>>> 4e9d2edad85f2407b677a04098e77343f5ed800a
-          # pm2 stop server || true
-          # pm2 start server.js --name "node-app"
-          # EOF
+
+      - name: Check PM2 status
+        run: |
+          ssh -i ~/.ssh/id_ed25519 aryan@${{ secrets.GCP_VM_IP }} "pm2 status"
+       
