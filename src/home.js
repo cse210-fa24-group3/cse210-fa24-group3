@@ -113,32 +113,6 @@ function displayDocuments(showAll = false) {
     }
 }
 
-// Fetch and display recently edited documents
-async function fetchAndDisplayRecentlyEdited() {
-    try {
-        console.log('Fetching recently edited documents...');
-        const response = await fetch('/api/documents');
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error response:', errorText);
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-        }
-
-        const documents = await response.json();
-        console.log('Fetched recently edited documents:', documents);
-
-        // Sort documents by updated_at in descending order
-        allRecentDocuments = documents.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-
-        displayRecentlyEdited();
-    } catch (error) {
-        console.error('Detailed error fetching recently edited documents:', error);
-        const container = document.getElementById('recently-edited-container');
-        container.innerHTML = `Error loading recent entries: ${error.message}`;
-    }
-}
-
 // Display recently edited documents with option to show more
 function displayRecentlyEdited(showAll = false) {
     const container = document.getElementById('recently-edited-container');
