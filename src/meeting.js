@@ -393,11 +393,9 @@ async function saveDocument() {
         const result = await response.json();
         console.log('Save result:', result);
         saveStatus.textContent = 'Saved successfully';
-
-        // Redirect after successful save
         setTimeout(() => {
-            window.location.href = '/';
-        }, 1000);
+            saveStatus.textContent = '';
+        }, 2000);
 
     } catch (error) {
         console.error('Save failed:', error);
