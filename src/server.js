@@ -189,7 +189,7 @@ app.post('/run-command', (req, res) => {
             git config user.name "test" 
             git add ${fileName} 
             git commit -m "Add ${title}" 
-            git push -u https://imaryandokania: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}@github.com/imaryandokania/documents.git main
+            git push -u https://imaryandokania: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@github.com/imaryandokania/documents.git main
          
         `;
 
