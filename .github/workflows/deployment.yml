@@ -15,8 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Step 2: Install sshpass (if required)
       - name: Install sshpass
-        run: sudo apt-get install -y sshpass      # Step 2: Set up SSH key and permissions
+        run: sudo apt-get install -y sshpass
+
+      # Step 3: Set up SSH key and permissions
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -24,26 +27,18 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           echo -e "Host ${{ secrets.GCP_VM_IP }}\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
-    
-      - name: Set up SSH key
+      # Step 4: Deploy files to GCP VM
+      - name: Deploy application files to GCP VM
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-      
-      - name: Deploy to GCP VM
+          scp -o StrictHostKeyChecking=no -r ./ aryan@${{ secrets.GCP_VM_IP }}:/home/aryan/
+
+      # Step 5: Install dependencies and restart server on the GCP VM
+      - name: Install dependencies and restart server
         run: |
-          scp -o StrictHostKeyChecking=no -r ./ aryan@104.155.190.17:/home/aryan/
-
-
-      # # Step 4: Install dependencies and restart server on the GCP VM
-      # - name: Deploy application on GCP VM
-      #   run: |
-      #     ssh -i ~/.ssh/id_ed25519 aryan@${{ secrets.GCP_VM_IP }} << 'EOF'
-      #     set -e  # Exit immediately if any command fails
-      #     cd /home/aryan/
-      #     npm install
-          # pm2 stop server || true
-          # pm2 start server.js --name "node-app"
-          # EOF
+          ssh -i ~/.ssh/id_ed25519 aryan@${{ secrets.GCP_VM_IP }} << 'EOF'
+          set -e  # Exit immediately if any command fails
+          cd /home/aryan
+          npm install
+          pm2 stop server || true
+          pm2 start server.js --name "node-app"
+          EOF
