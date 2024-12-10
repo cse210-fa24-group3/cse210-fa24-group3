@@ -1,4 +1,5 @@
 name: Deploy to GCP VM
+name: Deploy to GCP VM
 
 on:
   push:
@@ -8,9 +9,12 @@ on:
 jobs:
   deploy:
     name: Deploy to GCP VM
+  deploy:
+    name: Deploy to GCP VM
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Check out code
       # Step 1: Check out code
       - name: Checkout code
         uses: actions/checkout@v2
