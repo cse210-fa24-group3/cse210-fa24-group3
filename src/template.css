@@ -134,6 +134,29 @@ body.dark-mode .task-item {
 }
 
 
+.download-button {
+    background: #1C7D41; /* Secondary color */
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0rem;
+}
+.download-button:hover {
+    background: #14532d;
+}
+.download-status {
+    color: #64748b;
+    font-size: 0.875rem;
+    min-width: 120px;
+    text-align: right;
+}
+
 textarea {
     flex: 1;
     padding: 0.75rem 1rem;

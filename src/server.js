@@ -304,6 +304,58 @@ app.delete('/api/documents/:id', (req, res) => {
 });
 
 
+// Download document as Markdown
+app.get('/api/documents/:id/download', (req, res) => {
+    const { id } = req.params;
+
+    console.log('Received DOWNLOAD request for document:', id);
+
+    if (!id) {
+        return res.status(400).json({ success: false, message: 'Document ID is required.' });
+    }
+
+    // Fetch the document from the database
+    db.get('SELECT * FROM documents WHERE id = ?', [id], (err, row) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ success: false, message: 'Internal server error.' });
+        }
+
+        if (!row) {
+            console.log('Document not found:', id);
+            return res.status(404).json({ success: false, message: 'Document not found.' });
+        }
+
+        // Parse the content
+        let content;
+        try {
+            content = JSON.parse(row.content);
+        } catch (parseError) {
+            console.error('Error parsing document content:', parseError);
+            return res.status(500).json({ success: false, message: 'Invalid document content.' });
+        }
+
+        // Assuming 'content.text' contains plain text
+        const plainTextContent = content.text || '';
+
+        // Define the filename with .txt extension based on the title
+        const sanitizedTitle = row.title 
+            ? row.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() 
+            : 'document';
+        const filename = `${sanitizedTitle}.txt`;
+
+        // Set headers to prompt download as .txt
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Type', 'text/plain');
+
+        // Send the Plain Text content
+        res.send(plainTextContent);
+    });
+});
+
+
+
+// Script for template routines
 
 
 app.get(['/todo_template/todo.html'], (req, res) => {
