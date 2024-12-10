@@ -2,15 +2,87 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="/meeting.js"></script>
+    <script src="/script.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minutes of Meeting</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/template.css">
-    <!-- For HTML Only styles -->
     <link rel="stylesheet" href="./styles.css">
     <link rel="stylesheet" href="./template.css">
-    
 
+    <style>
+       .container {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        height: 90vh; /* Adjust height to fit the viewport */
+        padding: 10px;
+    }
+        .editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview {
+        flex: 1;
+        display: flex;
+        flex-direction: column; /* Ensures children stack vertically */
+        justify-content: flex-start; /* Align content at the top */
+        padding: 15px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        overflow-y: auto; /* Enable scrolling for long content */
+    }
+
+        textarea {
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 150px);
+            font-family: monospace;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .save-button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .save-button:hover {
+            background-color: #0056b3;
+        }
+
+        .save-status {
+            margin-left: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+         /* Preview Content */
+    #preview-content {
+        width: 100%;
+        height: auto;
+        font-family: sans-serif;
+        line-height: 1.5;
+    }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -49,78 +121,140 @@
     </div>
 
     <main class="main-content">
-        <div class="container">
-            <div class="header">
-                <input type="text" class="title-input" placeholder="Untitled Minutes of Meeting ###" id="meetingName">
-                <div class="header-right">
-                    <div class="save-status" id="saveStatus"></div>
+        <div class="header">
+            <input type="text" class="title-input" placeholder="Untitled Minutes of Meeting ###" id="meetingName">
+            <div class="header-right">
+                <div class="save-status" id="saveStatus"></div>
 
-                    <button class="save-button" id="saveButton" onclick="saveDocument()">
-                        <span>Save</span>
-                    </button>
-                    
-                    <button class="save-button" id="commitid" onclick="commitDocument()">
-                        <span>Commit</span>
-                    </button>
-                </div>
-                
+                <button class="save-button" id="saveButton" onclick="saveDocument()">
+                    Save
+                </button>
+
+                <button class="save-button" id="commitid" onclick="commitDocument()">
+                    Commit
+                </button>
+                <button id="download-pdf" onclick="downloadPDF()">Download PDF</button>
             </div>
-            <div class="section">
-                <h3>Meeting description</h3>
-                <textarea class="content-area" id="meeting-content" contenteditable="true">
-Meeting Title: [Descriptive title of the meeting]
-Meeting Date: [YYYY-MM-DD]
-Meeting Time: [Start Time - End Time]
-Location/Platform: [Physical location or virtual platform]
-    
-Participants
-Chairperson: [Name]
-Attendees: [List of participant names]
-Absent: [List of absent members]
-    
-Agenda
-• [Agenda item 1]
-• [Agenda item 2]
-• [Agenda item 3]
-• [Continue as needed]
-    
-Discussion Points
-    
-[Agenda Item 1 Title]
-• Key Points Discussed: [Summary of discussion]
-• Decisions Made: [Any decisions made regarding this item]
-• Action Items: [Actions to be taken, by whom, and deadlines]
-    
-[Agenda Item 2 Title]
-• Key Points Discussed: [Summary of discussion]
-• Decisions Made: [Any decisions made regarding this item]
-• Action Items: [Actions to be taken, by whom, and deadlines]
-    
-[Agenda item 3 Title]
-• Key Points Discussed: [Summary of discussion]
-• Decisions Made: [Any decisions made regarding this item]
-• Action Items: [Actions to be taken, by whom, and deadlines]
-    
-Action Items Summary
-• [Action Item 1]: [Responsible person], Deadline: [YYYY-MM-DD]
-• [Action Item 2]: [Responsible person], Deadline: [YYYY-MM-DD]
-    
-Next Meeting
-Date: [YYYY-MM-DD]
-Time: [Start Time]
-Location/Platform: [Physical location or virtual platform]
-    
-Sign-off
-Prepared By: [Note taker name]
-Approved By: [Chairperson name]
-    
-Minutes Circulated Date: [YYYY-MM-DD]
-            </textarea>
+        </div>
+
+        <div class="container">
+            <!-- Markdown Editor -->
+            <div class="editor">
+                <h3>Markdown Editor</h3>
+                <textarea id="markdown-editor" oninput="updatePreview()">
+## Meeting Title: [Descriptive title of the meeting]
+**Meeting Date:** [YYYY-MM-DD]  
+**Meeting Time:** [Start Time - End Time]  
+**Location/Platform:** [Physical location or virtual platform]
+
+## Participants
+- **Chairperson:** [Name]  
+- **Attendees:**  
+  - [Participant 1]  
+  - [Participant 2]  
+- **Absent:**  
+  - [Absent Member 1]  
+
+## Agenda
+1. [Agenda item 1]
+2. [Agenda item 2]
+3. [Agenda item 3]
+
+## Discussion Points
+
+### [Agenda Item 1 Title]
+- **Key Points Discussed:**  
+  [Summary of discussion]
+- **Decisions Made:**  
+  [Any decisions made regarding this item]
+- **Action Items:**  
+  - [Action Item 1]: [Responsible person], Deadline: [YYYY-MM-DD]
+
+### [Agenda Item 2 Title]
+- **Key Points Discussed:**  
+  [Summary of discussion]
+- **Decisions Made:**  
+  [Any decisions made regarding this item]
+- **Action Items:**  
+  - [Action Item 2]: [Responsible person], Deadline: [YYYY-MM-DD]
+
+### [Agenda Item 3 Title]
+- **Key Points Discussed:**  
+  [Summary of discussion]
+- **Decisions Made:**  
+  [Any decisions made regarding this item]
+- **Action Items:**  
+  - [Action Item 3]: [Responsible person], Deadline: [YYYY-MM-DD]
+
+## Action Items Summary
+- [Action Item 1]: [Responsible person], Deadline: [YYYY-MM-DD]  
+- [Action Item 2]: [Responsible person], Deadline: [YYYY-MM-DD]
+
+## Next Meeting
+- **Date:** [YYYY-MM-DD]  
+- **Time:** [Start Time]  
+- **Location/Platform:** [Physical location or virtual platform]
+
+## Sign-off
+- **Prepared By:** [Note taker name]  
+- **Approved By:** [Chairperson name]  
+
+**Minutes Circulated Date:** [YYYY-MM-DD]
+                </textarea>
+            </div>
+            <!-- <h3>Preview</h3> -->
+            <!-- Markdown Preview -->
+            <!-- <h3>Preview</h3> -->
+            <!-- Markdown Preview -->
+            <div class="preview">
+                <h3>Preview</h3>
+                <div id="preview-content"></div>
             </div>
         </div>
     </main>
 
-    <script src="/meeting.js"></script>
-    <script src="/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.0.0/showdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script>
+        // Initialize Showdown converter
+        const converter = new showdown.Converter();
+
+        function updatePreview() {
+            const markdownText = document.getElementById('markdown-editor').value;
+            const html = converter.makeHtml(markdownText);
+            document.getElementById('preview-content').innerHTML = html;
+        }
+
+        // Initial render
+        updatePreview();
+
+        // Initialize Showdown converter
+    
+        // Update preview with Markdown content
+        function updatePreview() {
+            const markdownText = document.getElementById('markdown-editor').value;
+            const html = converter.makeHtml(markdownText);
+            document.getElementById('preview-content').innerHTML = html;
+        }
+    
+        // Convert preview content to PDF
+        function downloadPDF() {
+            const previewContent = document.getElementById('preview-content');
+            const options = {
+                margin: 1,
+                filename: 'markdown_preview.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+    
+            // Use html2pdf to generate and download the PDF
+            html2pdf().from(previewContent).set(options).save();
+        }
+    
+        // Initial render of the preview
+        updatePreview();
+    </script>
+   
 </body>
 </html>
