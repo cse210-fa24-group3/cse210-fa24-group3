@@ -232,12 +232,14 @@ async function loadDocument(documentId) {
 // Update the current date
 function updateDate() {
     const dateElement = document.getElementById('currentDate');
-    const now = new Date();
-    dateElement.textContent = now.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+    if (dateElement) {  // Only proceed if element exists
+        const now = new Date();
+        dateElement.textContent = now.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
 }
 // Auto-save functionality
 let autoSaveTimeout;

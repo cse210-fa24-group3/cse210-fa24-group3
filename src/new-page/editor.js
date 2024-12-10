@@ -1,3 +1,4 @@
+console.log('Editor.js loaded successfully');
 let documentId = new URLSearchParams(window.location.search).get('id') || 
                  window.location.pathname.split('/').pop();
 let lastSavedContent = '';
@@ -54,9 +55,6 @@ async function saveDocument(event) {
         saveStatus.textContent = 'Error saving';
     }
 }
-
-
-// Rest of the script remains the same as previous version...
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM Loaded');
