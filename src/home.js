@@ -122,6 +122,13 @@ const fetchDocuments = async () => {
         console.log('Fetched documents:', documents);
 
         const container = document.getElementById('document-list');
+        
+        // Check if container exists before trying to modify it
+        if (!container) {
+            console.error('Error: Could not find element with id "document-list"');
+            return;
+        }
+
         container.innerHTML = '';
 
         if (documents.length === 0) {
@@ -183,12 +190,22 @@ const deleteDocument = async (id) => {
     }
 };
 
-// Initialize document list on page load
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing document fetching...');
-    fetchDocuments();
-    fetchAndDisplayDocuments();
-    fetchAndDisplayRecentlyEdited();
+    // Make sure the element exists before calling fetchDocuments
+    if (document.getElementById('document-list')) {
+        fetchDocuments();
+    } else {
+        console.error('Error: Could not find element with id "document-list"');
+    }
+    
+    // Check if these elements exist before calling their respective functions
+    if (document.getElementById('entries')) {
+        fetchAndDisplayDocuments();
+    }
+    if (document.getElementById('recently-edited-container')) {
+        fetchAndDisplayRecentlyEdited();
+    }
 
     // Listen for custom event from editor page
     window.addEventListener('document-saved', refreshRecentlyEdited);
