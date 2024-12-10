@@ -40,10 +40,10 @@ jobs:
           sudo npm install -g pm2
           pm2 stop node-app
           pm2 start server.js --name "node-app"
+          pm2 save
           EOF
-          # ssh -i ~/.ssh/id_ed25519 aryan@${{ secrets.GCP_VM_IP }} << 'EOF'
-          # set -e  # Exit immediately if any command fails
-          # cd /home/aryan/github
-          # pm2 stop server || true
-          # pm2 start server.js --name "node-app"
-          # EOF
+      # Step 6: Verify deployment status
+      - name: Check PM2 status
+        run: |
+          ssh -i ~/.ssh/id_ed25519 aryan@${{ secrets.GCP_VM_IP }} "pm2 status"
+       
