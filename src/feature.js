@@ -199,7 +199,7 @@ async function deleteDocument() {
 // ============= LOADING FUNCTIONS =============
 async function loadDocument(documentId) {
     try {
-        const baseUrl = 'http://localhost:3000';
+        const baseUrl = 'http://104.155.190.17:8080';
         const response = await fetch(`${baseUrl}/api/documents/${documentId}`);
 
         if (!response.ok) {
