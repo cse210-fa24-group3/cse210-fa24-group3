@@ -30,7 +30,7 @@ jobs:
       # Step 4: Deploy files to GCP VM
       - name: Deploy application files to GCP VM
         run: |
-          scp -o StrictHostKeyChecking=no -r ./ aryan@${{ secrets.GCP_VM_IP }}:/home/aryan/
+          scp -o StrictHostKeyChecking=no -r * aryan@${{ secrets.GCP_VM_IP }}:/home/aryan/
 
       # Step 5: Install dependencies and restart server on the GCP VM
       - name: Install dependencies and restart server
