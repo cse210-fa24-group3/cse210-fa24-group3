@@ -199,8 +199,8 @@ async function deleteDocument() {
 // ============= LOADING FUNCTIONS =============
 async function loadDocument(documentId) {
     try {
-        const baseUrl = 'http://104.155.190.17:8080';
-        const response = await fetch(`${baseUrl}/api/documents/${documentId}`);
+        //const baseUrl = 'http://104.155.190.17:8080';
+        const response = await fetch(`/api/documents/${documentId}`);
 
         if (!response.ok) {
             throw new Error('Document not found');
