@@ -58,6 +58,42 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 });
 
+  async function commitDocument() {
+        const saveButton = document.getElementById('commitid');
+        const saveStatus = document.getElementById('saveStatus');
+        const meetingData = {
+            title: document.getElementById('meetingName').value || 'Untitled Meeting',
+            content: JSON.stringify({
+                text: document.getElementById('meeting-content').value || '',
+            }),
+            template_type: 'Minutes of Meeting'
+        };
+        saveButton.disabled = true;
+    saveStatus.textContent = 'Running CLI command...';
+    try {
+        const response = await fetch('/run-command', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(meetingData),
+        });
+
+        if (response.ok) {
+            const result = await response.text();
+            saveStatus.textContent = `Command output: ${result}`;
+        } else {
+            const error = await response.text();
+            saveStatus.textContent = `Error: ${error}`;
+        }
+    } catch (error) {
+        saveStatus.textContent = `Error: ${error.message}`;
+    }
+    finally {
+        saveButton.disabled = false;
+    }
+}
+
 async function saveDocument() {
     const saveButton = document.getElementById('saveButton');
     const saveStatus = document.getElementById('saveStatus');
@@ -68,6 +104,7 @@ async function saveDocument() {
         }),
         template_type: 'Minutes of Meeting'
     };
+  
 
     try {
         saveButton.disabled = true;

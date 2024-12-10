@@ -54,10 +54,16 @@
                 <input type="text" class="title-input" placeholder="Untitled Minutes of Meeting ###" id="meetingName">
                 <div class="header-right">
                     <div class="save-status" id="saveStatus"></div>
+
                     <button class="save-button" id="saveButton" onclick="saveDocument()">
                         <span>Save</span>
                     </button>
+                    
+                    <button class="save-button" id="commitid" onclick="commitDocument()">
+                        <span>Commit</span>
+                    </button>
                 </div>
+                
             </div>
             <div class="section">
                 <h3>Meeting description</h3>

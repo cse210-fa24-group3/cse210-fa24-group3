@@ -1,6 +1,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const { exec } = require('child_process');
 
 const fs = require('fs').promises;
 
@@ -24,6 +25,7 @@ app.use(express.static('public', {
         }
     }
 }));
+
 app.use('/todo_template', express.static(path.join(__dirname, 'todo_template')));
 app.use('/new-page', express.static(path.join(__dirname, 'new-page')));
 
@@ -34,6 +36,47 @@ const db = new sqlite3.Database('documents.db', (err) => {
     } else {
         console.log('Connected to the documents database.');
     }
+});
+
+app.post('/run-command', (req, res) => {
+    const { title, content } = req.body;
+
+    // Sanitize the title to create a safe file name
+    const sanitizedTitle = title.replace(/[^a-zA-Z0-9]/g, '_');
+    const fileName = `${sanitizedTitle}.txt`;
+    const filePath = path.join('/home/aryan/user', fileName);
+
+    // Save content to a file
+    const saveCommand = `echo "${content}" > ${filePath}`;
+ // git remote add origin https://github.com/imaryandokania/documents.git
+    const gitCommands = `
+        cd ..
+        cd ..
+        cd user
+        git init
+        git config user.name "test"
+        git branch -M main
+        git add ${fileName} 
+        git commit -m "Add ${title}" 
+        git push origin main
+        rm -rf ${fileName} 
+    `;
+    // Execute the commands
+    exec(saveCommand, (saveError, saveStdout, saveStderr) => {
+        if (saveError) {
+            console.error(`Error saving file: ${saveStderr}`);
+            return res.status(500).send(saveStderr);
+        }
+
+        exec(gitCommands, (gitError, gitStdout, gitStderr) => {
+            if (gitError) {
+                console.error(`Error with Git commands: ${gitStderr}`);
+                return res.status(500).send(gitStderr);
+            }
+
+            res.send(gitStdout || 'File saved and changes pushed to repository successfully!');
+        });
+    });
 });
 app.post('/api/documents', async (req, res) => {
     const { title, content, template_type = 'New Document' } = req.body;
