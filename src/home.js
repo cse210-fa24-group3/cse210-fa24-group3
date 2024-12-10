@@ -26,9 +26,23 @@ const TEMPLATE_LINKS = {
 };
 
 // Create HTML for a single entry card
-function createEntryCard(entry) {
-    const contentPreview = entry.content.length > 100 ? `${entry.content.substring(0, 100)}...` : entry.content;
+function createEntryCard(entry, isRecentlyEdited = false) {
     const link = TEMPLATE_LINKS[entry.template_type] || 'new-page/editor.html';
+
+    if (isRecentlyEdited) {
+        // For recently edited, only show title, template type, and last updated time
+        return `
+            <div class="entry-card">
+                <h3>${entry.title || 'Untitled'}</h3>
+                <p class="template-type">${entry.template_type}</p>
+                <small>Last updated: ${formatRelativeTime(entry.updated_at)}</small>
+                <a href="${link}?id=${entry.id}" class="btn">Open</a>
+            </div>
+        `;
+    }
+
+    // Original full entry card for other views
+    const contentPreview = entry.content.length > 100 ? `${entry.content.substring(0, 100)}...` : entry.content;
 
     return `
         <div class="entry-card">
@@ -40,16 +54,17 @@ function createEntryCard(entry) {
     `;
 }
 
-// Fetch and display all documents
-async function fetchAndDisplayDocuments() {
+// Global variables to manage document display
+let allDocuments = [];
+let allRecentDocuments = [];
+const INITIAL_DISPLAY_COUNT = 8;
+
+// Fetch and display recently edited documents
+async function fetchAndDisplayRecentlyEdited() {
     try {
-        console.log('Fetching documents...');
+        console.log('Fetching recently edited documents...');
         const response = await fetch('/api/documents');
         
-        // Log the full response for debugging
-        console.log('Response status:', response.status);
-        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Error response:', errorText);
@@ -57,18 +72,44 @@ async function fetchAndDisplayDocuments() {
         }
 
         const documents = await response.json();
-        console.log('Fetched documents:', documents);
+        console.log('Fetched recently edited documents:', documents);
 
-        const container = document.getElementById('entries');
-        container.innerHTML = '';
+        // Sort documents by updated_at in descending order
+        allRecentDocuments = documents.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
 
-        documents.forEach(doc => {
-            container.innerHTML += createEntryCard(doc);
-        });
+        displayRecentlyEdited();
     } catch (error) {
-        console.error('Detailed error fetching documents:', error);
-        const container = document.getElementById('entries');
-        container.innerHTML = `Error loading entries: ${error.message}`;
+        console.error('Detailed error fetching recently edited documents:', error);
+        const container = document.getElementById('recently-edited-container');
+        container.innerHTML = `Error loading recent entries: ${error.message}`;
+    }
+}
+
+// Display documents with option to show more
+function displayDocuments(showAll = false) {
+    const container = document.getElementById('entries');
+    container.innerHTML = '';
+
+    const documentsToShow = showAll ? allDocuments : allDocuments.slice(0, INITIAL_DISPLAY_COUNT);
+
+    documentsToShow.forEach(doc => {
+        container.innerHTML += createEntryCard(doc);
+    });
+
+    // Manage "See More" button visibility
+    const seeMoreContainer = document.getElementById('see-more-container');
+    if (seeMoreContainer) {
+        if (allDocuments.length > INITIAL_DISPLAY_COUNT && !showAll) {
+            seeMoreContainer.innerHTML = `
+                <a href="#" id="see-more" class="see-more">See More (${allDocuments.length - INITIAL_DISPLAY_COUNT} more)</a>
+            `;
+            document.getElementById('see-more').addEventListener('click', (e) => {
+                e.preventDefault();
+                displayDocuments(true);
+            });
+        } else {
+            seeMoreContainer.innerHTML = '';
+        }
     }
 }
 
@@ -87,16 +128,38 @@ async function fetchAndDisplayRecentlyEdited() {
         const documents = await response.json();
         console.log('Fetched recently edited documents:', documents);
 
-        const container = document.getElementById('recently-edited-container');
-        container.innerHTML = '';
+        // Sort documents by updated_at in descending order
+        allRecentDocuments = documents.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
 
-        documents.forEach(doc => {
-            container.innerHTML += createEntryCard(doc);
-        });
+        displayRecentlyEdited();
     } catch (error) {
         console.error('Detailed error fetching recently edited documents:', error);
         const container = document.getElementById('recently-edited-container');
         container.innerHTML = `Error loading recent entries: ${error.message}`;
+    }
+}
+
+// Display recently edited documents with option to show more
+function displayRecentlyEdited(showAll = false) {
+    const container = document.getElementById('recently-edited-container');
+    const seeMoreButton = document.getElementById('see-more-button');
+    container.innerHTML = '';
+
+    const documentsToShow = showAll ? allRecentDocuments : allRecentDocuments.slice(0, INITIAL_DISPLAY_COUNT);
+
+    documentsToShow.forEach(doc => {
+        container.innerHTML += createEntryCard(doc, true);
+    });
+
+    // Manage "See More" button visibility
+    if (allRecentDocuments.length > INITIAL_DISPLAY_COUNT) {
+        seeMoreButton.style.display = showAll ? 'none' : 'block';
+        
+        if (!showAll) {
+            seeMoreButton.textContent = `See More (${allRecentDocuments.length - INITIAL_DISPLAY_COUNT} more)`;
+        }
+    } else {
+        seeMoreButton.style.display = 'none';
     }
 }
 
@@ -183,15 +246,19 @@ const deleteDocument = async (id) => {
     }
 };
 
-// Initialize document list on page load
+// Add event listener for "See More" button in the recently edited section
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing document fetching...');
-    fetchDocuments();
-    fetchAndDisplayDocuments();
+    const seeMoreButton = document.getElementById('see-more-button');
+    if (seeMoreButton) {
+        seeMoreButton.addEventListener('click', () => {
+            displayRecentlyEdited(true);
+        });
+    }
+});
+// Fetch and display recently edited documents on page load
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing recently edited documents...');
     fetchAndDisplayRecentlyEdited();
-
-    // Listen for custom event from editor page
-    window.addEventListener('document-saved', refreshRecentlyEdited);
 });
 
 // Utility functions for page navigation
