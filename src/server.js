@@ -184,12 +184,13 @@ app.post('/run-command', (req, res) => {
         console.log(`File created successfully at ${filePath}`);
         // Git commands
             // git push -u origin main 
+            const cp=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
         const gitCommands = `
             cd /home/aryan/user 
             git config user.name "test" 
             git add ${fileName} 
             git commit -m "Add ${title}" 
-            git push -u https://imaryandokania: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@github.com/imaryandokania/documents.git main
+            git push -u https://imaryandokania:${cp}@github.com/imaryandokania/documents.git main
          
         `;
 
