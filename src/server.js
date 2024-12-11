@@ -65,7 +65,7 @@ app.get('/api/response', async (req, res) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer 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`,
+                Authorization: `Bearer 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`,
             },
             body: JSON.stringify({
                 model: "gpt-4o", // Use gpt-4 if you have access
