@@ -1,4 +1,9 @@
-// Format relative time for entries
+/**
+ * Returns a human-friendly format of a relative time string.
+ *
+ * @param {string} dateString - A date string in a format that can be parsed by the JavaScript Date constructor.
+ * @return {string} A relative time string in the format "just now", "Xm ago", "Xh ago", or "Xday ago", or a full date string with month, day, and year if the time difference is larger than one week.
+ */
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -16,7 +21,10 @@ function formatRelativeTime(dateString) {
     });
 }
 
-// Map template types to their respective page links
+
+/**
+ * A object containing various template links. Each key is a label, and each value is the corresponding template URL.
+ */
 const TEMPLATE_LINKS = {
     'New Document': 'new-page/editor.html',
     'Todo': 'todo_template/todo.html',
@@ -26,6 +34,13 @@ const TEMPLATE_LINKS = {
 };
 
 // Create HTML for a single entry card
+/**
+ * Create an entry card for an entry.
+ *
+ * @param {Object} entry - The entry to create a card for.
+ * @param {boolean} [isRecentlyEdited=false] - Whether the card should display the recently edited version.
+ * @returns {string} The HTML for the entry card.
+ */
 function createEntryCard(entry, isRecentlyEdited = false) {
     const link = TEMPLATE_LINKS[entry.template_type] || 'new-page/editor.html';
 
@@ -53,13 +68,20 @@ function createEntryCard(entry, isRecentlyEdited = false) {
         </div>
     `;
 }
-
 // Global variables to manage document display
 let allDocuments = [];
 let allRecentDocuments = [];
 const INITIAL_DISPLAY_COUNT = 8;
 
 // Fetch and display recently edited documents
+/**
+ * Fetches and displays the recently edited documents.
+ *
+ * Logs a message to the console while fetching, handles HTTP errors,
+ * sorts the documents by updated_at in descending order, and displays them.
+ *
+ * @throws {Error} If an HTTP error occurs.
+ */
 async function fetchAndDisplayRecentlyEdited() {
     try {
         console.log('Fetching recently edited documents...');
@@ -85,7 +107,11 @@ async function fetchAndDisplayRecentlyEdited() {
     }
 }
 
-// Display documents with option to show more
+/**
+ * Displays a list of documents in the given container.
+ * If `showAll` is true, displays all documents; otherwise, displays only a limited number of documents.
+ * @param {boolean} [showAll=false] - Whether to display all documents or not.
+ */
 function displayDocuments(showAll = false) {
     const container = document.getElementById('entries');
     container.innerHTML = '';
@@ -113,7 +139,11 @@ function displayDocuments(showAll = false) {
     }
 }
 
-// Display recently edited documents with option to show more
+/**
+ * Displays a list of recently edited documents.
+ *
+ * @param {boolean} showAll - whether to display all documents or only a subset
+ */
 function displayRecentlyEdited(showAll = false) {
     const container = document.getElementById('recently-edited-container');
     const seeMoreButton = document.getElementById('see-more-button');
@@ -137,13 +167,24 @@ function displayRecentlyEdited(showAll = false) {
     }
 }
 
-// Function to refresh recently edited section
+
+/**
+ * Sends a custom event to the window after refreshRecentlyEdited() operations have been completed.
+ * Firstly, it calls fetchAndDisplayRecentlyEdited() to handle the recent edits, and then fires a 'document-saved'
+ * event to notify any event listeners.
+ */
 function refreshRecentlyEdited() {
     fetchAndDisplayRecentlyEdited();
     const event = new CustomEvent('document-saved');
     window.dispatchEvent(event);
 }
 
+/**
+ * Fetches documents list and updates the document list container.
+ *
+ * Logs messages to the console and handles errors.
+ * If an error occurs, displays an alert with the error message.
+ */
 const fetchDocuments = async () => {
     try {
         console.log('Fetching documents list...');
@@ -189,7 +230,15 @@ const fetchDocuments = async () => {
     }
 };
 
-// Open document in the correct page
+
+/**
+ * Opens a document by its ID.
+ *
+ * Sends a GET request to the API to retrieve the document, and then navigates to the document's page.
+ * If the document is not found, displays an error message.
+ *
+ * @param {string} id - The ID of the document to open.
+ */
 const openDocument = async (id) => {
     try {
         const response = await fetch(`/api/documents/${id}`);
@@ -206,7 +255,13 @@ const openDocument = async (id) => {
     }
 };
 
-// Delete document
+
+/**
+ * Deletes a document and refreshes the document list.
+ * Prompts the user to confirm before deleting.
+ *
+ * @param {string} id - The ID of the document to delete
+ */
 const deleteDocument = async (id) => {
     if (!confirm('Are you sure you want to delete this document?')) {
         return;
@@ -239,7 +294,9 @@ const deleteDocument = async (id) => {
     }
 };
 
-// Add event listener for "See More" button in the recently edited section
+/**
+ * Initializes UI elements to display recently edited items when the 'see more' button is clicked.
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const seeMoreButton = document.getElementById('see-more-button');
     if (seeMoreButton) {
@@ -248,13 +305,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 // Fetch and display recently edited documents on page load
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing recently edited documents...');
     fetchAndDisplayRecentlyEdited();
 });
 
-// Utility functions for page navigation
+/**
+ * Navigates to a new page based on the provided template.
+ *
+ * If called without an argument, defaults to the bug review page.
+ *
+ * @memberof module:Templates
+ */
 function createNewBugReviewFromTemplate() {
     window.location.href = 'bug-review.html';
 }
@@ -270,7 +334,10 @@ function createNewMeetingFromTemplate() {
 function openTodoPage() {
     window.location.href = 'todo_template/todo.html';
 }
-// Open the modal and pre-fill the form
+/**
+ * Opens the GitHub modal.
+ * Fetches and fills credentials if a cached username is found in local storage.
+ */
 async function openModal() {
     document.getElementById('github-modal').style.display = 'block';
 
@@ -285,9 +352,12 @@ async function openModal() {
         console.log('No cached username found. Please configure credentials manually.');
     }
 }
-
-// Fetch credentials from the backend and update the form
-
+/**
+ * Fetches and fills GitHub credentials for the given username.
+ *
+ * @param {string} username - The GitHub username to fetch credentials for.
+ * @returns {void}
+ */
 async function fetchAndFillCredentials(username) {
     try {
         const response = await fetch(`/api/get-github-credentials?username=${encodeURIComponent(username)}`);
@@ -305,6 +375,11 @@ async function fetchAndFillCredentials(username) {
     }
 }
 
+/**
+ * Saves GitHub credentials to the backend.
+ *
+ * @returns {void}
+ */
 async function saveGithubCredentials() {
     const username = document.getElementById('github-username').value.trim();
     const sshKey = document.getElementById('github-ssh-key').value.trim();
@@ -344,13 +419,16 @@ async function saveGithubCredentials() {
         alert('An error occurred while saving credentials.');
     }
 }
-
-// Close the modal
+/**
+ * Closes the specified modal.
+ */
 function closeModal() {
     document.getElementById('github-modal').style.display = 'none';
 }
-
-// On page load, fetch credentials using cached username
+/**
+ * Retrieves GitHub credentials, either by fetching a cached username or by executing
+ * a login flow.
+ */
 async function getGithubCredentials() {
     const cachedUsername = localStorage.getItem('github-username');
     if (cachedUsername) {
@@ -360,6 +438,3 @@ async function getGithubCredentials() {
         console.log('No cached username found.');
     }
 }
-
-// Call this function when the application loads
-// getGithubCredentials();
