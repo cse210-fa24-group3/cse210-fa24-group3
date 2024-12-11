@@ -37,7 +37,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Initialize on page load
+// script.js
 document.addEventListener('DOMContentLoaded', () => {
     // Load saved theme preference
     const savedTheme = localStorage.getItem('theme');
@@ -48,25 +48,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Function to fetch GitHub contribution data
-async function fetchGithubData(username) {
+// GitHub Dashboard Functions
+async function fetchGithubData() {
     try {
-        // Fetch the user's events (includes commits)
-        const response = await fetch(`https://api.github.com/users/${username}/events`);
+        const username = localStorage.getItem('github-username');
+        if (!username) {
+            throw new Error('No GitHub username found');
+        }
+
+        const response = await fetch(`https://api.github.com/users/${username}/events/public`);
         if (!response.ok) {
             throw new Error('Failed to fetch GitHub data');
         }
         const events = await response.json();
         
-        // Create a map of dates to contribution counts
         const contributionMap = new Map();
         
-        // Process only push events (commits)
         events.forEach(event => {
-            if (event.type === 'PushEvent') {
-                const date = event.created_at.split('T')[0];
-                const currentCount = contributionMap.get(date) || 0;
-                contributionMap.set(date, currentCount + event.payload.size);
+            const date = event.created_at.split('T')[0];
+            const currentCount = contributionMap.get(date) || 0;
+            
+            let contributionCount = 0;
+            
+            switch (event.type) {
+                case 'PushEvent':
+                    contributionCount = event.payload.commits ? event.payload.commits.length : 1;
+                    break;
+                case 'CreateEvent':
+                case 'PullRequestEvent':
+                case 'IssuesEvent':
+                case 'IssueCommentEvent':
+                    contributionCount = 1;
+                    break;
+                default:
+                    contributionCount = 0;
+            }
+            
+            if (contributionCount > 0) {
+                contributionMap.set(date, currentCount + contributionCount);
             }
         });
         
@@ -77,72 +96,119 @@ async function fetchGithubData(username) {
     }
 }
 
-// Function to determine contribution level (0-4) based on count
 function getContributionLevel(count) {
     if (count === 0) return 0;
-    if (count <= 2) return 1;
-    if (count <= 4) return 2;
-    if (count <= 6) return 3;
+    if (count <= 3) return 1;
+    if (count <= 6) return 2;
+    if (count <= 9) return 3;
     return 4;
 }
 
-// Generate the contribution squares with real data
-async function generateContributionData(username) {
-    const squares = document.querySelector('#squares');
-    squares.innerHTML = ''; // Clear existing squares
+function updateMonthLabels() {
+    const monthsContainer = document.querySelector('.months');
+    monthsContainer.innerHTML = '';
     
     const today = new Date();
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(today.getFullYear() - 1);
+    const months = [];
     
-    // Fetch real contribution data
-    const contributionMap = await fetchGithubData(username);
-    
-    // Generate 52 weeks x 7 days of squares
-    for (let i = 0; i < 52 * 7; i++) {
-        const square = document.createElement('div');
-        square.classList.add('square');
-        
-        const date = new Date(oneYearAgo);
-        date.setDate(date.getDate() + i);
-        const dateString = date.toISOString().split('T')[0];
-        
-        // Get actual contribution count for this date
-        const count = contributionMap.get(dateString) || 0;
-        const level = getContributionLevel(count);
-        
-        square.setAttribute('data-level', level);
-        square.title = `${date.toDateString()}: ${count} contributions`;
-        
-        squares.appendChild(square);
+    // Get the last 3 months in reverse order
+    for (let i = 0; i < 3; i++) {
+        const date = new Date(today);
+        date.setMonth(today.getMonth() - i);
+        const monthName = date.toLocaleString('default', { month: 'short' });
+        months.push(monthName); // Use push instead of unshift
     }
+    
+    // Add month labels
+    months.reverse().forEach(month => {  // Reverse the array before creating elements
+        const span = document.createElement('span');
+        span.textContent = month;
+        monthsContainer.appendChild(span);
+    });
 }
 
-// Update the save GitHub credentials function
+async function generateContributionData() {
+    const squares = document.querySelector('#squares');
+    if (!squares) return;
+    
+    squares.innerHTML = '';
+    
+    const loadingElement = document.getElementById('contribution-loading');
+    const errorElement = document.getElementById('contribution-error');
+    
+    try {
+        if (loadingElement) loadingElement.style.display = 'block';
+        if (errorElement) errorElement.style.display = 'none';
+        
+        // Calculate start date (90 days ago, adjusted to Monday)
+        const today = new Date();
+        const ninetyDaysAgo = new Date(today);
+        ninetyDaysAgo.setDate(today.getDate() - 90);
+        
+        // Adjust to start from Monday
+        const dayOfWeek = ninetyDaysAgo.getDay();
+        const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - daysToSubtract);
+        
+        const contributionMap = await fetchGithubData();
+        
+        // Calculate number of weeks needed to show 90 days
+        const numberOfWeeks = Math.ceil(90 / 7); // This will give us 13 weeks
+        
+        // Generate squares for the actual number of weeks needed
+        for (let week = 0; week < numberOfWeeks; week++) {
+            for (let day = 0; day < 7; day++) {
+                const square = document.createElement('div');
+                square.classList.add('square');
+                
+                const date = new Date(ninetyDaysAgo);
+                date.setDate(date.getDate() + (week * 7) + day);
+                
+                // Skip if the date is in the future
+                if (date > today) continue;
+                
+                const dateString = date.toISOString().split('T')[0];
+                const count = contributionMap.get(dateString) || 0;
+                const level = getContributionLevel(count);
+                
+                square.setAttribute('data-level', level);
+                
+                const commitText = count === 0 ? 'No contributions' : 
+                                 count === 1 ? '1 contribution' : 
+                                 `${count} contributions`;
+                square.title = `${date.toDateString()}: ${commitText}`;
+                
+                squares.appendChild(square);
+            }
+        }
+    } catch (error) {
+        console.error('Error generating contribution data:', error);
+        if (errorElement) errorElement.style.display = 'block';
+    } finally {
+        if (loadingElement) loadingElement.style.display = 'none';
+    }
+}
 function saveGithubCredentials() {
     const username = document.getElementById('github-username').value;
     const sshKey = document.getElementById('github-ssh-key').value;
     
     if (username && sshKey) {
-        // Save credentials (you might want to store these securely)
-        localStorage.setItem('github_username', username);
-        localStorage.setItem('github_ssh_key', sshKey);
-        
-        // Generate contribution graph with the user's data
-        generateContributionData(username);
-        
-        // Close the modal
+        localStorage.setItem('github-username', username);
+        localStorage.setItem('github-ssh-key', sshKey);
+        generateContributionData();
         closeModal();
     }
 }
 
-// Function to initialize the dashboard
 function initializeDashboard() {
-    const savedUsername = localStorage.getItem('github_username');
-    if (savedUsername) {
-        generateContributionData(savedUsername);
+    const username = localStorage.getItem('github-username');
+    if (username) {
+        updateMonthLabels();
+        generateContributionData();
     }
 }
 
-// Initialize when page loads
-window.addEventListener('load', initializeDashboard);
+window.addEventListener('load', () => {
+    initializeDashboard();
+    setInterval(initializeDashboard, 30 * 60 * 1000);
+});
