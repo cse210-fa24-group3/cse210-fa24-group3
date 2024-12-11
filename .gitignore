@@ -8,3 +8,7 @@ mochawesome-report/mochawesome1.html
 xpath_ideas.js
 DS_Store
 yarn.lock
+junit.xml
+src/coverage
+src/package-lock.json
+src/junit.xml
