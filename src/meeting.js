@@ -1,6 +1,7 @@
 /**
  * Event listener for the DOMContentLoaded event. This function handles loading or creating a new document
  * based on the URL parameters. It also loads the meeting content and populates the UI.
+ * @event DOMContentLoaded
  */
 document.addEventListener('DOMContentLoaded', async function () {
     try {
@@ -51,6 +52,8 @@ document.addEventListener('DOMContentLoaded', async function () {
  * Posting a new meeting document with the provided metadata andMarkdown content.
  * If the creation is successful, it updates the UI with the new document's data.
  * Otherwise, it throws an error.
+ * @async
+ * @function createNewMeeting
  */
 async function createNewMeeting() {
     const newDocData = {
@@ -137,7 +140,9 @@ async function createNewMeeting() {
  * Retrieves the current document ID from local storage, constructs a meeting data object,
  * and sends it to the backend to save and commit the file. Updates the UI with the
  * save status and enables the save button once the operation is complete.
- */
+ * @async
+ * @function commitDocument
+*/
 async function commitDocument() {
     const saveButton = document.getElementById('commitid');
     const saveStatus = document.getElementById('saveStatus');
@@ -177,11 +182,14 @@ async function commitDocument() {
         saveButton.disabled = false;
     }
 }
+
 /**
  * Saves the currently edited document.
  *
  * Gets the current title and content from the UI, sends the updated data to the server,
  * and updates the UI to reflect the save status.
+ * @async
+ * @function saveDocument
  */
 async function saveDocument() {
     const saveButton = document.getElementById('saveButton');
@@ -248,6 +256,12 @@ async function saveDocument() {
         saveButton.disabled = false;
     }
 }
+
+/**
+ * Deletes the current document from the server.
+ * @async
+ * @function deleteDocument
+ */
 async function deleteDocument() {
     const deleteButton = document.getElementById('deleteButton');
     const deleteStatus = document.getElementById('saveStatus');
@@ -299,14 +313,9 @@ async function deleteDocument() {
 
 /**
  * Loads a document by its ID.
- *
  * @param {string} documentId - The ID of the document to load.
- *
  * @throws {Error} If the document is not found.
  */
-
-
-
 async function loadDocument(documentId) {
     try {
         const baseUrl = 'http://104.155.190.17:8080';
@@ -340,9 +349,9 @@ async function loadDocument(documentId) {
 
 /**
  * Update the current date element in the page.
- *
  * Set the text content of the element with id 'currentDate' to the current date in
  * the format year, month, and day, in English.
+ * @function updateDate
  */
 function updateDate() {
     const dateElement = document.getElementById('currentDate');
@@ -353,9 +362,11 @@ function updateDate() {
         day: 'numeric'
     });
 }
+
 /**
  * Schedules the auto-save timer to save the document after a specified delay.
  * Clears any existing timer before setting a new one.
+ * @function scheduleAutoSave
  */
 function scheduleAutoSave() {
 clearTimeout(autoSaveTimeout);

@@ -1,3 +1,8 @@
+/**
+ * Event listener for the DOMContentLoaded event. This function handles loading or creating a new document
+ * based on the URL parameters. It also loads the meeting content and populates the UI.
+ * @event DOMContentLoaded
+ */
 document.addEventListener('DOMContentLoaded', async function () {
     try {
         // Get document ID from URL parameters
@@ -38,6 +43,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 // ============= SAVE FUNCTION =============
+/**
+ * Saves the current document to the server.
+ * @async
+ * @function saveDocument
+ */
 async function saveFeatureDocument() {
     // Get DOM elements with null checks
     const saveButton = document.getElementById('saveButton');
@@ -142,6 +152,11 @@ async function saveFeatureDocument() {
 
 
 // ============= DELETE FUNCTION =============
+/**
+ * Deletes the current document from the server.
+ * @async
+ * @function deleteDocument
+ */
 async function deleteDocument() {
     const deleteButton = document.getElementById('deleteButton');
     const deleteStatus = document.getElementById('deleteStatus');
@@ -197,6 +212,12 @@ async function deleteDocument() {
 
 
 // ============= LOADING FUNCTIONS =============
+/**
+ * Loads a document by its unique identifier.
+ * @async
+ * @function loadDocument
+ * @param {string} documentId - The ID of the document to load.
+ */
 async function loadDocument(documentId) {
     try {
         //const baseUrl = 'http://104.155.190.17:8080';
@@ -229,7 +250,10 @@ async function loadDocument(documentId) {
 }
 
 // ============= UTILITY FUNCTIONS =============
-// Update the current date
+/**
+ * Updates the displayed current date on the webpage.
+ * @function updateDate
+ */
 function updateDate() {
     const dateElement = document.getElementById('currentDate');
     if (dateElement) {  // Only proceed if element exists
@@ -241,7 +265,11 @@ function updateDate() {
         });
     }
 }
-// Auto-save functionality
+
+/**
+ * Schedules an automatic save operation after a specified timeout.
+ * @function scheduleAutoSave
+ */
 let autoSaveTimeout;
 function scheduleAutoSave() {
     clearTimeout(autoSaveTimeout);

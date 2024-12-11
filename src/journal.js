@@ -6,6 +6,14 @@ let isNewDocument = !documentId;
 // Initialize autosave timer
 let autosaveTimer = null;
 
+/**
+ * Saves the currently edited document.
+ *
+ * Gets the current title and content from the UI, sends the updated data to the server,
+ * and updates the UI to reflect the save status.
+ * @async
+ * @function saveDocument
+ */
 async function saveDocument() {
     const titleInput = document.getElementById('titleInput');
     const contentArea = document.getElementById('contentArea');
@@ -54,6 +62,11 @@ async function saveDocument() {
     }
 }
 
+/**
+ * Loads a document by its ID.
+ * @param {string} documentId - The ID of the document to load.
+ * @throws {Error} If the document is not found.
+ */
 async function loadDocument() {
     if (!documentId) return;
 
@@ -71,6 +84,11 @@ async function loadDocument() {
     }
 }
 
+/**
+ * Schedules the auto-save timer to save the document after a specified delay.
+ * Clears any existing timer before setting a new one.
+ * @function setupAutosave
+ */
 function setupAutosave() {
     const contentArea = document.getElementById('contentArea');
     const titleInput = document.getElementById('titleInput');
