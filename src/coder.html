@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="/coder.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code with AI</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/template.css">
+
+    <style>
+        .container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            height: 90vh;
+            padding: 10px;
+        }
+
+        .editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 15px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace; /* Code-style font */
+        }
+
+        textarea {
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 150px);
+            font-family: 'Courier New', Courier, monospace; /* Coding font */
+            font-size: 14px;
+            background-color: #2e2e2e; /* Dark coding background */
+            color: #f8f8f2; /* Light text for dark background */
+            line-height: 1.6;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            resize: none;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #007bff; /* Highlight border on focus */
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+
+        .header-right {
+            display: flex;
+        gap: 10px;
+        margin-left: auto; /* Push buttons to the right */
+        }
+
+        .save-button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .save-button:hover {
+            background-color: #0056b3;
+        }
+
+        .save-status {
+            margin-left: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        #preview-content {
+            white-space: pre-wrap; /* Preserve spacing for code-like appearance */
+            background-color: #f5f5f5; /* Light background for preview */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace; /* Match coding font */
+            font-size: 14px;
+            color: #333;
+        }
+
+        #go-home {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #go-home:hover {
+            background-color: #45a049;
+        }
+
+        .home-icon {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div>☰</div>
+            <div><a class="logo" href="/">DevLog</a></div>
+        </div>
+        <div class="navbar-right">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search entries">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="theme-toggle">
+                <span class="light-mode">🌙</span>
+                <span class="dark-mode" style="display:none;">☀️</span>
+            </div>
+            <div class="user-btn">👤</div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="header">
+            <div class="header-right">
+                <div class="save-status" id="saveStatus"></div>
+                <button class="save-button" id="generateButton" onclick="AI_document()">
+                    Generate Code
+                </button>
+                <button id="go-home" class="save-button" onclick="goToHome()">
+                    <span class="home-icon">🏠</span> Home
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Markdown Editor -->
+            <div class="editor">
+                <h3>Enter Your Code, Idea here</h3>
+                <textarea id="markdown-editor" placeholder="Type your prompt or content here..."></textarea>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview">
+                <h3>AI Assistant response</h3>
+                <div id="preview-content"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- External JS Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.0.0/showdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+    <script>
+        function goToHome() {
+            window.location.href = '/'; 
+        }
+    </script>
+</body>
+</html>
