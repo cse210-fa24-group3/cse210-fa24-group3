@@ -13,6 +13,7 @@ app.use(cors({
     credentials: true
 }));
 
+
 app.use(express.json());
 
 // Serve static files
@@ -37,6 +38,126 @@ const db = new sqlite3.Database('documents.db', (err) => {
         console.log('Connected to the documents database.');
     }
 });
+
+
+app.post('/api/query', (req, res) => {
+    const { query } = req.body;
+
+    if (!query) {
+        return res.status(400).json({ error: 'Query is required' });
+    }
+
+    console.log(`Received query: ${query}`);
+    storedQuery = query; // Save the query
+    res.json({ message: 'Query stored successfully' });
+});
+
+// GET endpoint to fetch OpenAI response
+app.get('/api/response', async (req, res) => {
+    if (!storedQuery) {
+        return res.status(400).json({ error: 'No query stored. Please submit a query first.' });
+    }
+
+    console.log(`Fetching response for query: ${storedQuery}`);
+
+    try {
+        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer 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`,
+            },
+            body: JSON.stringify({
+                model: "gpt-4o", // Use gpt-4 if you have access
+                messages: [
+                    { role: "system", content: "You are an assistant that provides accurate and helpful responses." },
+                    { role: "user", content: storedQuery },
+                ],
+                max_tokens: 300,
+                temperature: 0.7,
+            }),
+        });
+
+        if (!openaiResponse.ok) {
+            const errorText = await openaiResponse.text();
+            console.error('OpenAI API error:', errorText);
+            return res.status(openaiResponse.status).json({ error: errorText });
+        }
+
+        const data = await openaiResponse.json();
+        const aiResponse = data.choices[0].message.content.trim();
+
+        console.log('OpenAI Response:', aiResponse);
+        res.json({ response: aiResponse });
+    } catch (error) {
+        console.error('Error fetching OpenAI response:', error);
+        res.status(500).json({ error: 'Failed to fetch OpenAI response.' });
+    }
+});
+
+// app.post('/api/generate', async (req, res) => {
+//     const { messages } = req.body;
+
+//     try {
+//         const apiKey = process.env.OPENAI_API_KEY;
+//         console.log(apiKey)
+//         const response = await fetch('https://api.openai.com/v1/chat/completions', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 Authorization: `Bearer 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`, // Ensure this is set in .env
+//             },
+//             body: JSON.stringify({
+//                 model: "gpt-3.5-turbo", // Update to gpt-4 if needed
+//                 messages,
+//                 max_tokens: 300,
+//                 temperature: 0.7,
+//             }),
+//         });
+
+//         const data = await response.json();
+//         res.json(data);
+//     } catch (error) {
+//         console.error('Error generating content:', error);
+//         res.status(500).json({ error: 'Error generating content.' });
+//     }
+// });
+
+// app.post('/api/generate', async (req, res) => {
+//     const { messages } = req.body;
+
+//     try {
+//         console.log('Received request with messages:', messages);
+
+//         const response = await fetch('https://api.openai.com/v1/chat/completions', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 Authorization: `Bearer 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`,
+//             },
+//             body: JSON.stringify({
+//                 model: "gpt-3.5-turbo", // Change to gpt-4 if needed
+//                 messages,
+//                 // max_tokens: 300,
+//                 // temperature: 0.7,
+//             }),
+//         });
+
+//         if (!response.ok) {
+//             const errorText = await response.text();
+//             console.error('OpenAI API error:', errorText);
+//             return res.status(response.status).json({ error: errorText });
+//         }
+
+//         const data = await response.json();
+//         console.log('OpenAI API response:', data);
+
+//         res.json(data);
+//     } catch (error) {
+//         console.error('Server error:', error);
+//         res.status(500).json({ error: 'Failed to generate content.' });
+//     }
+// });
 
 // app.post('/run-command', (req, res) => {
 //     const { title, content } = req.body;

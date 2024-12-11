@@ -332,7 +332,7 @@ function createNewMeetingFromTemplate() {
 }
 
 function createAI() {
-    window.location.href = 'meeting.html';
+    window.location.href = 'coder.html';
 }
 
 function openTodoPage() {
