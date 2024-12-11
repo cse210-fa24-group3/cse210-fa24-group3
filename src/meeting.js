@@ -89,6 +89,11 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.log('No document ID found in URL, creating a new document...');
             await createNewMeeting();
         }
+        
+        // Add event listener for the delete button
+        const deleteButton = document.getElementById('deleteButton');
+        deleteButton.addEventListener('click', deleteDocument);
+
     } catch (error) {
         console.error('Error during document loading/creation:', error);
     }
@@ -423,6 +428,61 @@ async function saveDocument() {
         saveButton.disabled = false;
     }
 }
+
+
+// ============= DELETE FUNCTION =============
+async function deleteDocument() {
+    const deleteButton = document.getElementById('deleteButton');
+    const deleteStatus = document.getElementById('saveStatus');
+
+    // Confirmation Dialog
+    const confirmDelete = confirm('Are you sure you want to delete this feature specification? This action cannot be undone.');
+    if (!confirmDelete) {
+        return; // User canceled the deletion
+    }
+
+    try {
+        deleteButton.disabled = true;
+        deleteStatus.textContent = 'Deleting...';
+
+        // Get current document ID from URL
+        const pathParts = window.location.pathname.split('/');
+        const documentId = pathParts[pathParts.length - 1];
+
+        if (!documentId || documentId === 'feature') {
+            throw new Error('Invalid document ID');
+        }
+
+        const response = await fetch(`/api/documents/${documentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to delete document');
+        }
+
+        const result = await response.json();
+        console.log('Delete result:', result);
+
+        deleteStatus.textContent = 'Deleted successfully. Redirecting...';
+
+        // Redirect to Home or another appropriate page after deletion
+        setTimeout(() => {
+            window.location.href = '/'; // Change this URL if you want to redirect elsewhere
+        }, 2000);
+
+    } catch (error) {
+        console.error('Delete failed:', error);
+        deleteStatus.textContent = `Failed to delete: ${error.message}`;
+    } finally {
+        deleteButton.disabled = false;
+    }
+}
+
 
 
 // ============= LOADING FUNCTIONS =============
