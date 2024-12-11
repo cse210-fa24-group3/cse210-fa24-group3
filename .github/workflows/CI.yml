@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         working-directory: src
         run: |
-       
+          npm install --save-dev jest-junit
           npm install --save-dev jest-environment-node
 
       # Step 4: Run Jest tests with coverage and JUnit report
