@@ -1,0 +1,151 @@
+/* GitHub Activity Dashboard Styles */
+.github-dashboard {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.contribution-graph {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.months {
+    display: flex;
+    margin-left: 36px;
+    height: 20px;
+}
+
+.months span {
+    width: 28px;
+    font-size: 12px;
+    color: #767676;
+    margin-right: 30px;
+    text-align: left;
+}
+
+body.dark-mode .months span {
+    color: #a3a3a3;
+}
+
+.months span:last-child {
+    margin-right: 0;
+}
+
+.days {
+    position: sticky;
+    left: 0;
+    display: grid;
+    grid-template-rows: repeat(7, 12px);
+    grid-gap: 2px;
+    float: left;
+    padding-right: 4px;
+}
+
+.days span {
+    font-size: 12px;
+    color: #767676;
+    height: 12px;
+    line-height: 12px;
+}
+
+body.dark-mode .days span {
+    color: #a3a3a3;
+}
+
+.squares {
+    display: flex;
+    gap: 2px;
+}
+
+.week {
+    display: grid;
+    grid-template-rows: repeat(7, 12px);
+    grid-gap: 2px;
+}
+
+.square {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background-color: #ebedf0;
+    transition: background-color 0.1s ease;
+}
+
+/* Light mode contribution colors */
+.square[data-level="0"] { background-color: #ebedf0; }
+.square[data-level="1"] { background-color: #9be9a8; }
+.square[data-level="2"] { background-color: #40c463; }
+.square[data-level="3"] { background-color: #30a14e; }
+.square[data-level="4"] { background-color: #216e39; }
+
+/* Dark mode contribution colors */
+body.dark-mode .square[data-level="0"] { background-color: #161b22; }
+body.dark-mode .square[data-level="1"] { background-color: #0e4429; }
+body.dark-mode .square[data-level="2"] { background-color: #006d32; }
+body.dark-mode .square[data-level="3"] { background-color: #26a641; }
+body.dark-mode .square[data-level="4"] { background-color: #39d353; }
+
+.square.inactive {
+    background-color: transparent;
+}
+
+.contribution-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 16px;
+    gap: 8px;
+}
+
+body.dark-mode .contribution-footer {
+    color: #a3a3a3;
+}
+
+.contribution-scale {
+    display: flex;
+    gap: 2px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contribution-scale li {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+/* Light mode scale colors */
+.contribution-scale li[data-level="0"] { background-color: #ebedf0; }
+.contribution-scale li[data-level="1"] { background-color: #9be9a8; }
+.contribution-scale li[data-level="2"] { background-color: #40c463; }
+.contribution-scale li[data-level="3"] { background-color: #30a14e; }
+.contribution-scale li[data-level="4"] { background-color: #216e39; }
+
+/* Dark mode scale colors */
+body.dark-mode .contribution-scale li[data-level="0"] { background-color: #161b22; }
+body.dark-mode .contribution-scale li[data-level="1"] { background-color: #0e4429; }
+body.dark-mode .contribution-scale li[data-level="2"] { background-color: #006d32; }
+body.dark-mode .contribution-scale li[data-level="3"] { background-color: #26a641; }
+body.dark-mode .contribution-scale li[data-level="4"] { background-color: #39d353; }
+
+#contribution-loading, #contribution-error {
+    padding: 20px;
+    text-align: center;
+}
+
+body.dark-mode #contribution-loading {
+    color: #a3a3a3;
+}
+
+#contribution-error {
+    color: #ff0000;
+}
+
+body.dark-mode #contribution-error {
+    color: #ff6b6b;
+}
