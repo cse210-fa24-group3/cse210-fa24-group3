@@ -595,6 +595,101 @@ body.dark-mode .card-meta {
 .github-dashboard.loading .contribution-graph {
     opacity: 0.5;
 }
+.editor-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#editor-container {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    min-height: 300px;
+}
+
+#preview-container {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    padding: 15px;
+    min-height: 300px;
+    overflow-y: auto;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.priority-tags {
+    margin: 15px 0;
+}
+
+.issues-section {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: sans-serif;
+    display: flex;
+    flex-wrap: wrap; /* Allow tags to wrap */
+    gap: 10px;
+}
+.issue-tag {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.issue-tag:hover {
+    background-color: #0056b3;
+}
+
+.priority-container {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.priority-label {
+    font-weight: bold;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.priority-tag {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+}
+
+.priority-critical {
+    background-color: #e74c3c; /* Red for Critical */
+}
+
+.priority-high {
+    background-color: #f39c12; /* Orange for High */
+}
+
+.priority-medium {
+    background-color: #f1c40f; /* Yellow for Medium */
+    color: #333;
+}
+
+.priority-low {
+    background-color: #2ecc71; /* Green for Low */
+}
 
 .contribution-scale li[data-level="0"] { background-color: #ebedf0; }
 .contribution-scale li[data-level="1"] { background-color: #9be9a8; }
