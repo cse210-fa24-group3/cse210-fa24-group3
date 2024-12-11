@@ -303,4 +303,5 @@ function updateDate() {
 function scheduleAutoSave() {
 clearTimeout(autoSaveTimeout);
 autoSaveTimeout = setTimeout(saveDocument, 30000);
+
 }
