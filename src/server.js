@@ -1,19 +1,31 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const cors = require('cors');
+const { exec } = require('child_process');
+
 const fs = require('fs').promises;
 
 const app = express();
-const port = 3000;
+const port = 8080;
+const cors = require('cors');
+app.use(cors({
+    origin: '*', // Replace '*' with your frontend's URL in production
+    credentials: true
+}));
 
-// Middleware
-app.use(cors());
 app.use(express.json());
 
-// Serve static files from the directories
+// Serve static files
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname)));
+app.use(express.static('public', {
+    setHeaders: (res, path, stat) => {
+        if (path.endsWith('.js')) {
+            res.set('Content-Type', 'application/javascript');
+        }
+    }
+}));
+
 app.use('/todo_template', express.static(path.join(__dirname, 'todo_template')));
 app.use('/new-page', express.static(path.join(__dirname, 'new-page')));
 
@@ -26,179 +38,421 @@ const db = new sqlite3.Database('documents.db', (err) => {
     }
 });
 
-// Initialize database schema
-db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS documents (
-        id TEXT PRIMARY KEY, 
-        title TEXT, 
-        content TEXT, 
-        template_type TEXT, 
-        created_at TEXT, 
-        updated_at TEXT
-    )`);
+// app.post('/run-command', (req, res) => {
+//     const { title, content } = req.body;
 
-    db.run(`CREATE TABLE IF NOT EXISTS history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        document_id TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (document_id) REFERENCES documents(id)
-    )`);
+//     // Sanitize the title to create a safe file name
+//     const sanitizedTitle = title.replace(/[^a-zA-Z0-9]/g, '_');
+//     const fileName = `${sanitizedTitle}.txt`;
+//     const filePath = path.join('/home/aryan/user', fileName);
+
+//     // Save content to a file
+//     const saveCommand = `echo "${content}" > ${filePath}`;
+//  // git remote add origin https://github.com/imaryandokania/documents.git
+//     const gitCommands = `
+//         cd ..
+//         cd ..
+//         cd user
+//         git init
+//         git config user.name "test"
+//         git branch -M main
+//         git add ${fileName} 
+//         git commit -m "Add ${title}" 
+//         git push origin main
+//         rm -rf ${fileName} 
+//     `;
+//     // Execute the commands
+//     exec(saveCommand, (saveError, saveStdout, saveStderr) => {
+//         if (saveError) {
+//             console.error(`Error saving file: ${saveStderr}`);
+//             return res.status(500).send(saveStderr);
+//         }
+
+//         exec(gitCommands, (gitError, gitStdout, gitStderr) => {
+//             if (gitError) {
+//                 console.error(`Error with Git commands: ${gitStderr}`);
+//                 return res.status(500).send(gitStderr);
+//             }
+
+//             res.send(gitStdout || 'File saved and changes pushed to repository successfully!');
+//         });
+//     });
+// });
+
+
+
+// app.get('/api/get-github-credentials', (req, res) => {
+//     const { username } = req.query;
+
+//     if (!username) {
+//         console.error('Username is missing in the request');
+//         return res.status(400).send('Username is required.');
+//     }
+
+//     console.log('Fetching credentials for username:', username);
+
+//     const filePath = path.join(__dirname, 'github-credentials.json');
+
+//     fs.readFile(filePath, 'utf8', (err, data) => {
+//         if (err) {
+//             console.error('Error reading credentials file:', err);
+//             return res.status(500).send('Failed to read credentials file.');
+//         }
+
+//         try {
+//             const credentials = JSON.parse(data);
+
+//             if (credentials.username !== username) {
+//                 console.error('No credentials found for username:', username);
+//                 return res.status(404).send('No credentials found for the specified username.');
+//             }
+
+//             res.json(credentials);
+//         } catch (parseError) {
+//             console.error('Error parsing credentials:', parseError);
+//             res.status(500).send('Invalid credentials format.');
+//         }
+//     });
+// });
+app.get('/api/get-github-credentials', (req, res) => {
+    const { username } = req.query;
+
+    if (!username) {
+        return res.status(400).send('Username is required.');
+    }
+
+    const query = `SELECT username, ssh_key FROM github_credentials WHERE username = ?`;
+
+    db.get(query, [username], (err, row) => {
+        if (err) {
+            console.error('Error retrieving GitHub credentials:', err);
+            return res.status(500).send('Failed to retrieve GitHub credentials.');
+        }
+
+        if (!row) {
+            return res.status(404).send('No credentials found for the specified username.');
+        }
+
+        res.json(row);
+    });
+});
+app.post('/api/save-github-credentials', (req, res) => {
+    const { username, sshKey } = req.body;
+
+    if (!username || !sshKey) {
+        return res.status(400).send('Both username and SSH key are required.');
+    }
+
+    const query = `
+        INSERT INTO github_credentials (username, ssh_key)
+        VALUES (?, ?)
+        ON CONFLICT(username) DO UPDATE SET ssh_key = excluded.ssh_key
+    `;
+
+    db.run(query, [username, sshKey], function (err) {
+        if (err) {
+            console.error('Error saving GitHub credentials:', err);
+            return res.status(500).send('Failed to save GitHub credentials.');
+        }
+
+        res.send('GitHub credentials saved successfully.');
+    });
 });
 
+
+app.post('/run-command', (req, res) => {
+    const { documentId, title, content } = req.body;
+
+    if (!documentId) {
+        return res.status(400).send('Document ID is required.');
+    }
+
+    // Use documentId as the file name
+    const fileName = `${documentId}.md`; // File name is now based on the document ID
+    const filePath = path.join('/home/aryan/user', fileName); // Adjust path as necessary
+
+    console.log(`Writing file: ${filePath}`);
+
+    // Save content to a Markdown file
+    fs.writeFile(filePath, content, (err) => {
+        if (err) {
+            console.error('Error writing file:', err);
+            return res.status(500).send('Failed to save Markdown file.');
+        }
+    });
+
+        console.log(`File created successfully at ${filePath}`);
+          const gitCommands = `
+            cd /home/aryan/user 
+            git init
+            git remote remove origin
+            git remote add origin git@github.com:imaryandokania/documents.git
+            git config user.name "imaryandokania" 
+            git add ${fileName} 
+            git commit -m "Add ${title}" 
+            git push -u origin main
+        `;
+
+        console.log(`Executing Git commands:\n${gitCommands}`);
+
+        // Execute Git commands
+        exec(gitCommands, (gitError, gitStdout, gitStderr) => {
+            if (gitError) {
+                console.error(`Error with Git commands: ${gitStderr}`);
+                return res.status(500).send(gitStderr);
+            }
+
+            res.send(gitStdout || 'Markdown file committed and pushed to repository successfully!');
+        });
+
+});
+app.post('/api/documents', async (req, res) => {
+    const { title, content, template_type = 'New Document' } = req.body;
+
+    console.log('Received document creation request:', req.body);
+
+    if (!title) {
+        console.error('Title is required');
+        return res.status(400).json({ error: 'Title is required' });
+    }
+
+    const id = Date.now().toString();
+    const now = new Date().toISOString();
+
+    console.log('Generated document ID:', id);
+    console.log('Current timestamp:', now);
+
+    try {
+        await runTransaction([
+            {
+                query: 'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+                params: [id, title, content, template_type, now, now]
+            }
+        ]);
+
+        console.log('Document successfully inserted');
+
+        res.json({
+            success: true,
+            documentId: id,
+            message: 'Document created successfully'
+        });
+    } catch (error) {
+        console.error('Detailed document creation error:', error);
+        res.status(500).json({ 
+            error: 'Failed to create document', 
+            details: error.message,
+            stack: error.stack 
+        });
+    }
+});
+// In your database initialization
+db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS documents (
+        id TEXT PRIMARY KEY,
+        title TEXT,
+        content TEXT,
+        template_type TEXT,
+        created_at TEXT,
+        updated_at TEXT
+    )`, (err) => {
+        if (err) {
+            console.error('Error creating documents table:', err);
+        } else {
+            console.log('Documents table ensured');
+        }
+        db.run(`
+            CREATE TABLE IF NOT EXISTS github_credentials (
+                username TEXT PRIMARY KEY,
+                ssh_key TEXT NOT NULL
+            )
+        `);
+        console.log('GitHub credentials table ensured.');
+    });
+});
+
+// Utility function for database transactions
+function runTransaction(queries) {
+    return new Promise((resolve, reject) => {
+        db.run('BEGIN TRANSACTION', (err) => {
+            if (err) {
+                return reject(err);
+            }
+
+            const runQuery = (query, params = []) => {
+                return new Promise((queryResolve, queryReject) => {
+                    db.run(query, params, function (err) {
+                        if (err) {
+                            console.error('Transaction query error:', err);
+                            queryReject(err);
+                        } else {
+                            queryResolve(this);
+                        }
+                    });
+                });
+            };
+
+            // Run all queries in sequence
+            Promise.all(queries.map(q => runQuery(q.query, q.params)))
+                .then(() => {
+                    db.run('COMMIT', (err) => {
+                        if (err) {
+                            console.error('Commit error:', err);
+                            db.run('ROLLBACK');
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
+                    });
+                })
+                .catch((err) => {
+                    db.run('ROLLBACK');
+                    reject(err);
+                });
+        });
+    });
+}
+
+// Middleware for logging requests
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
     next();
 });
 
 // API Routes
-// Get all documents
+// Add more detailed error logging to routes
 app.get('/api/documents', (req, res) => {
+    console.log('Received GET request for documents');
     db.all('SELECT * FROM documents ORDER BY created_at DESC', [], (err, rows) => {
         if (err) {
-            res.status(500).json({ error: err.message });
+            console.error('Database error:', err);
+            res.status(500).json({ 
+                error: 'Internal server error', 
+                details: err.message 
+            });
             return;
         }
+        console.log('Fetched documents:', rows.length);
         res.json(rows);
     });
 });
-
 // Get single document
 app.get('/api/documents/:id', (req, res) => {
     const { id } = req.params;
-    console.log('Fetching document:', id);
-    
     db.get('SELECT * FROM documents WHERE id = ?', [id], (err, row) => {
         if (err) {
-            console.error('Database error:', err);
-            return res.status(500).json({ error: err.message });
+            return res.status(500).json({ error: 'Internal server error', details: err.message });
         }
         if (!row) {
-            console.log('Document not found:', id);
             return res.status(404).json({ error: 'Document not found' });
         }
-        console.log('Found document:', row);
         res.json(row);
     });
 });
 
 // Create new document
-app.post('/api/documents', (req, res) => {
-    console.log('Received POST request for document:', req.body);
+app.post('/api/documents', async (req, res) => {
     const { title, content, template_type = 'New Document' } = req.body;
-    
-    // Validate input
+
     if (!title) {
         return res.status(400).json({ error: 'Title is required' });
     }
 
-    const id = Date.now().toString(); // Generate unique ID
+    const id = Date.now().toString();
     const now = new Date().toISOString();
 
-    db.serialize(() => {
-        console.log('Starting document creation transaction');
-        
-        db.run('BEGIN TRANSACTION');
-
-        // Insert into documents table
-        db.run(
-            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-            [id, title, content, template_type, now, now],
-            function(err) {
-                if (err) {
-                    db.run('ROLLBACK');
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-
-                // Insert into history table
-                db.run(
-                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
-                    [id, now, now],
-                    function(err) {
-                        if (err) {
-                            db.run('ROLLBACK');
-                            res.status(500).json({ error: err.message });
-                            return;
-                        }
-
-                        db.run('COMMIT', (err) => {
-                            if (err) {
-                                db.run('ROLLBACK');
-                                res.status(500).json({ error: err.message });
-                                return;
-                            }
-                            res.json({ 
-                                success: true, 
-                                documentId: id,
-                                message: 'Document created successfully' 
-                            });
-                        });
-                    }
-                );
+    try {
+        await runTransaction([
+            {
+                query: 'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+                params: [id, title, content, template_type, now, now]
+            },
+            {
+                query: 'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                params: [id, now, now]
             }
-        );
-    });
+        ]);
+
+        res.json({
+            success: true,
+            documentId: id,
+            message: 'Document created successfully'
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to create document', details: error.message });
+    }
 });
 
-// Update document
+
+// Update document route with proper transaction handling
 app.put('/api/documents/:id', (req, res) => {
     const { id } = req.params;
-    const { title, content } = req.body;
-    
-    // Validate input
-    if (!title) {
-        return res.status(400).json({ error: 'Title is required' });
-    }
-
+    const { title, content, template_type } = req.body;
     const now = new Date().toISOString();
 
+    console.log('Received update request:', { id, title, content, template_type });
+
+    // Begin transaction explicitly
     db.serialize(() => {
-        db.run('BEGIN TRANSACTION');
+        db.run('BEGIN TRANSACTION', (beginErr) => {
+            if (beginErr) {
+                console.error('Error beginning transaction:', beginErr);
+                return res.status(500).json({ error: beginErr.message });
+            }
 
-        // Update documents table
-        db.run(
-            'UPDATE documents SET title = ?, content = ?, updated_at = ? WHERE id = ?',
-            [title, content, now, id],
-            function(err) {
-                if (err) {
-                    db.run('ROLLBACK');
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
+            // Update documents table
+            db.run(
+                'UPDATE documents SET title = ?, content = ?, updated_at = ? WHERE id = ?',
+                [title, content, now, id],
+                function(updateErr) {
+                    if (updateErr) {
+                        console.error('Error updating document:', updateErr);
+                        db.run('ROLLBACK', () => {
+                            res.status(500).json({ error: updateErr.message });
+                        });
+                        return;
+                    }
 
-                if (this.changes === 0) {
-                    db.run('ROLLBACK');
-                    res.status(404).json({ error: 'Document not found' });
-                    return;
-                }
+                    if (this.changes === 0) {
+                        db.run('ROLLBACK', () => {
+                            res.status(404).json({ error: 'Document not found' });
+                        });
+                        return;
+                    }
 
-                // Insert into history
-                db.run(
-                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
-                    [id, now, now],
-                    function(err) {
-                        if (err) {
-                            db.run('ROLLBACK');
-                            res.status(500).json({ error: err.message });
-                            return;
-                        }
-
-                        db.run('COMMIT', (err) => {
-                            if (err) {
-                                db.run('ROLLBACK');
-                                res.status(500).json({ error: err.message });
+                    // Insert into history
+                    db.run(
+                        'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
+                        [id, now, now],
+                        function(historyErr) {
+                            if (historyErr) {
+                                console.error('Error updating history:', historyErr);
+                                db.run('ROLLBACK', () => {
+                                    res.status(500).json({ error: historyErr.message });
+                                });
                                 return;
                             }
-                            res.json({ 
-                                success: true, 
-                                message: 'Document updated successfully' 
+
+                            // Commit the transaction
+                            db.run('COMMIT', (commitErr) => {
+                                if (commitErr) {
+                                    console.error('Error committing transaction:', commitErr);
+                                    db.run('ROLLBACK', () => {
+                                        res.status(500).json({ error: commitErr.message });
+                                    });
+                                    return;
+                                }
+
+                                res.json({ 
+                                    success: true, 
+                                    message: 'Document updated successfully' 
+                                });
                             });
-                        });
-                    }
-                );
-            }
-        );
+                        }
+                    );
+                }
+            );
+        });
     });
 });
 
@@ -355,255 +609,50 @@ app.post('/api/documents/new-bug-review', (req, res) => {
         db.run('BEGIN TRANSACTION');
 
         db.run(
-            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-            [id, emptyBugReview.title, emptyBugReview.content, emptyBugReview.template_type, now, now],
-            function(err) {
-                if (err) {
-                    console.error('Document creation error:', err);
-                    db.run('ROLLBACK');
+            `UPDATE documents SET title = ?, content = ?, template_type = ?, updated_at = ? WHERE id = ?`,
+            [title, content, template_type, now, id],
+            function (updateErr) {
+                if (updateErr) {
+                    console.error('Error updating document:', updateErr);
                     return res.status(500).json({ 
-                        success: false, 
-                        error: err.message 
+                        error: 'Failed to update document', 
+                        details: updateErr.message 
                     });
                 }
+                
+                if (this.changes === 0) {
+                    return res.status(404).json({ error: 'Document not found' });
+                }
 
-                db.run(
-                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
-                    [id, now, now],
-                    function(err) {
-                        if (err) {
-                            console.error('History creation error:', err);
-                            db.run('ROLLBACK');
-                            return res.status(500).json({ 
-                                success: false, 
-                                error: err.message 
-                            });
-                        }
-
-                        db.run('COMMIT', (err) => {
-                            if (err) {
-                                console.error('Commit error:', err);
-                                db.run('ROLLBACK');
-                                return res.status(500).json({ 
-                                    success: false, 
-                                    error: err.message 
-                                });
-                            }
-                            
-                            console.log('Bug review created successfully with ID:', id);
-                            return res.status(200).json({ 
-                                success: true, 
-                                documentId: id,
-                                message: 'Bug review created successfully'
-                            });
-                        });
-                    }
-                );
+                res.json({ 
+                    success: true, 
+                    documentId: id,
+                    message: 'Document updated successfully' 
+                });
             }
         );
     });
 });
 
-app.get(['/todo_template/todo.html'], (req, res) => {
-    const todoTemplatePath = path.join(__dirname, 'todo_template', 'todo.html');
-    console.log('Attempting to serve todo_template');
-    console.log('Full path:', todoTemplatePath);
-    
-    // Use fs to check if file exists before sending
-    fs.access(todoTemplatePath, fs.constants.F_OK, (err) => {
+// Delete document
+app.delete('/api/documents/:id', (req, res) => {
+    const { id } = req.params;
+
+    db.run(`DELETE FROM documents WHERE id = ?`, [id], function (err) {
         if (err) {
-            console.error('Todo template file not found:', err);
-            return res.status(404).send('Todo template not found');
+            res.status(500).json({ error: 'Failed to delete document', details: err.message });
+            return;
         }
-        res.sendFile(todoTemplatePath);
-    });
-});
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+        if (this.changes === 0) {
+            res.status(404).json({ error: 'Document not found' });
+            return;
+        }
 
-app.get('/editor', (req, res) => {
-    res.sendFile(path.join(__dirname, 'new-page', 'editor.html'));
-});
-
-
-
-app.get('/journal', (req, res) => {
-    res.sendFile(path.join(__dirname, 'journal.html'));
-});
-
-app.get('/journal/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'journal.html'));
-});
-
-app.get('/bug-review', (req, res) => {
-    res.sendFile(path.join(__dirname, 'bug-review.html'));
-});
-
-app.get('/bug-review/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'bug-review.html'));
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    res.status(500).send('Something broke!');
-});
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
-
-// Feature
-app.get('/feature', (req, res) => {
-    res.sendFile(path.join(__dirname, 'feature.html'));
-});
-
-app.get('/feature/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'feature.html'));
-});
-
-app.post('/api/documents/new-feature', (req, res) => {
-    const id = Date.now().toString();
-    const now = new Date().toISOString();
-    
-    console.log('Creating new feature document...');
-
-    const emptyFeature = {
-        title: "",
-        content: JSON.stringify({
-            text: '',
-            lastUpdated: now
-        }),
-        template_type: 'feature'
-    };
-
-    db.serialize(() => {
-        db.run('BEGIN TRANSACTION');
-
-        db.run(
-            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-            [id, emptyFeature.title, emptyFeature.content, emptyFeature.template_type, now, now],
-            function(err) {
-                if (err) {
-                    console.error('Document creation error:', err);
-                    db.run('ROLLBACK');
-                    return res.status(500).json({ 
-                        success: false, 
-                        error: err.message 
-                    });
-                }
-
-                db.run(
-                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
-                    [id, now, now],
-                    function(err) {
-                        if (err) {
-                            console.error('History creation error:', err);
-                            db.run('ROLLBACK');
-                            return res.status(500).json({ 
-                                success: false, 
-                                error: err.message 
-                            });
-                        }
-
-                        db.run('COMMIT', (err) => {
-                            if (err) {
-                                console.error('Commit error:', err);
-                                db.run('ROLLBACK');
-                                return res.status(500).json({ 
-                                    success: false, 
-                                    error: err.message 
-                                });
-                            }
-                            
-                            console.log('Feature created successfully with ID:', id);
-                            return res.status(200).json({ 
-                                success: true, 
-                                documentId: id,
-                                message: 'Feature created successfully'
-                            });
-                        });
-                    }
-                );
-            }
-        );
+        res.json({ success: true, message: 'Document deleted successfully' });
     });
 });
 
-// Meeting
-app.get('/meeting', (req, res) => {
-    res.sendFile(path.join(__dirname, 'meeting.html'));
-});
-
-app.get('/meeting/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'meeting.html'));
-});
-
-app.post('/api/documents/new-meeting', (req, res) => {
-    const id = Date.now().toString();
-    const now = new Date().toISOString();
-    
-    console.log('Creating new meeting document...');
-
-    const emptyMeeting = {
-        title: "",
-        content: JSON.stringify({
-            text: '',
-            lastUpdated: now
-        }),
-        template_type: 'meeting'
-    };
-
-    db.serialize(() => {
-        db.run('BEGIN TRANSACTION');
-
-        db.run(
-            'INSERT INTO documents (id, title, content, template_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-            [id, emptyMeeting.title, emptyMeeting.content, emptyMeeting.template_type, now, now],
-            function(err) {
-                if (err) {
-                    console.error('Document creation error:', err);
-                    db.run('ROLLBACK');
-                    return res.status(500).json({ 
-                        success: false, 
-                        error: err.message 
-                    });
-                }
-
-                db.run(
-                    'INSERT INTO history (document_id, created_at, updated_at) VALUES (?, ?, ?)',
-                    [id, now, now],
-                    function(err) {
-                        if (err) {
-                            console.error('History creation error:', err);
-                            db.run('ROLLBACK');
-                            return res.status(500).json({ 
-                                success: false, 
-                                error: err.message 
-                            });
-                        }
-
-                        db.run('COMMIT', (err) => {
-                            if (err) {
-                                console.error('Commit error:', err);
-                                db.run('ROLLBACK');
-                                return res.status(500).json({ 
-                                    success: false, 
-                                    error: err.message 
-                                });
-                            }
-                            
-                            console.log('Meeting created successfully with ID:', id);
-                            return res.status(200).json({ 
-                                success: true, 
-                                documentId: id,
-                                message: 'Meeting created successfully'
-                            });
-                        });
-                    }
-                );
-            }
-        );
-    });
+// Start server
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Server running on port ${port}`);
 });

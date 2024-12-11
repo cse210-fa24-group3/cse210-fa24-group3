@@ -340,3 +340,32 @@
     - Keqian
         - Templates done, opening a PR
         - Will ensure they match new style too
+
+
+## 12/5/2024
+- Attended by: Amy, Andrew, Aryan, Keqian, Sneha, Venu
+
+- Updates
+    - Amy
+        - Updated todo and journal theming, waiting on Venu to merge her PR to raise mine
+        - Amy will change delete button styling later
+    - Andrew
+        - Was delayed starting unit test due to canceled CICD meeting from this morning
+        - Will meet with Aryan tomorrow 
+    - Keqian
+        - Implemented delete for the Features template
+        - Works on Amy and Sneha’s local machines as well
+    - Venu
+        - Resolved merge conflicts for PR
+        - Todo backend should be working
+        - Will finish off Recently viewed and push by tomorrow
+    - Sneha
+        - Was working on todo deletion, will wait for Venu and Keqian and then push it
+    - Aryan
+        - Worked on doing an sqli server to host the app
+        - Noticed some localhost ports were hardcoded
+        - Sneha made note to store localhost in the env file based on host url
+- ADRs
+    - Should have one for code coverage, only existing one is for general CICD pipeline
+    - Needs more depth 
+    - Need one for Netlify and the SQLi server hosting 
