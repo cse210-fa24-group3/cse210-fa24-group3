@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: home.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: home.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * Returns a human-friendly format of a relative time string.
  *
  * @param {string} dateString - A date string in a format that can be parsed by the JavaScript Date constructor.
@@ -9,10 +37,10 @@ function formatRelativeTime(dateString) {
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
 
-    if (diffInSeconds < 60) return 'just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    if (diffInSeconds &lt; 60) return 'just now';
+    if (diffInSeconds &lt; 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds &lt; 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds &lt; 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
 
     return date.toLocaleDateString('en-US', {
         month: 'short',
@@ -47,12 +75,12 @@ function createEntryCard(entry, isRecentlyEdited = false) {
     if (isRecentlyEdited) {
         // For recently edited, only show title, template type, and last updated time
         return `
-            <div class="entry-card">
-                <h3>${entry.title || 'Untitled'}</h3>
-                <p class="template-type">${entry.template_type}</p>
-                <small>Last updated: ${formatRelativeTime(entry.updated_at)}</small>
-                <a href="${link}?id=${entry.id}" class="btn">Open</a>
-            </div>
+            &lt;div class="entry-card">
+                &lt;h3>${entry.title || 'Untitled'}&lt;/h3>
+                &lt;p class="template-type">${entry.template_type}&lt;/p>
+                &lt;small>Last updated: ${formatRelativeTime(entry.updated_at)}&lt;/small>
+                &lt;a href="${link}?id=${entry.id}" class="btn">Open&lt;/a>
+            &lt;/div>
         `;
     }
 
@@ -60,12 +88,12 @@ function createEntryCard(entry, isRecentlyEdited = false) {
     const contentPreview = entry.content.length > 100 ? `${entry.content.substring(0, 100)}...` : entry.content;
 
     return `
-        <div class="entry-card">
-            <h3>${entry.title || 'Untitled'}</h3>
-            <p>${contentPreview}</p>
-            <small>Last updated: ${formatRelativeTime(entry.updated_at)}</small>
-            <a href="${link}?id=${entry.id}" class="btn">Open</a>
-        </div>
+        &lt;div class="entry-card">
+            &lt;h3>${entry.title || 'Untitled'}&lt;/h3>
+            &lt;p>${contentPreview}&lt;/p>
+            &lt;small>Last updated: ${formatRelativeTime(entry.updated_at)}&lt;/small>
+            &lt;a href="${link}?id=${entry.id}" class="btn">Open&lt;/a>
+        &lt;/div>
     `;
 }
 // Global variables to manage document display
@@ -125,9 +153,9 @@ function displayDocuments(showAll = false) {
     // Manage "See More" button visibility
     const seeMoreContainer = document.getElementById('see-more-container');
     if (seeMoreContainer) {
-        if (allDocuments.length > INITIAL_DISPLAY_COUNT && !showAll) {
+        if (allDocuments.length > INITIAL_DISPLAY_COUNT &amp;&amp; !showAll) {
             seeMoreContainer.innerHTML = `
-                <a href="#" id="see-more" class="see-more">See More (${allDocuments.length - INITIAL_DISPLAY_COUNT} more)</a>
+                &lt;a href="#" id="see-more" class="see-more">See More (${allDocuments.length - INITIAL_DISPLAY_COUNT} more)&lt;/a>
             `;
             document.getElementById('see-more').addEventListener('click', (e) => {
                 e.preventDefault();
@@ -208,7 +236,7 @@ const fetchDocuments = async () => {
         container.innerHTML = '';
 
         if (documents.length === 0) {
-            container.innerHTML = '<p>No documents found.</p>';
+            container.innerHTML = '&lt;p>No documents found.&lt;/p>';
             return;
         }
 
@@ -216,10 +244,10 @@ const fetchDocuments = async () => {
             const documentDiv = document.createElement('div');
             documentDiv.className = 'document-item';
             documentDiv.innerHTML = `
-                <h3>${doc.title}</h3>
-                <p>${new Date(doc.created_at).toLocaleString()}</p>
-                <button onclick="openDocument('${doc.id}')">Open</button>
-                <button onclick="deleteDocument('${doc.id}')">Delete</button>
+                &lt;h3>${doc.title}&lt;/h3>
+                &lt;p>${new Date(doc.created_at).toLocaleString()}&lt;/p>
+                &lt;button onclick="openDocument('${doc.id}')">Open&lt;/button>
+                &lt;button onclick="deleteDocument('${doc.id}')">Delete&lt;/button>
             `;
             container.appendChild(documentDiv);
         });
@@ -437,4 +465,26 @@ async function getGithubCredentials() {
     } else {
         console.log('No cached username found.');
     }
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#TEMPLATE_LINKS">TEMPLATE_LINKS</a></li><li><a href="global.html#closeModal">closeModal</a></li><li><a href="global.html#commitDocument">commitDocument</a></li><li><a href="global.html#createEntryCard">createEntryCard</a></li><li><a href="global.html#createNewMeeting">createNewMeeting</a></li><li><a href="global.html#deleteDocument">deleteDocument</a></li><li><a href="global.html#displayDocuments">displayDocuments</a></li><li><a href="global.html#displayRecentlyEdited">displayRecentlyEdited</a></li><li><a href="global.html#fetchAndDisplayRecentlyEdited">fetchAndDisplayRecentlyEdited</a></li><li><a href="global.html#fetchAndFillCredentials">fetchAndFillCredentials</a></li><li><a href="global.html#fetchDocuments">fetchDocuments</a></li><li><a href="global.html#formatRelativeTime">formatRelativeTime</a></li><li><a href="global.html#getGithubCredentials">getGithubCredentials</a></li><li><a href="global.html#loadDocument">loadDocument</a></li><li><a href="global.html#openDocument">openDocument</a></li><li><a href="global.html#openModal">openModal</a></li><li><a href="global.html#refreshRecentlyEdited">refreshRecentlyEdited</a></li><li><a href="global.html#saveDocument">saveDocument</a></li><li><a href="global.html#saveGithubCredentials">saveGithubCredentials</a></li><li><a href="global.html#scheduleAutoSave">scheduleAutoSave</a></li><li><a href="global.html#updateDate">updateDate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Dec 10 2024 16:57:02 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
