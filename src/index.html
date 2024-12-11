@@ -1,52 +1,200 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Journey</title>
+    <title>DevLog</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Pop-Up Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%;
+            border-radius: 5px;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        form input, form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        form button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-left">
-            <div class="menu-icon">☰</div>
-            <div class="logo">DevLog</div>
+            <div>☰</div>
+            <div>DevLog</div>
         </div>
         <div class="navbar-right">
-            <div class="theme-toggle">
-                <span class="light-mode">☀️</span>
-                <span class="dark-mode" style="display: none;">🌙</span>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search entries">
+                <span class="search-icon">🔍</span>
             </div>
+            <div class="theme-toggle">
+                <span class="light-mode">🌙</span>
+                <span class="dark-mode" style="display:none;">☀️</span>
+            </div>
+            <div class="user-btn" onclick="openModal()">👤</div>
         </div>
     </nav>
-
     <div class="sidebar">
-        <a href="#">Home</a>
-        <a href="#">About</a>
+        <div class="sidebar-links">
+            <a href="#">Home</a>
+            <a href="#">My Documents</a>
+            <a href="#">Templates</a>
+            <a href="#">Settings</a>
+        </div>
     </div>
-
     <div class="overlay"></div>
+    <div class="user-menu">
+        <a href="#" class="block p-2">Profile</a>
+        <a href="#" class="block p-2">Settings</a>
+        <a href="#" class="block p-2">Logout</a>
+    </div>
+    <main class="main-content">
+        <div class="hero-text">
+            Chronicle your code journey.<br>
+            One commit at a time.
+        </div>
 
-    <main>
-        <section class="hero-section">
-            <div class="hero-text-container">
-                <h1 class="hero-text">Chronicle your <span class="highlight">code</span> journey.</h1>
-                <h1 class="hero-text">One commit at a time.</h1>
-            </div>
-            <div class="action-container">
-                <a href="new-page/editor.html" class="create-button">
-                    <span class="icon">+</span>
-                    Create New
-                </a>
+        <section class="github-activity">
+            <h2 class="section-title">Contribution Activity</h2>
+            <div class="github-dashboard">
+                <div id="contribution-loading" style="display: none;">
+                    Loading contribution data...
+                </div>
+                <div id="contribution-error" style="display: none; color: #ff0000;">
+                    Failed to load GitHub contribution data. Please check your username and try again.
+                </div>
+                <div class="contribution-graph">
+                    <div class="contribution-graph">
+                        <div class="months">
+                            <span>Jan</span>
+                            <span>Feb</span>
+                            <span>Mar</span>
+                            <span>Apr</span>
+                            <span>May</span>
+                            <span>Jun</span>
+                            <span>Jul</span>
+                            <span>Aug</span>
+                            <span>Sep</span>
+                            <span>Oct</span>
+                            <span>Nov</span>
+                            <span>Dec</span>
+                        </div>
+                        <div class="days">
+                            <span>Mon</span>
+                            <span>Wed</span>
+                            <span>Fri</span>
+                        </div>
+                        <div class="squares" id="squares">
+                            <!-- JavaScript will populate this -->
+                        </div>
+                    </div>
+                    <div class="contribution-footer">
+                        <span>Less</span>
+                        <ul class="contribution-scale">
+                            <li data-level="0"></li>
+                            <li data-level="1"></li>
+                            <li data-level="2"></li>
+                            <li data-level="3"></li>
+                            <li data-level="4"></li>
+                        </ul>
+                        <span>More</span>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="entries-section">
-            <div class="entries-grid" id="entries-grid">
-                <!-- Entries will be dynamically inserted here -->
+        <section>
+            <h2 class="section-title">Start a new document</h2>
+            <div class="card-grid">
+                <a href="new-page/editor.html" class="card create-card">
+                    <span class="plus-icon">+</span>
+                </a>
+                <div class="card" onclick="openTodoPage()">To-do list</div>
+                <div class="card" onclick="createNewBugReviewFromTemplate()">Bug - Root Cause Analysis</div>
+                <div class="card" onclick="createNewFeatureFromTemplate()">Feature Specification</div>
+                <div class="card" onclick="createNewMeetingFromTemplate()">Minutes of Meeting</div>
+                <div class="card" onclick="createAI()">Code along with AI</div>
             </div>
+            <a href="#" class="see-more">See more templates</a>
+        </section>
+        <section class="recently-edited">
+            <h2 class="section-title">Recently edited pages</h2>
+            <div id="recently-edited-container" class="card-grid">
+                <div class="card loading">Loading recent entries...</div>
+            </div>
+            <a href="#" id="see-more-button" class="see-more">See More</a>
         </section>
     </main>
+
+    <!-- Pop-Up Form Modal -->
+    <div id="github-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2>GitHub Configuration</h2>
+            <form id="github-form">
+                <label for="github-username">GitHub Username</label>
+                <input type="text" id="github-username" placeholder="Enter your GitHub username" required>
+                
+                <label for="github-ssh-key">GitHub SSH Key</label>
+                <textarea id="github-ssh-key" placeholder="Paste your SSH key here" rows="5" required></textarea>
+                
+                <button type="button" onclick="saveGithubCredentials()">Save</button>
+            </form>
+        </div>
+    </div>
 
     <script src="script.js"></script>
     <script src="home.js"></script>

@@ -1,132 +1,82 @@
-// DOM Elements
-const titleInput = document.getElementById('title-input');
-const contentInput = document.getElementById('content-input');
+console.log('Editor.js loaded successfully');
+let documentId = new URLSearchParams(window.location.search).get('id') || 
+                 window.location.pathname.split('/').pop();
+let lastSavedContent = '';
+let isNewDocument = !documentId;
 
-// Save function for both auto-save and manual save
-function saveContent(isAutoSave = false) {
-    const title = titleInput.value.trim();
-    const content = contentInput.value.trim();
-    
-    if (!title && !content) return;
+// Initialize autosave timer
+let autosaveTimer = null;
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const editingId = urlParams.get('id');
-    const timestamp = new Date().toISOString();
+async function saveDocument(event) {
+    if (event) event.preventDefault();
+    console.log('Starting save process...');
 
-    const entry = {
-        id: editingId || crypto.randomUUID(),
-        title: title || 'Untitled',
-        content,
-        createdAt: timestamp,
-        updatedAt: timestamp
-    };
+    const titleInput = document.getElementById('titleInput');
+    const contentArea = document.getElementById('contentArea');
+    const saveStatus = document.getElementById('saveStatus');
 
-    // Get existing entries
-    const entries = JSON.parse(localStorage.getItem('entries') || '[]');
-    
-    if (editingId) {
-        // Update existing entry
-        const index = entries.findIndex(e => e.id === editingId);
-        if (index !== -1) {
-            entry.createdAt = entries[index].createdAt;
-            entries[index] = entry;
-        }
-    } else {
-        // Add new entry
-        entries.unshift(entry);
-    }
-    
-    localStorage.setItem('entries', JSON.stringify(entries));
-
-    if (!isAutoSave) {
-        // Show success message and redirect
-        const message = document.createElement('div');
-        message.textContent = 'Saved successfully!';
-        message.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: var(--olive-green);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 4px;
-            animation: fadeIn 0.3s ease;
-        `;
-        document.body.appendChild(message);
-        setTimeout(() => message.remove(), 2000);
-
-        // Fixed: Use absolute path to return to main page
-        setTimeout(() => {
-            window.location.href = '../index.html';
-        }, 1000);
-    }
-}
-
-// Auto-save functionality
-let autoSaveTimeout;
-function setupAutoSave() {
-    const handleInput = () => {
-        clearTimeout(autoSaveTimeout);
-        autoSaveTimeout = setTimeout(() => {
-            saveContent(true);
-        }, 2000);
-    };
-
-    titleInput.addEventListener('input', handleInput);
-    contentInput.addEventListener('input', handleInput);
-}
-
-// Save button click handler
-function setupSaveButton() {
-    const saveButton = document.querySelector('.save-button');
-    if (saveButton) {
-        saveButton.addEventListener('click', () => saveContent(false));
-    }
-}
-
-// Load existing entry or draft content
-function loadContent() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const editingId = urlParams.get('id');
-    
-    if (editingId) {
-        const entries = JSON.parse(localStorage.getItem('entries') || '[]');
-        const entry = entries.find(e => e.id === editingId);
-        
-        if (entry) {
-            titleInput.value = entry.title;
-            contentInput.value = entry.content;
-        }
-    } else {
-        // Check for draft content
-        const draftContent = localStorage.getItem('draftContent');
-        if (draftContent) {
-            const { title, content } = JSON.parse(draftContent);
-            titleInput.value = title || '';
-            contentInput.value = content || '';
-            localStorage.removeItem('draftContent');
-        }
-    }
-}
-
-// Save draft before unloading
-function setupBeforeUnload() {
-    window.addEventListener('beforeunload', () => {
-        const title = titleInput.value.trim();
-        const content = contentInput.value.trim();
-        if (title || content) {
-            localStorage.setItem('draftContent', JSON.stringify({ title, content }));
-        }
+    console.log({
+        title: titleInput?.value,
+        content: contentArea?.value,
+        saveStatusExists: !!saveStatus
     });
+
+    if (!titleInput || !contentArea || !saveStatus) {
+        console.error('Required elements missing!');
+        return;
+    }
+
+    const url = isNewDocument ? '/api/documents' : `/api/documents/${documentId}`;
+    console.log(`Saving to URL: ${url}, Method: ${isNewDocument ? 'POST' : 'PUT'}`);
+    
+    try {
+        const response = await fetch(url, {
+            method: isNewDocument ? 'POST' : 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: titleInput.value,
+                content: contentArea.value
+            })
+        });
+
+        console.log('Response:', response);
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success) {
+            saveStatus.textContent = 'Saved!';
+        } else {
+            throw new Error(data.error || 'Unknown save error');
+        }
+    } catch (error) {
+        console.error('Save failed:', error.message);
+        saveStatus.textContent = 'Error saving';
+    }
 }
 
-// Initialize all functionality
-function init() {
-    setupAutoSave();
-    setupSaveButton();
-    loadContent();
-    setupBeforeUnload();
-}
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Loaded');
 
-// Start the application
-init();
+    const titleInput = document.getElementById('titleInput');
+    const contentArea = document.getElementById('contentArea');
+    const saveButton = document.getElementById('saveButton');
+
+    if (!titleInput || !contentArea || !saveButton) {
+        console.error('Required elements not found');
+        return;
+    }
+
+    // Load existing document if applicable
+    loadDocument();
+
+    // Attach save button click event
+    saveButton.addEventListener('click', (event) => {
+        console.log('Save Button Clicked');
+        saveDocument(event);
+    });
+
+    // Setup autosave
+    setupAutosave();
+});

@@ -1,39 +1,30 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Entry | Code Journey</title>
-    <link rel="stylesheet" href="../styles.css">
-    <link rel="stylesheet" href="editor.css">
+    <title>Journal - DevLog</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/template.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-left">
-            <!-- Fixed: Back button path -->
-            <a href="../index.html" class="back-button">←</a>
-            <div class="logo">Your Logo</div>
-        </div>
-        <div class="navbar-right">
-            <button class="save-button">Save</button>
-            <div class="theme-toggle">
-                <span class="light-mode">☀️</span>
-                <span class="dark-mode" style="display: none;">🌙</span>
-            </div>
-        </div>
-    </nav>
+    <!-- Your existing HTML content -->
 
-    <main class="editor-container">
-        <div class="editor-content">
-            <input type="text" id="title-input" class="title-input" placeholder="Enter title...">
-            <textarea id="content-input" class="content-input" placeholder="Start writing your content here..."></textarea>
+    <main class="main-content">
+        <div class="container">
+            <div class="header">
+                <input type="text" class="title-input" placeholder="Untitled Journal Entry" id="titleInput">
+                <div class="header-right">
+                    <div class="save-status" id="saveStatus"></div>
+                    <button class="save-button" id="saveButton">
+                        <span>Save</span>
+                    </button>
+                </div>
+            </div>
+            <textarea class="content-area" placeholder="Start writing..." id="contentArea"></textarea>
         </div>
     </main>
 
-    <script src="editor-script.js"></script>
-
-    <!-- Fixed: Script paths -->
-    <script src="../script.js"></script>
-    <script src="editor.js"></script>
+    <script src="/editor.js"></script>
 </body>
 </html>

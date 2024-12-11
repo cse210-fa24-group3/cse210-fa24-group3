@@ -2,6 +2,7 @@ describe('Home Component Event Listeners', () => {
     let menuBtn, sidebar, overlay, darkModeToggle, userBtn, userMenu;
 
     beforeEach(() => {
+
         document.body.innerHTML = `
             <div class="navbar-left">
                 <div class="menu-btn">Menu</div>
