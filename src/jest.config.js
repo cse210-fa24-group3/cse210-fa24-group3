@@ -1,6 +1,8 @@
 
 module.exports = {
-  testEnvironment: "jest-environment-jsdom",
+
+  testEnvironment: "jest-environment-node,
+  // testEnvironment: "jest-environment-jsdom",
   roots: ["<rootDir>/"],
   testMatch: ["**/__tests__/*.test.js", "**/?(*.)+(spec|test).[jt]s?(x)"],
   testPathIgnorePatterns: ["/node_modules/", "/dist/"],
