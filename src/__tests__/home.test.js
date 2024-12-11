@@ -123,3 +123,46 @@ describe('Home Component Event Listeners', () => {
         expect(container.innerHTML).toContain('Failed to load entries');
     });
 });
+
+describe('Home Component Additional Coverage', () => {
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="entries-grid"></div>
+        `;
+
+        // Clear localStorage before each test
+        localStorage.clear();
+        
+        // Add a mock entry to localStorage to trigger displayEntries
+        const mockEntries = [
+            {
+                id: 1,
+                title: 'Test Entry',
+                content: 'This is a test entry with a lot of content. '.repeat(10), // Long content to ensure truncation
+                createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString() // 5 minutes ago
+            }
+        ];
+        
+        localStorage.setItem('entries', JSON.stringify(mockEntries));
+
+        // Reset modules so that when we import home.js it runs displayEntries again
+        jest.resetModules();
+    });
+
+    test('displayEntries covers formatRelativeTime, truncateText, and createEntryTile', () => {
+        // Import home.js after localStorage is set
+        require('../home');
+
+        const entriesGrid = document.getElementById('entries-grid');
+        const entryTile = entriesGrid.querySelector('.entry-tile');
+        expect(entryTile).not.toBeNull();
+
+        // Check truncated text
+        const previewText = entryTile.querySelector('.entry-preview').textContent;
+        expect(previewText.endsWith('...')).toBe(true);
+
+        // Check relative time formatting (should show "minutes ago" since we set it 5 min ago)
+        const metaText = entryTile.querySelector('.entry-meta').textContent;
+        expect(metaText).toMatch(/minutes ago/);
+    });
+});
