@@ -261,10 +261,10 @@ async function deleteDocument() {
     try {
         deleteButton.disabled = true;
         deleteStatus.textContent = 'Deleting...';
-
+        const documentId = localStorage.getItem('meetingDocumentId');
         // Get current document ID from URL
-        const pathParts = window.location.pathname.split('/');
-        const documentId = pathParts[pathParts.length - 1];
+        // const pathParts = window.location.pathname.split('/');
+        // const documentId = pathParts[pathParts.length - 1];
 
         if (!documentId || documentId === 'feature') {
             throw new Error('Invalid document ID');
