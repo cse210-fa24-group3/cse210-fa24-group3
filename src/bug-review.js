@@ -1,4 +1,9 @@
-// Update date on page load
+/**
+ * Update the current date element in the page.
+ * Set the text content of the element with id 'currentDate' to the current date in
+ * the format year, month, and day, in English.
+ * @function updateDate
+ */
 function updateDate() {
     const dateElement = document.getElementById('currentDate');
     if (dateElement) {
@@ -11,7 +16,11 @@ function updateDate() {
     }
 }
 
-// Auto-save functionality
+/**
+ * Schedules the auto-save timer to save the document after a specified delay.
+ * Clears any existing timer before setting a new one.
+ * @function scheduleAutoSave
+ */
 let autoSaveTimeout;
 function scheduleAutoSave() {
     clearTimeout(autoSaveTimeout);
@@ -94,6 +103,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 });
 
+/**
+ * Saves the currently edited document.
+ *
+ * Gets the current title and content from the UI, sends the updated data to the server,
+ * and updates the UI to reflect the save status.
+ * @async
+ * @function saveDocument
+ */
 async function saveDocument() {
     console.log('Save document called');
     const saveButton = document.getElementById('saveButton');

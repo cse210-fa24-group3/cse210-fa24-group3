@@ -10,12 +10,22 @@ const userMenu = document.querySelector('.user-menu');
 menuBtn.addEventListener('click', toggleSidebar);
 overlay.addEventListener('click', toggleSidebar);
 
+/**
+ * Toggles the visibility of the sidebar and overlay elements.
+ * @function toggleSidebar
+ */
 function toggleSidebar() {
     sidebar.classList.toggle('active');
     overlay.classList.toggle('active');
 }
 
-// Dark mode toggle
+/**
+ * Handles the click event for the dark mode toggle button.
+ * Toggles dark mode on document body, toggle button icon.
+ * Saves the theme preference in localStorage.
+ * @event click
+ * @param {Event} event - The click event object.
+ */
 darkModeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     darkModeToggle.querySelector('.light-mode').style.display = document.body.classList.contains('dark-mode') ? 'none' : 'block';
@@ -25,19 +35,33 @@ darkModeToggle.addEventListener('click', () => {
     localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
 });
 
-// User menu toggle
+/**
+ * Handles the click event for the user menu button.
+ * Toggles the visibility of the user menu.
+ * @event click
+ * @param {Event} e - The click event object.
+ */
 userBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     userMenu.classList.toggle('active');
 });
 
+/**
+ * Handles click events on the document to close the user menu
+ * if the click is outside of the user menu.
+ * @event click
+ * @param {Event} e - The click event object.
+ */
 document.addEventListener('click', (e) => {
     if (!userMenu.contains(e.target)) {
         userMenu.classList.remove('active');
     }
 });
 
-// Initialize on page load
+/**
+ * Initializes the application when the DOM content is fully loaded.
+ * @event DOMContentLoaded
+ */
 document.addEventListener('DOMContentLoaded', () => {
     // Load saved theme preference
     const savedTheme = localStorage.getItem('theme');

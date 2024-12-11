@@ -7,6 +7,16 @@ let isNewDocument = !documentId;
 // Initialize autosave timer
 let autosaveTimer = null;
 
+/**
+ * Saves the currently edited document.
+ *
+ * Gets the current title and content from the UI, sends the updated data to the server,
+ * and updates the UI to reflect the save status.
+ * @async
+ * @function saveDocument
+ * @param {Event} [event] - The event object from the form submission, if applicable.
+ * @returns {Promise<void>} - A promise that resolves when the save process completes.
+ */
 async function saveDocument(event) {
     if (event) event.preventDefault();
     console.log('Starting save process...');
