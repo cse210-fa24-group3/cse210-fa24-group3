@@ -331,6 +331,10 @@ function createNewMeetingFromTemplate() {
     window.location.href = 'meeting.html';
 }
 
+function createAI() {
+    window.location.href = 'meeting.html';
+}
+
 function openTodoPage() {
     window.location.href = 'todo_template/todo.html';
 }

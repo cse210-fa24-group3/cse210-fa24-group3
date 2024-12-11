@@ -106,6 +106,56 @@
             Chronicle your code journey.<br>
             One commit at a time.
         </div>
+
+        <section class="github-activity">
+            <h2 class="section-title">Contribution Activity</h2>
+            <div class="github-dashboard">
+                <div id="contribution-loading" style="display: none;">
+                    Loading contribution data...
+                </div>
+                <div id="contribution-error" style="display: none; color: #ff0000;">
+                    Failed to load GitHub contribution data. Please check your username and try again.
+                </div>
+                <div class="contribution-graph">
+                    <div class="contribution-graph">
+                        <div class="months">
+                            <span>Jan</span>
+                            <span>Feb</span>
+                            <span>Mar</span>
+                            <span>Apr</span>
+                            <span>May</span>
+                            <span>Jun</span>
+                            <span>Jul</span>
+                            <span>Aug</span>
+                            <span>Sep</span>
+                            <span>Oct</span>
+                            <span>Nov</span>
+                            <span>Dec</span>
+                        </div>
+                        <div class="days">
+                            <span>Mon</span>
+                            <span>Wed</span>
+                            <span>Fri</span>
+                        </div>
+                        <div class="squares" id="squares">
+                            <!-- JavaScript will populate this -->
+                        </div>
+                    </div>
+                    <div class="contribution-footer">
+                        <span>Less</span>
+                        <ul class="contribution-scale">
+                            <li data-level="0"></li>
+                            <li data-level="1"></li>
+                            <li data-level="2"></li>
+                            <li data-level="3"></li>
+                            <li data-level="4"></li>
+                        </ul>
+                        <span>More</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section>
             <h2 class="section-title">Start a new document</h2>
             <div class="card-grid">
@@ -116,6 +166,7 @@
                 <div class="card" onclick="createNewBugReviewFromTemplate()">Bug - Root Cause Analysis</div>
                 <div class="card" onclick="createNewFeatureFromTemplate()">Feature Specification</div>
                 <div class="card" onclick="createNewMeetingFromTemplate()">Minutes of Meeting</div>
+                <div class="card" onclick="createAI()">Code along with AI</div>
             </div>
             <a href="#" class="see-more">See more templates</a>
         </section>
