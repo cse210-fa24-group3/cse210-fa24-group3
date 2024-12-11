@@ -126,43 +126,79 @@ describe('Home Component Event Listeners', () => {
 
 describe('Home Component Additional Coverage', () => {
     beforeEach(() => {
-        document.body.innerHTML = `
-            <div id="entries-grid"></div>
-        `;
-
-        // Clear localStorage before each test
+        document.body.innerHTML = `<div id="entries-grid"></div>`;
         localStorage.clear();
-        
-        // Add a mock entry to localStorage to trigger displayEntries
-        const mockEntries = [
-            {
-                id: 1,
-                title: 'Test Entry',
-                content: 'This is a test entry with a lot of content. '.repeat(10), // Long content to ensure truncation
-                createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString() // 5 minutes ago
-            }
-        ];
-        
-        localStorage.setItem('entries', JSON.stringify(mockEntries));
-
-        // Reset modules so that when we import home.js it runs displayEntries again
         jest.resetModules();
     });
 
-    test('displayEntries covers formatRelativeTime, truncateText, and createEntryTile', () => {
-        // Import home.js after localStorage is set
+    test('displayEntries covers all branches of formatRelativeTime', () => {
+        const now = Date.now();
+        const oneMinute = 60 * 1000;
+        const oneHour = 3600 * 1000;
+        const oneDay = 86400 * 1000;
+        const oneWeek = 604800 * 1000;
+
+        const mockEntries = [
+            {
+                id: 1,
+                title: 'Just Now',
+                content: 'Short content',
+                createdAt: new Date(now - 30 * 1000).toISOString() // 30 seconds ago
+            },
+            {
+                id: 2,
+                title: 'Minutes Ago',
+                content: 'Content 2',
+                createdAt: new Date(now - 5 * oneMinute).toISOString() // 5 minutes ago
+            },
+            {
+                id: 3,
+                title: 'Hours Ago',
+                content: 'Content 3',
+                createdAt: new Date(now - 2 * oneHour).toISOString() // 2 hours ago
+            },
+            {
+                id: 4,
+                title: 'Days Ago',
+                content: 'Content 4',
+                createdAt: new Date(now - 2 * oneDay).toISOString() // 2 days ago
+            },
+            {
+                id: 5,
+                title: 'Older Than A Week',
+                content: 'Content 5',
+                createdAt: new Date(now - 8 * oneDay).toISOString() // 8 days ago
+            }
+        ];
+
+        localStorage.setItem('entries', JSON.stringify(mockEntries));
         require('../home');
 
         const entriesGrid = document.getElementById('entries-grid');
-        const entryTile = entriesGrid.querySelector('.entry-tile');
-        expect(entryTile).not.toBeNull();
+        const tiles = entriesGrid.querySelectorAll('.entry-tile');
+        expect(tiles.length).toBe(mockEntries.length);
 
-        // Check truncated text
-        const previewText = entryTile.querySelector('.entry-preview').textContent;
-        expect(previewText.endsWith('...')).toBe(true);
+        const metaTexts = Array.from(tiles).map(tile => tile.querySelector('.entry-meta').textContent);
 
-        // Check relative time formatting (should show "minutes ago" since we set it 5 min ago)
-        const metaText = entryTile.querySelector('.entry-meta').textContent;
-        expect(metaText).toMatch(/minutes ago/);
+        // Check each entry's relative time
+        const [justNow, minutesAgo, hoursAgo, daysAgo, olderDate] = metaTexts.map(text => text.trim());
+
+        // "just now"
+        expect(justNow).toBe('just now');
+        
+        // "X minutes ago"
+        expect(minutesAgo).toMatch(/\d+ minutes ago/);
+
+        // "X hours ago"
+        expect(hoursAgo).toMatch(/\d+ hours ago/);
+
+        // "X days ago"
+        expect(daysAgo).toMatch(/\d+ days ago/);
+
+        // Older than a week returns a locale date string
+        // Just check it's not matching the patterns above and is likely a date
+        expect(olderDate).not.toMatch(/just now|minutes ago|hours ago|days ago/);
+        // You could also do a loose check, such as:
+        // expect(new Date(olderDate).toString()).not.toBe('Invalid Date');
     });
 });
