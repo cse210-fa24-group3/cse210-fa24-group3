@@ -27,11 +27,13 @@ jobs:
           node-version: 18
 
       # Step 3: Install dependencies in `src`
+         # npm install
+          # npm install --save-dev jest jest-junit
       - name: Install dependencies
         working-directory: src
         run: |
-          npm install
-          npm install --save-dev jest jest-junit
+       
+          npm install --save-dev jest-environment-node
 
       # Step 4: Run Jest tests with coverage and JUnit report
       - name: Run Jest tests
