@@ -453,6 +453,17 @@ body.dark-mode .card-meta {
     color: inherit;
     text-decoration: none;
 }
+.entry-btn {
+    background: #1C7D41;
+    border: 1px solid #1C7D41;
+    color: white;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 16px;
+    transition: box-shadow 0.3s ease;
+    text-decoration: none;
+    font-size: 10px;
+}
 
 .entry-content {
     color: #666;
@@ -559,6 +570,7 @@ body.dark-mode .card-meta {
 .priority-tag {
     display: inline-block;
     padding: 5px 10px;
+    margin-left: 10px;
     border-radius: 5px;
     font-size: 14px;
     font-weight: bold;

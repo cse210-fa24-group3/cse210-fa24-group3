@@ -49,9 +49,9 @@ function createEntryCard(entry, isRecentlyEdited = false) {
         return `
             <div class="entry-card">
                 <h3>${entry.title || 'Untitled'}</h3>
-                <p class="template-type">${entry.template_type}</p>
+                <p>${contentPreview}</p>
                 <small>Last updated: ${formatRelativeTime(entry.updated_at)}</small>
-                <a href="${link}?id=${entry.id}" class="btn">Open</a>
+                <a href="${link}?id=${entry.id}" class="entry-btn">▶</a>
             </div>
         `;
     }
@@ -64,7 +64,7 @@ function createEntryCard(entry, isRecentlyEdited = false) {
             <h3>${entry.title || 'Untitled'}</h3>
             <p>${contentPreview}</p>
             <small>Last updated: ${formatRelativeTime(entry.updated_at)}</small>
-            <a href="${link}?id=${entry.id}" class="btn">Open</a>
+            // <a href="${link}?id=${entry.id}" class="entry-btn">▶</a>
         </div>
     `;
 }
