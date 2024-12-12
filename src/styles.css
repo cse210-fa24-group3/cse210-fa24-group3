@@ -25,7 +25,26 @@ body {
     padding: 1rem;
     border-bottom: 1px solid #e5e7eb;
 }
+.entry-card {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    color: inherit;
+    transition: all 0.3s ease;
+}
 
+body.dark-mode .entry-card.dark-mode {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e5e7eb;
+}
+
+.entry-card:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+body.dark-mode .entry-card.dark-mode:hover {
+    box-shadow: 0 2px 5px rgba(255,255,255,0.1);
+}
 /* If you're using a .dark-mode class */
 .dark-mode {
     --bg-primary: #242424;
@@ -43,7 +62,116 @@ body.dark-mode {
     background: #242424;  /* Lighter dark background */
     color: #ffffff;
 }
+.entry-card {
+    background-color: white;
+    color: black;
+    transition: background-color 0.3s, color 0.3s;
+}
 
+.entry-card.dark-mode {
+    background-color: #333;
+    color: white;
+}
+/* Light Mode Styles */
+body.light-mode .theme-responsive {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+body.light-mode .theme-text {
+    color: #333;
+}
+
+body.light-mode .theme-cards {
+    background-color: #ffffff;
+}
+
+body.light-mode .theme-card {
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+body.light-mode .theme-link {
+    color: #007bff;
+}
+
+/* Dark Mode Styles */
+body.dark-mode .theme-responsive {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .theme-text {
+    color: #f0f0f0;
+}
+
+body.dark-mode .theme-cards {
+    background-color: #2c2c2c;
+}
+
+body.dark-mode .theme-card {
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+body.dark-mode .theme-link {
+    color: #4da6ff;
+}
+.entry-card {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+/* Dark mode styles */
+body.dark-mode .entry-card.dark-mode {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e5e7eb;
+}
+
+body.dark-mode .entry-card.dark-mode h3 {
+    color: #ffffff;
+}
+
+body.dark-mode .entry-card.dark-mode p,
+body.dark-mode .entry-card.dark-mode small {
+    color: #b0b0b0;
+}
+
+body.dark-mode .entry-card.dark-mode .btn {
+    background-color: #4a9eff;
+    color: #ffffff;
+}
+
+body.dark-mode .entry-card.dark-mode .btn:hover {
+    background-color: #3b8be6;
+}
+
+/* Hover effects */
+.entry-card:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+body.dark-mode .entry-card.dark-mode:hover {
+    box-shadow: 0 2px 5px rgba(255,255,255,0.1);
+}
+
+/* Additional dark mode styles for the recently-edited section */
+body.dark-mode .recently-edited {
+    background-color: #1a1a1a;
+}
+
+body.dark-mode .section-title {
+    color: #ffffff;
+}
+
+body.dark-mode .see-more {
+    color: #4da6ff;
+}
 body.dark-mode .navbar,
 body.dark-mode .sidebar,
 body.dark-mode .user-menu {

@@ -25,6 +25,7 @@ darkModeToggle.addEventListener('click', () => {
     localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
 });
 
+
 // User menu toggle
 userBtn.addEventListener('click', (e) => {
     e.stopPropagation();
