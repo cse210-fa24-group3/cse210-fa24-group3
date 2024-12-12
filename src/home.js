@@ -197,6 +197,7 @@ async function fetchAndDisplayRecentlyEdited() {
             }
         }
 
+
         // Dispatch event after recently edited documents are loaded
         const event = new Event('recently-edited-loaded');
         window.dispatchEvent(event);
@@ -230,6 +231,30 @@ async function fetchAndDisplayRecentlyEdited() {
     const isDarkMode = document.body.classList.contains('dark-mode');
     localStorage.setItem('theme-preference', isDarkMode ? 'dark' : 'light');
 }
+function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    
+    // Explicitly update recently edited section
+    const recentlyEditedContainer = document.getElementById('recently-edited-container');
+    const cards = recentlyEditedContainer.querySelectorAll('.entry-card');
+    
+    cards.forEach(card => {
+        if (document.body.classList.contains('dark-mode')) {
+            card.classList.add('dark-mode');
+        } else {
+            card.classList.remove('dark-mode');
+        }
+    });
+    
+    // Dispatch custom event for theme toggling
+    const event = new Event('theme-toggled');
+    window.dispatchEvent(event);
+
+    // Optional: Save theme preference to localStorage
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    localStorage.setItem('theme-preference', isDarkMode ? 'dark' : 'light');
+}
+
 
 
 /**
