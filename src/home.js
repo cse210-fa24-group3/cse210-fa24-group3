@@ -155,6 +155,20 @@ window.addEventListener('document-deleted', (event) => {
 });
 
 // Enhance the existing fetchAndDisplayRecentlyEdited function to handle empty states
+// Fetch and display recently edited documents on page load
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing recently edited documents...');
+    fetchAndDisplayRecentlyEdited();
+});
+
+/**
+ * Fetches and displays the recently edited documents.
+ * @ignore
+ * Logs a message to the console while fetching, handles HTTP errors,
+ * sorts the documents by updated_at in descending order, and displays them.
+ *@ignore
+ * @throws {Error} If an HTTP error occurs.
+ */
 async function fetchAndDisplayRecentlyEdited() {
     try {
         console.log('Fetching recently edited documents...');
@@ -172,6 +186,16 @@ async function fetchAndDisplayRecentlyEdited() {
             new Date(b.updated_at) - new Date(a.updated_at)
         );
 
+        const container = document.getElementById('recently-edited-container');
+        if (container) {
+            // If no documents, show a message
+            if (allRecentDocuments.length === 0) {
+                container.innerHTML = '<p>No recent entries found.</p>';
+            } else {
+                // Display the initial set of documents
+                displayRecentlyEdited();
+            }
+        }
 
         // Dispatch event after recently edited documents are loaded
         const event = new Event('recently-edited-loaded');
@@ -180,11 +204,10 @@ async function fetchAndDisplayRecentlyEdited() {
         console.error('Error fetching recently edited documents:', error);
         const container = document.getElementById('recently-edited-container');
         if (container) {
-            container.innerHTML = `Error loading recent entries: ${error.message}`;
+            container.innerHTML = `<p>Error loading recent entries: ${error.message}</p>`;
         }
     }
-}
-function toggleTheme() {
+}function toggleTheme() {
     document.body.classList.toggle('dark-mode');
     
     // Explicitly update recently edited section
@@ -243,13 +266,31 @@ function displayDocuments(showAll = false) {
 
 /**
  * Displays a list of recently edited documents.
+// Global variables to manage document display
+let allDocuments = [];
+let allRecentDocuments = [];
+const INITIAL_DISPLAY_COUNT = 8;
+
+/**
+ * Displays a list of recently edited documents.
  *
  * @param {boolean} showAll - whether to display all documents or only a subset
  */
 function displayRecentlyEdited(showAll = false) {
     const container = document.getElementById('recently-edited-container');
-    const seeMoreButton = document.getElementById('see-more-button');
+    const seeMoreContainer = document.getElementById('see-more-container');
+    
+    // Clear previous content
     container.innerHTML = '';
+
+    // If there are no recent documents, show a message
+    if (allRecentDocuments.length === 0) {
+        container.innerHTML = '<p>No recent entries found.</p>';
+        if (seeMoreContainer) {
+            seeMoreContainer.style.display = 'none';
+        }
+        return;
+    }
 
     const documentsToShow = showAll ? allRecentDocuments : allRecentDocuments.slice(0, INITIAL_DISPLAY_COUNT);
 
@@ -257,22 +298,32 @@ function displayRecentlyEdited(showAll = false) {
         container.innerHTML += createEntryCard(doc, true);
     });
 
-    // Manage "See More" button visibility
-    if (allRecentDocuments.length > INITIAL_DISPLAY_COUNT) {
-        seeMoreButton.style.display = showAll ? 'none' : 'block';
-        
-        if (!showAll) {
-            seeMoreButton.textContent = `See More (${allRecentDocuments.length - INITIAL_DISPLAY_COUNT} more)`;
+    // Manage "See More" link visibility
+    if (seeMoreContainer) {
+        if (allRecentDocuments.length > INITIAL_DISPLAY_COUNT) {
+            if (!showAll) {
+                const remainingCount = allRecentDocuments.length - INITIAL_DISPLAY_COUNT;
+                seeMoreContainer.innerHTML = `<a href="#" class="see-more">See More (${remainingCount} more)</a>`;
+                seeMoreContainer.style.display = 'block';
+                
+                // Add click event to see more link
+                seeMoreContainer.querySelector('.see-more').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    displayRecentlyEdited(true);
+                });
+            } else {
+                // Hide see more container when all items are shown
+                seeMoreContainer.style.display = 'none';
+            }
+        } else {
+            // Hide see more container if no more items to show
+            seeMoreContainer.style.display = 'none';
         }
-    } else {
-        seeMoreButton.style.display = 'none';
     }
 }
-
-
 /**
  * Sends a custom event to the window after refreshRecentlyEdited() operations have been completed.
- * Firstly, it calls fetchAndDisplayRecentlyEdited() to handle the recent edits, and then fires a 'document-saved'
+ * Firstly, it calls AndDisplayRecentlyEdited() to handle the recent edits, and then fires a 'document-saved'
  * event to notify any event listeners.
  */
 function refreshRecentlyEdited() {
@@ -415,7 +466,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing recently edited documents...');
     fetchAndDisplayRecentlyEdited();
 });
-
 /**
  * Navigates to a new page based on the provided template.
  *

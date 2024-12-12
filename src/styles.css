@@ -162,7 +162,7 @@ body.dark-mode .entry-card.dark-mode:hover {
 
 /* Additional dark mode styles for the recently-edited section */
 body.dark-mode .recently-edited {
-    background-color: #1a1a1a;
+    background-color: #2d2d2d;
 }
 
 body.dark-mode .section-title {
@@ -537,8 +537,8 @@ body.dark-mode .recently-edited .section-title {
 }
 
 body.dark-mode .recently-edited .card {
-    background: #2d2d2d;
-    border-color: #404040;
+    background: #242424;
+    border-color: #242424;
     color: #e5e7eb;
 }
 
