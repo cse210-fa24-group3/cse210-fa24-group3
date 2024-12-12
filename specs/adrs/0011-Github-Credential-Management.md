@@ -24,7 +24,7 @@ We implement a GitHub integration using SSH key with enhanced security measures.
 * ADR 0005: Git Commit Button For Export
 
 ## Date
-2024-11-28
+2024-11-21
 
 ## Authors
 - Sneha Pujari
