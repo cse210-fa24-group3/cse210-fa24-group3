@@ -18,42 +18,22 @@
         gap: 20px;
         height: 90vh; /* Adjust height to fit the viewport */
         padding: 10px;
-    }
+        }
         .editor {
             flex: 1;
             display: flex;
             flex-direction: column;
         }
-        #go-home {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background-color: #4CAF50; /* Green background */
-    color: white; /* White text */
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-#go-home:hover {
-    background-color: #45a049; /* Darker green on hover */
-}
-
-.home-icon {
-    font-size: 16px; /* Adjust the icon size */
-}
         .preview {
-        flex: 1;
-        display: flex;
-        flex-direction: column; /* Ensures children stack vertically */
-        justify-content: flex-start; /* Align content at the top */
-        padding: 15px;
-        border: 1px solid #ddd;
-        background-color: #f9f9f9;
-        overflow-y: auto; /* Enable scrolling for long content */
-    }
-
+            flex: 1;
+            display: flex;
+            flex-direction: column; /* Ensures children stack vertically */
+            justify-content: flex-start; /* Align content at the top */
+            padding: 15px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            overflow-y: auto; /* Enable scrolling for long content */
+        }
         textarea {
             flex: 1;
             width: 100%;
@@ -74,32 +54,13 @@
             display: flex;
             gap: 10px;
         }
-
-        .save-button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .save-button:hover {
-            background-color: #0056b3;
-        }
-
-        .save-status {
-            margin-left: 10px;
-            font-size: 14px;
-            color: #666;
-        }
          /* Preview Content */
-    #preview-content {
-        width: 100%;
-        height: auto;
-        font-family: sans-serif;
-        line-height: 1.5;
-    }
+        #preview-content {
+            width: 100%;
+            height: auto;
+            font-family: sans-serif;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -151,7 +112,7 @@
                 <button class="save-button" id="commitid" onclick="commitDocument()">
                     Commit
                 </button>
-                <button id="download-pdf" onclick="downloadPDF()">Download PDF</button>
+                <button class="download-button" id="download-pdf" onclick="downloadPDF()">Download PDF</button>
                 <button id="go-home" class="save-button" onclick="goToHome()">
                     <span class="home-icon">🏠</span> Home
                 </button>
