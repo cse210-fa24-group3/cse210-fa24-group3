@@ -80,8 +80,8 @@ async function saveFeatureDocument() {
         console.log('Preparing to save document:', featureData);
 
         const method = documentId ? 'PUT' : 'POST';
-        const url = method === 'PUT'
-            ? `/api/documents/${finalDocumentId}`
+        const url = method === 'PUT' 
+            ? `/api/documents/${finalDocumentId}` 
             : '/api/documents';
 
         console.log('Save request details:', {
@@ -158,7 +158,7 @@ async function deleteDocument() {
 
         // Get current document ID from URL
         const pathParts = window.location.pathname.split('/');
-        const documentId = localStorage.getItem('featureDocumentId');
+        const documentId = pathParts[pathParts.length - 1];
 
         if (!documentId || documentId === 'feature') {
             throw new Error('Invalid document ID');
