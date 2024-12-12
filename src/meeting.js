@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 // Populate the fields with the existing data
                 document.getElementById('meetingName').value = loadDocument.title;
                 document.getElementById('markdown-editor').value = loadDocument.content;
+                // eslint-disable-next-line no-undef
                 updatePreview()
             } else if (response.status === 404) {
                 // Meeting does not exist, create a new document
@@ -357,8 +358,11 @@ function updateDate() {
  * Schedules the auto-save timer to save the document after a specified delay.
  * Clears any existing timer before setting a new one.
  */
+ 
 function scheduleAutoSave() {
+    // eslint-disable-next-line no-undef
 clearTimeout(autoSaveTimeout);
+// eslint-disable-next-line no-undef
 autoSaveTimeout = setTimeout(saveDocument, 30000);
 
 }

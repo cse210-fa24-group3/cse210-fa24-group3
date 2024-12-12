@@ -319,6 +319,7 @@ const deleteDocument = async (id) => {
 
     // Check if these elements exist before calling their respective functions
     if (document.getElementById('entries')) {
+        // eslint-disable-next-line no-undef
         fetchAndDisplayDocuments();
     }
     if (document.getElementById('recently-edited-container')) {

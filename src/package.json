@@ -13,5 +13,10 @@
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0"
   }
 }
