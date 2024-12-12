@@ -747,6 +747,7 @@ body.dark-mode .card-meta {
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 14px;
+    margin-left: 10px;
     font-weight: bold;
     text-transform: uppercase;
     color: white;
