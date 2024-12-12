@@ -1,8 +1,9 @@
 /**
  * Returns a human-friendly format of a relative time string.
- *
+ * @ignore
  * @param {string} dateString - A date string in a format that can be parsed by the JavaScript Date constructor.
  * @return {string} A relative time string in the format "just now", "Xm ago", "Xh ago", or "Xday ago", or a full date string with month, day, and year if the time difference is larger than one week.
+
  */
 
 
@@ -83,6 +84,15 @@ const TEMPLATE_LINKS = {
     'Minutes of Meeting': 'meeting.html'
 };
 
+
+// Create HTML for a single entry card
+/** 
+ * Create an entry card for an entry.
+ *@ignore
+ * @param {Object} entry - The entry to create a card for.
+ * @param {boolean} [isRecentlyEdited=false] - Whether the card should display the recently edited version.
+ * @returns {string} The HTML for the entry card.
+ */
 function createEntryCard(entry, isRecentlyEdited = false) {
     const link = TEMPLATE_LINKS[entry.template_type] || 'new-page/editor.html';
     const isDarkMode = document.body.classList.contains('dark-mode');
@@ -117,10 +127,10 @@ const INITIAL_DISPLAY_COUNT = 8;
 // Fetch and display recently edited documents
 /**
  * Fetches and displays the recently edited documents.
- *
+ * @ignore
  * Logs a message to the console while fetching, handles HTTP errors,
  * sorts the documents by updated_at in descending order, and displays them.
- *
+ *@ignore
  * @throws {Error} If an HTTP error occurs.
  */
 async function fetchAndDisplayRecentlyEdited() {
