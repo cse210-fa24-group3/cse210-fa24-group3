@@ -21,7 +21,7 @@ jobs:
         working-directory: src
         id: eslint
         run: |
-          files=("home.js" "./new-page/editor.js")  
+          files=("home.js" "meeting.js")  
           for file in "${files[@]}"; do
             echo "Running ESLint on $file"
             if npx eslint "$file"; then
