@@ -1,7 +1,5 @@
 # DevLog
 
-[![Code Coverage](https://codecov.io/gh/cse210-fa24-group3/cse210-fa24-group3/branch/main/graph/badge.svg?token=M2UL3ELWEF)](https://codecov.io/gh/cse210-fa24-group3/cse210-fa24-group3)
-
 ## Project Overview
 
 DevLog is a developer documentation tool designed to ease documentation tasks for developers, providing a comprehensive platform for document management and collaboration.
