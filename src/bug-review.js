@@ -295,45 +295,45 @@ function downloadPDF() {
     // Use html2pdf to generate and download the PDF
     html2pdf().from(previewContent).set(options).save();
 }
-async function commitDocument() {
-    const saveButton = document.getElementById('commitid');
-    const saveStatus = document.getElementById('saveStatus');
+// async function commitDocument() {
+//     const saveButton = document.getElementById('commitid');
+//     const saveStatus = document.getElementById('saveStatus');
 
-    const documentId = localStorage.getItem('meetingDocumentId') || Date.now().toString(); // Use timestamp if not available
+//     const documentId = localStorage.getItem('meetingDocumentId') || Date.now().toString(); // Use timestamp if not available
 
-    const meetingData = {
-        documentId, // Include document ID
-        title: document.getElementById('meetingName').value || 'Untitled Meeting',
-        content: document.getElementById('markdown-editor').value || '', // Fetch Markdown content directly
-        template_type: 'Minutes of Meeting'
-    };
+//     const meetingData = {
+//         documentId, // Include document ID
+//         title: document.getElementById('meetingName').value || 'Untitled Meeting',
+//         content: document.getElementById('markdown-editor').value || '', // Fetch Markdown content directly
+//         template_type: 'Minutes of Meeting'
+//     };
 
-    saveButton.disabled = true;
-    saveStatus.textContent = 'Running CLI command...';
+//     saveButton.disabled = true;
+//     saveStatus.textContent = 'Running CLI command...';
 
-    try {
-        // Send data to the backend to save and commit the file
-        const response = await fetch('/run-command', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(meetingData), // Send the document ID, title, and content
-        });
+//     try {
+//         // Send data to the backend to save and commit the file
+//         const response = await fetch('/run-command', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify(meetingData), // Send the document ID, title, and content
+//         });
 
-        if (response.ok) {
-            const result = await response.text();
-            saveStatus.textContent = `Pushed to GitHub`;
-        } else {
-            const error = await response.text();
-            saveStatus.textContent = `Error: ${error}`;
-        }
-    } catch (error) {
-        saveStatus.textContent = `Error: ${error.message}`;
-    } finally {
-        saveButton.disabled = false;
-    }
-}
+//         if (response.ok) {
+//             const result = await response.text();
+//             saveStatus.textContent = `Pushed to GitHub`;
+//         } else {
+//             const error = await response.text();
+//             saveStatus.textContent = `Error: ${error}`;
+//         }
+//     } catch (error) {
+//         saveStatus.textContent = `Error: ${error.message}`;
+//     } finally {
+//         saveButton.disabled = false;
+//     }
+// }
 
 async function saveDocument() {
     console.log('Save document called');
