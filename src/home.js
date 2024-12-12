@@ -28,7 +28,7 @@ function formatRelativeTime(dateString) {
  */
 const TEMPLATE_LINKS = {
     'Todo': 'todo_template/todo.html',
-    'Bug Report': 'bug-review.html',
+    'Bug Report': 'bug-review/bug-review.html',
     'Feature Specification': 'feature.html',
     'Minutes of Meeting': 'meeting.html'
 };
@@ -82,28 +82,60 @@ const INITIAL_DISPLAY_COUNT = 8;
  *@ignore
  * @throws {Error} If an HTTP error occurs.
  */
+// Listen for document deletion events
+window.addEventListener('message', (event) => {
+    if (event.data.type === 'document-deleted') {
+        console.log('Document deleted, refreshing lists...');
+        // Refresh the recently edited documents
+        fetchAndDisplayRecentlyEdited();
+        // Refresh the main document list if it exists
+        if (typeof fetchDocuments === 'function') {
+            fetchDocuments();
+        }
+    }
+});
+
+// Also listen for the custom event
+window.addEventListener('document-deleted', (event) => {
+    console.log('Document deleted event received, refreshing lists...');
+    fetchAndDisplayRecentlyEdited();
+    if (typeof fetchDocuments === 'function') {
+        fetchDocuments();
+    }
+});
+
+// Enhance the existing fetchAndDisplayRecentlyEdited function to handle empty states
 async function fetchAndDisplayRecentlyEdited() {
     try {
         console.log('Fetching recently edited documents...');
         const response = await fetch('/api/documents');
         
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error response:', errorText);
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const documents = await response.json();
         console.log('Fetched recently edited documents:', documents);
 
         // Sort documents by updated_at in descending order
-        allRecentDocuments = documents.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+        allRecentDocuments = documents.sort((a, b) => 
+            new Date(b.updated_at) - new Date(a.updated_at)
+        );
 
-        displayRecentlyEdited();
-    } catch (error) {
-        console.error('Detailed error fetching recently edited documents:', error);
         const container = document.getElementById('recently-edited-container');
-        container.innerHTML = `Error loading recent entries: ${error.message}`;
+        if (container) {
+            if (allRecentDocuments.length === 0) {
+                container.innerHTML = '<p>No recent documents</p>';
+            } else {
+                displayRecentlyEdited();
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching recently edited documents:', error);
+        const container = document.getElementById('recently-edited-container');
+        if (container) {
+            container.innerHTML = `Error loading recent entries: ${error.message}`;
+        }
     }
 }
 
@@ -320,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
  * @memberof module:Templates
  */
 function createNewBugReviewFromTemplate() {
-    window.location.href = 'bug-review.html';
+    window.location.href = '/bug-review/bug-review.html';
 }
 
 function createNewFeatureFromTemplate() {

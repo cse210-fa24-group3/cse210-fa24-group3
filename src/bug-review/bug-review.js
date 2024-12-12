@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (response.ok) {
                 const result = await response.json();
                 localStorage.setItem('currentDocumentId', result.documentId);
-                history.replaceState(null, '', `bug-review.html?id=${result.documentId}`);
+                history.replaceState(null, '', `/bug-review/bug-review.html?id=${result.documentId}`);
             }
         } catch (error) {
             console.error('Error creating new document:', error);
@@ -98,7 +98,179 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (saveButton) {
         saveButton.addEventListener('click', saveDocument);
     }
+
+    const deleteButton = document.getElementById('deleteButton');
+    if (deleteButton) {
+        deleteButton.addEventListener('click', handleDelete);
+    }
 });
+
+async function handleDelete() {
+    const documentId = localStorage.getItem('currentDocumentId');
+    
+    if (!documentId) {
+        console.error('No document ID found for deletion');
+        alert('Error: Unable to delete document - No document ID found');
+        return;
+    }
+
+    // Ask for confirmation before deleting
+    const confirmDelete = confirm('Are you sure you want to delete this bug review? This action cannot be undone.');
+    
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/documents/${documentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to delete document: ${errorText}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.success) {
+            // Clear local storage
+            localStorage.removeItem('currentDocumentId');
+            
+            // Trigger custom event for document deletion
+            const event = new CustomEvent('document-deleted', {
+                detail: { documentId }
+            });
+            window.dispatchEvent(event);
+
+            // Notify the parent window (home page) about the deletion
+            if (window.opener) {
+                window.opener.postMessage({
+                    type: 'document-deleted',
+                    documentId: documentId
+                }, '*');
+            }
+
+            // Redirect to home page
+            window.location.href = '/';
+        } else {
+            throw new Error(result.message || 'Failed to delete document');
+        }
+    } catch (error) {
+        console.error('Error deleting document:', error);
+        alert(`Error deleting document: ${error.message}`);
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.querySelector('.theme-toggle');
+    const lightModeIcon = document.querySelector('.light-mode');
+    const darkModeIcon = document.querySelector('.dark-mode');
+    
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcons(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcons(newTheme);
+
+        // Update Quill editor if it exists
+        updateQuillTheme(newTheme);
+    });
+
+    function updateThemeIcons(theme) {
+        if (theme === 'dark') {
+            lightModeIcon.style.display = 'none';
+            darkModeIcon.style.display = 'inline';
+        } else {
+            lightModeIcon.style.display = 'inline';
+            darkModeIcon.style.display = 'none';
+        }
+    }
+
+    function updateQuillTheme(theme) {
+        const toolbar = document.querySelector('.ql-toolbar');
+        const container = document.querySelector('.ql-container');
+        if (toolbar && container) {
+            if (theme === 'dark') {
+                toolbar.style.backgroundColor = 'var(--nav-bg)';
+                container.style.backgroundColor = 'var(--input-bg)';
+            } else {
+                toolbar.style.backgroundColor = '';
+                container.style.backgroundColor = '';
+            }
+        }
+    }
+});
+
+// Add message listener for parent window communication
+window.addEventListener('message', (event) => {
+    if (event.data.type === 'document-deleted') {
+        // Refresh document lists if they exist
+        if (typeof fetchAndDisplayRecentlyEdited === 'function') {
+            fetchAndDisplayRecentlyEdited();
+        }
+        if (typeof fetchDocuments === 'function') {
+            fetchDocuments();
+        }
+    }
+});
+
+// Add GitHub Issues Loading Logic
+function loadGitHubIssues() {
+    const issuesContainer = document.getElementById('github-issues');
+    
+    // Example function to create an issue item
+    function createIssueItem(issue) {
+        return `
+            <div class="issue-item">
+                <div class="issue-header">
+                    <a href="${issue.url}" class="issue-title">${issue.title}</a>
+                    <span class="issue-number">#${issue.number}</span>
+                </div>
+                <div class="issue-meta">
+                    <span>Opened by: ${issue.author}</span>
+                    <span>Created: ${issue.created}</span>
+                </div>
+                <div class="issue-tags">
+                    ${issue.labels.map(label => `
+                        <span class="issue-tag">${label}</span>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // Example error handling
+    function showError(message) {
+        issuesContainer.innerHTML = `
+            <div class="issues-error">
+                <p>Error loading issues: ${message}</p>
+            </div>
+        `;
+    }
+
+    // Here you would typically fetch your GitHub issues
+    // For now, we'll just show a loading state
+    issuesContainer.innerHTML = `
+        <div class="loading-issues">
+            <p>Loading GitHub issues...</p>
+        </div>
+    `;
+}
+
+// Call the function when the page loads
+document.addEventListener('DOMContentLoaded', loadGitHubIssues);
 
 function updatePriorityTag() {
     const prioritySelect = document.getElementById('priority-select');
