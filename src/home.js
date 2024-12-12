@@ -92,17 +92,26 @@ const TEMPLATE_LINKS = {
  * @param {boolean} [isRecentlyEdited=false] - Whether the card should display the recently edited version.
  * @returns {string} The HTML for the entry card.
  */
-function createEntryCard(entry, isRecentlyEdited = false) {
+ function createEntryCard(entry, isRecentlyEdited = false) {
     const link = TEMPLATE_LINKS[entry.template_type] || 'new-page/editor.html';
     const isDarkMode = document.body.classList.contains('dark-mode');
 
     if (isRecentlyEdited) {
         return `
             <div class="entry-card ${isDarkMode ? 'dark-mode' : ''}">
-                <h3>${entry.title || 'Untitled'}</h3>
-                <p class="template-type">${entry.template_type}</p>
-                <small>Last updated: ${formatRelativeTime(entry.updated_at)}</small>
-                <a href="${link}?id=${entry.id}" class="btn">Open</a>
+                <div class="entry-content">
+                    <div>
+                        <h3>${entry.title || 'Untitled'}</h3>
+                        <p class="template-type">${entry.template_type}</p>
+                        <small>Last updated: ${formatRelativeTime(entry.updated_at)}</small>
+                    </div>
+                    <a href="${link}?id=${entry.id}" class="entry-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
             </div>
         `;
     }
