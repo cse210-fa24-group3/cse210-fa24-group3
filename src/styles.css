@@ -1018,3 +1018,24 @@ body.dark-mode form button:hover {
 body.dark-mode h2 {
     color: #e5e7eb;
 }
+
+.entry-card {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .entry-card.dark-mode {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e5e7eb;
+}
+
+.entry-card:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+body.dark-mode .entry-card.dark-mode:hover {
+    box-shadow: 0 2px 5px rgba(255,255,255,0.1);
+}
