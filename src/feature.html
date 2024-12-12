@@ -6,10 +6,28 @@
     <title>Feature Specification</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/template.css">
-    <!-- For HTML Only styles -->
-    <link rel="stylesheet" href="./styles.css">
-    <link rel="stylesheet" href="./template.css">
     
+    <style>
+        #go-home {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #go-home:hover {
+            background-color: #45a049;
+        }
+
+        .home-icon {
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -19,8 +37,7 @@
         </div>
         <div class="navbar-right">
             <div class="search-container">
-                <!-- <input type="text" class="search-input" placeholder="Search entries"> -->
-                <!-- <span class="search-icon">🔍</span> -->
+                <!-- Search functionality can be added later -->
             </div>
             <div class="theme-toggle">
                 <span class="light-mode">🌙</span>
@@ -50,15 +67,21 @@
     <main class="main-content">
         <div class="container">
             <div class="header">
-                <div id="currentDate"></div>
-                <input type="text" class="title-input" placeholder="Untitled Feature Specifications ###" id="featureName">
+                <input type="text" class="title-input" placeholder="Untitled Feature Specifications" id="featureName">
                 <div class="header-right">
                     <div class="save-status" id="saveStatus"></div>
-                    <button class="save-button" id="saveButton" onclick="saveFeatureDocument()">
+                    <button class="save-button" id="saveButton">
                         <span>Save</span>
                     </button>
+                    <button class="save-button" id="commitButton">
+                        Commit
+                    </button>
+                    <button id="download-pdf">Download PDF</button>
+                    <button id="go-home" class="save-button">
+                        <span class="home-icon">🏠</span> Home
+                    </button>
                     <div class="delete-status" id="deleteStatus"></div>                    
-                    <button class="delete-button" id="deleteButton" aria-label="Delete Feature">
+                    <button class="delete-button" id="deleteButton">
                         <span>Delete</span>
                     </button>
                 </div>
@@ -97,42 +120,4 @@ Data Model:
 • New Tables/Fields:
 • User transaction logs
 • Performance benchmarks
-• Data Migration: Scripts to migrate legacy data to the updated schema.
-    
-API Design:
-• Endpoints: New endpoints to handle advanced requests.
-• Request/Response Format: Updated API contracts with clear error messages.
-• Error Handling: Graceful recovery mechanisms for invalid requests.
-
-3. Implementation Details
-Technical Requirements:
-• Dependencies: Node.js, PostgreSQL, and Express.js framework.
-• Infrastructure Changes: New AWS S3 storage buckets for logs.
-• Security Considerations: Implementation of JWT-based authentication.
-• Performance Requirements: Ensure requests are processed in under 200ms.
-    
-Algorithm/Logic:
-• Business Logic: Advanced validation of user inputs and dynamic response generation.
-• Edge Cases: Handling of malformed data and network timeouts.
-• State Management: User session data stored securely in Redis.
-    
-User Interface:
-• UI Components: Minimal changes to reflect API updates.
-• User Flows: Seamless user interaction with APIs via the developer portal.
-• Mockups: Link to design prototypes.
-
-4. Testing Strategy
-Test Plan:
-• Unit Tests: Validate individual API endpoints and data validation logic.
-• Integration Tests: End-to-end testing of API interactions with the database.
-• Performance Tests: Benchmark the response time and system load capacity.
-• User Acceptance: Feedback from a pilot group of users to ensure feature readiness.
-            </textarea>
-            </div>
-        </div>
-    </main>
-
-    <script src="/feature.js"></script>
-    <script src="/script.js"></script>
-</body>
-</html>
+• Data Migration: Scripts to

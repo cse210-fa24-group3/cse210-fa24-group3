@@ -511,8 +511,12 @@ app.put('/api/documents/:id', (req, res) => {
     const { title, content, template_type } = req.body;
     const now = new Date().toISOString();
 
-    console.log('Received update request:', { id, title, content, template_type });
-
+    console.log('Received update request:', { 
+        id, 
+        title, 
+        content: content ? `${content.substring(0, 100)}...` : 'No content', 
+        template_type 
+    });
     // Begin transaction explicitly
     db.serialize(() => {
         db.run('BEGIN TRANSACTION', (beginErr) => {
