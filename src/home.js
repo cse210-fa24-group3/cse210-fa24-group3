@@ -3,62 +3,7 @@
  * @ignore
  * @param {string} dateString - A date string in a format that can be parsed by the JavaScript Date constructor.
  * @return {string} A relative time string in the format "just now", "Xm ago", "Xh ago", or "Xday ago", or a full date string with month, day, and year if the time difference is larger than one week.
-
- */
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Function to update theme for recently edited cards
-    function updateRecentlyEditedTheme() {
-        const recentlyEditedContainer = document.getElementById('recently-edited-container');
-        if (!recentlyEditedContainer) return;
-    
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        const cards = recentlyEditedContainer.querySelectorAll('.entry-card');
-    
-        cards.forEach(card => {
-            if (isDarkMode) {
-                card.classList.add('dark-mode');
-            } else {
-                card.classList.remove('dark-mode');
-            }
-        });
-    }
-    window.addEventListener('theme-toggled', updateRecentlyEditedTheme);
-
-// Initial theme sync after documents are loaded
-document.addEventListener('recently-edited-loaded', updateRecentlyEditedTheme);
-
-// Modify the existing theme toggle functionality in script.js
-darkModeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    darkModeToggle.querySelector('.light-mode').style.display = document.body.classList.contains('dark-mode') ? 'none' : 'block';
-    darkModeToggle.querySelector('.dark-mode').style.display = document.body.classList.contains('dark-mode') ? 'block' : 'none';
-    
-    // Save preference
-    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-
-    // Dispatch custom event for theme toggling
-    const event = new Event('theme-toggled');
-    window.dispatchEvent(event);
-});
-    // Theme toggle functionality
-    const themeToggle = document.querySelector('.theme-toggle');
-    const lightModeIcon = document.querySelector('.light-mode');
-    const darkModeIcon = document.querySelector('.dark-mode');
-
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        lightModeIcon.style.display = document.body.classList.contains('dark-mode') ? 'none' : 'inline';
-        darkModeIcon.style.display = document.body.classList.contains('dark-mode') ? 'inline' : 'none';
-        
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        localStorage.setItem('theme-preference', isDarkMode ? 'dark' : 'light');
-        
-        updateRecentlyEditedTheme();
-    });
-});
-
+ */  
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -76,13 +21,17 @@ function formatRelativeTime(dateString) {
     });
 }
 
+
+/**
+ * @ignore
+ * A object containing various template links. Each key is a label, and each value is the corresponding template URL.
+ */
 const TEMPLATE_LINKS = {
     'Todo': 'todo_template/todo.html',
     'Bug Report': 'bug-review/bug-review.html',
-    'Feature Specification': 'feature.html',
+    'Feature Specification': 'feature-specs/feature.html',
     'Minutes of Meeting': 'meeting.html'
 };
-
 
 // Create HTML for a single entry card
 /** 
@@ -94,9 +43,9 @@ const TEMPLATE_LINKS = {
  */
 function createEntryCard(entry, isRecentlyEdited = false) {
     const link = TEMPLATE_LINKS[entry.template_type] || 'new-page/editor.html';
-    const isDarkMode = document.body.classList.contains('dark-mode');
 
     if (isRecentlyEdited) {
+        // For recently edited, only show title, template type, and last updated time
         return `
             <div class="entry-card ${isDarkMode ? 'dark-mode' : ''}">
                 <h3>${entry.title || 'Untitled'}</h3>
@@ -107,10 +56,11 @@ function createEntryCard(entry, isRecentlyEdited = false) {
         `;
     }
 
+    // Original full entry card for other views
     const contentPreview = entry.content.length > 100 ? `${entry.content.substring(0, 100)}...` : entry.content;
 
     return `
-        <div class="entry-card ${isDarkMode ? 'dark-mode' : ''}">
+        <div class="entry-card">
             <h3>${entry.title || 'Untitled'}</h3>
             <p>${contentPreview}</p>
             <small>Last updated: ${formatRelativeTime(entry.updated_at)}</small>
@@ -155,20 +105,6 @@ window.addEventListener('document-deleted', (event) => {
 });
 
 // Enhance the existing fetchAndDisplayRecentlyEdited function to handle empty states
-// Fetch and display recently edited documents on page load
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing recently edited documents...');
-    fetchAndDisplayRecentlyEdited();
-});
-
-/**
- * Fetches and displays the recently edited documents.
- * @ignore
- * Logs a message to the console while fetching, handles HTTP errors,
- * sorts the documents by updated_at in descending order, and displays them.
- *@ignore
- * @throws {Error} If an HTTP error occurs.
- */
 async function fetchAndDisplayRecentlyEdited() {
     try {
         console.log('Fetching recently edited documents...');
@@ -188,11 +124,9 @@ async function fetchAndDisplayRecentlyEdited() {
 
         const container = document.getElementById('recently-edited-container');
         if (container) {
-            // If no documents, show a message
             if (allRecentDocuments.length === 0) {
-                container.innerHTML = '<p>No recent entries found.</p>';
+                container.innerHTML = '<p>No recent documents</p>';
             } else {
-                // Display the initial set of documents
                 displayRecentlyEdited();
             }
         }
@@ -205,7 +139,7 @@ async function fetchAndDisplayRecentlyEdited() {
         console.error('Error fetching recently edited documents:', error);
         const container = document.getElementById('recently-edited-container');
         if (container) {
-            container.innerHTML = `<p>Error loading recent entries: ${error.message}</p>`;
+            container.innerHTML = `Error loading recent entries: ${error.message}`;
         }
     }
 }function toggleTheme() {
@@ -291,31 +225,13 @@ function displayDocuments(showAll = false) {
 
 /**
  * Displays a list of recently edited documents.
-// Global variables to manage document display
-let allDocuments = [];
-let allRecentDocuments = [];
-const INITIAL_DISPLAY_COUNT = 8;
-
-/**
- * Displays a list of recently edited documents.
  *
  * @param {boolean} showAll - whether to display all documents or only a subset
  */
 function displayRecentlyEdited(showAll = false) {
     const container = document.getElementById('recently-edited-container');
-    const seeMoreContainer = document.getElementById('see-more-container');
-    
-    // Clear previous content
+    const seeMoreButton = document.getElementById('see-more-button');
     container.innerHTML = '';
-
-    // If there are no recent documents, show a message
-    if (allRecentDocuments.length === 0) {
-        container.innerHTML = '<p>No recent entries found.</p>';
-        if (seeMoreContainer) {
-            seeMoreContainer.style.display = 'none';
-        }
-        return;
-    }
 
     const documentsToShow = showAll ? allRecentDocuments : allRecentDocuments.slice(0, INITIAL_DISPLAY_COUNT);
 
@@ -323,32 +239,22 @@ function displayRecentlyEdited(showAll = false) {
         container.innerHTML += createEntryCard(doc, true);
     });
 
-    // Manage "See More" link visibility
-    if (seeMoreContainer) {
-        if (allRecentDocuments.length > INITIAL_DISPLAY_COUNT) {
-            if (!showAll) {
-                const remainingCount = allRecentDocuments.length - INITIAL_DISPLAY_COUNT;
-                seeMoreContainer.innerHTML = `<a href="#" class="see-more">See More (${remainingCount} more)</a>`;
-                seeMoreContainer.style.display = 'block';
-                
-                // Add click event to see more link
-                seeMoreContainer.querySelector('.see-more').addEventListener('click', (e) => {
-                    e.preventDefault();
-                    displayRecentlyEdited(true);
-                });
-            } else {
-                // Hide see more container when all items are shown
-                seeMoreContainer.style.display = 'none';
-            }
-        } else {
-            // Hide see more container if no more items to show
-            seeMoreContainer.style.display = 'none';
+    // Manage "See More" button visibility
+    if (allRecentDocuments.length > INITIAL_DISPLAY_COUNT) {
+        seeMoreButton.style.display = showAll ? 'none' : 'block';
+        
+        if (!showAll) {
+            seeMoreButton.textContent = `See More (${allRecentDocuments.length - INITIAL_DISPLAY_COUNT} more)`;
         }
+    } else {
+        seeMoreButton.style.display = 'none';
     }
 }
+
+
 /**
  * Sends a custom event to the window after refreshRecentlyEdited() operations have been completed.
- * Firstly, it calls AndDisplayRecentlyEdited() to handle the recent edits, and then fires a 'document-saved'
+ * Firstly, it calls fetchAndDisplayRecentlyEdited() to handle the recent edits, and then fires a 'document-saved'
  * event to notify any event listeners.
  */
 function refreshRecentlyEdited() {
@@ -407,7 +313,6 @@ const fetchDocuments = async () => {
         alert(alertMessage);
     }
 };
-
 
 
 /**
@@ -491,6 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing recently edited documents...');
     fetchAndDisplayRecentlyEdited();
 });
+
 /**
  * Navigates to a new page based on the provided template.
  *
@@ -503,7 +409,7 @@ function createNewBugReviewFromTemplate() {
 }
 
 function createNewFeatureFromTemplate() {
-    window.location.href = 'feature.html';
+    window.location.href = 'feature-specs/feature.html';
 }
 
 function createNewMeetingFromTemplate() {
@@ -621,9 +527,3 @@ async function getGithubCredentials() {
         console.log('No cached username found.');
     }
 }
-document.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme-preference');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
-});
