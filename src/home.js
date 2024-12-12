@@ -26,7 +26,6 @@ function formatRelativeTime(dateString) {
  * A object containing various template links. Each key is a label, and each value is the corresponding template URL.
  */
 const TEMPLATE_LINKS = {
-    'New Document': 'new-page/editor.html',
     'Todo': 'todo_template/todo.html',
     'Bug Report': 'bug-review.html',
     'Feature Specification': 'feature.html',
