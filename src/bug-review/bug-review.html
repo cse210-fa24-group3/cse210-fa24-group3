@@ -6,10 +6,9 @@
     <title>Bug Review Template - DevLog</title>
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/template.css">
-    <link rel="stylesheet" href="./styles.css">
-    <link rel="stylesheet" href="./template.css">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../template.css">
+    <link rel="stylesheet" href="bug-review.css">
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 </head>
@@ -20,10 +19,6 @@
             <div><a class="logo" href="/">DevLog</a></div>
         </div>
         <div class="navbar-right">
-            <!-- <div class="search-container"> -->
-                <!-- <input type="text" class="search-input" placeholder="Search entries"> -->
-                <!-- <span class="search-icon">🔍</span> -->
-            <!-- </div> -->
             <div class="theme-toggle">
                 <span class="light-mode">🌙</span>
                 <span class="dark-mode" style="display:none;">☀️</span>
@@ -41,7 +36,6 @@
                     <button class="save-button" id="saveButton" onclick="saveDocument()">
                         Save
                     </button>
-                    <button class="download-button" id="download-pdf" onclick="downloadPDF()">Download PDF</button>
                     <button id="go-home" class="save-button" onclick="goToHome()">
                         <span class="home-icon">🏠</span> Home
                     </button>
@@ -53,10 +47,6 @@
             </div>
 
             <!-- Bug Priority Dropdown -->
-            <!-- <div class="priority-container">
-                <label for="priority" class="priority-label">Priority:</label>
-                <span class="priority-tag priority-critical">Critical</span>
-            </div> -->
             <div class="priority-container">
                 <label for="priority-select" class="priority-label">Priority:</label>
                 <select id="priority-select" onchange="updatePriorityTag()">
@@ -67,15 +57,6 @@
                 </select>
                 <span id="priority-tag" class="priority-tag priority-critical">Critical</span>
             </div>
-            <!-- <div class="priority-tags">
-                <label for="priority">Priority:</label>
-                <select id="priority">
-                    <option value="critical">Critical</option>
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
-                </select>
-            </div> -->
 
             <!-- Editor and Preview -->
             <div class="editor-container">
@@ -84,15 +65,32 @@
             </div>
 
             <!-- GitHub Issues Section -->
-            <div id="github-issues" class="issues-section">Loading GitHub issues...</div>
+            <div id="github-issues" class="issues-section">
+                <h3>Linked GitHub Issues</h3>
+                <div class="issue-list">
+                    <!-- Example issue item -->
+                    <div class="issue-item">
+                        <div class="issue-header">
+                            <a href="#" class="issue-title">Update user authentication flow</a>
+                            <span class="issue-number">#123</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span>Opened by: johndoe</span>
+                            <span>Created: 2 days ago</span>
+                        </div>
+                        <div class="issue-tags">
+                            <span class="issue-tag">bug</span>
+                            <span class="issue-tag">authentication</span>
+                        </div>
+                    </div>
+                    <!-- More issue items would be dynamically added here -->
+                </div>
         </div>
     </main>
 
     <!-- External Scripts -->
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2pdf.js"></script>
-    <!-- <script src="/socket.io/socket.io.js"></script> -->
-    <script src="/bug-review.js"></script>
+    <script src="bug-review.js"></script>
 </body>
 </html>

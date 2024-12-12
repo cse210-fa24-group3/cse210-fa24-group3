@@ -1,0 +1,197 @@
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --nav-bg: #2d2d2d;
+    --input-bg: #333333;
+    --border-color: #404040;
+    --button-bg: #4a4a4a;
+    --button-hover: #5a5a5a;
+    --issue-bg: #2d2d2d;
+    --issue-border: #404040;
+    --issue-link: #58a6ff;
+    --issue-hover: #363636;
+    --tag-bg: #3f3f3f;
+    --logo-color: #ffffff;  /* Added logo color for dark mode */
+}
+
+[data-theme="light"] {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --nav-bg: #f8f9fa;
+    --input-bg: #ffffff;
+    --border-color: #dee2e6;
+    --button-bg: #e9ecef;
+    --button-hover: #dee2e6;
+    --issue-bg: #f8f9fa;
+    --issue-border: #e1e4e8;
+    --issue-link: #0366d6;
+    --issue-hover: #f1f1f1;
+    --tag-bg: #edf2f7;
+    --logo-color: #000000;  /* Added logo color for light mode */
+}
+
+/* Logo styling */
+.logo {
+    color: var(--logo-color);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.logo:hover {
+    color: var(--logo-color);
+    opacity: 0.8;
+}
+
+/* Apply theme variables */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar {
+    background-color: var(--nav-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.title-input {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.save-button, .delete-button {
+    background-color: var(--button-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.save-button:hover, .delete-button:hover {
+    background-color: var(--button-hover);
+}
+
+#priority-select {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.editor-container {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+}
+
+/* Dark mode adjustments for Quill editor */
+[data-theme="dark"] .ql-toolbar {
+    background-color: var(--nav-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .ql-container {
+    background-color: var(--input-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .ql-editor {
+    color: var(--text-color);
+}
+
+.issues-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: var(--issue-bg);
+    border-radius: 8px;
+    border: 1px solid var(--issue-border);
+    transition: all 0.3s ease;
+}
+
+.issues-section h3 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    font-size: 1.25rem;
+}
+
+.issue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.issue-item {
+    padding: 1rem;
+    background-color: var(--bg-color);
+    border: 1px solid var(--issue-border);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.issue-item:hover {
+    background-color: var(--issue-hover);
+    transform: translateX(4px);
+}
+
+.issue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.issue-title {
+    color: var(--issue-link);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.issue-title:hover {
+    text-decoration: underline;
+}
+
+.issue-number {
+    color: var(--text-color);
+    opacity: 0.7;
+    font-size: 0.9rem;
+}
+
+.issue-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.issue-tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.issue-tag {
+    padding: 0.25rem 0.75rem;
+    background-color: var(--tag-bg);
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: var(--text-color);
+}
+
+/* Loading state */
+.loading-issues {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+/* Error state */
+.issues-error {
+    text-align: center;
+    padding: 2rem;
+    color: #dc3545;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
