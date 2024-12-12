@@ -3,7 +3,62 @@
  * @ignore
  * @param {string} dateString - A date string in a format that can be parsed by the JavaScript Date constructor.
  * @return {string} A relative time string in the format "just now", "Xm ago", "Xh ago", or "Xday ago", or a full date string with month, day, and year if the time difference is larger than one week.
- */  
+
+ */
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Function to update theme for recently edited cards
+    function updateRecentlyEditedTheme() {
+        const recentlyEditedContainer = document.getElementById('recently-edited-container');
+        if (!recentlyEditedContainer) return;
+    
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const cards = recentlyEditedContainer.querySelectorAll('.entry-card');
+    
+        cards.forEach(card => {
+            if (isDarkMode) {
+                card.classList.add('dark-mode');
+            } else {
+                card.classList.remove('dark-mode');
+            }
+        });
+    }
+    window.addEventListener('theme-toggled', updateRecentlyEditedTheme);
+
+// Initial theme sync after documents are loaded
+document.addEventListener('recently-edited-loaded', updateRecentlyEditedTheme);
+
+// Modify the existing theme toggle functionality in script.js
+darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    darkModeToggle.querySelector('.light-mode').style.display = document.body.classList.contains('dark-mode') ? 'none' : 'block';
+    darkModeToggle.querySelector('.dark-mode').style.display = document.body.classList.contains('dark-mode') ? 'block' : 'none';
+    
+    // Save preference
+    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+
+    // Dispatch custom event for theme toggling
+    const event = new Event('theme-toggled');
+    window.dispatchEvent(event);
+});
+    // Theme toggle functionality
+    const themeToggle = document.querySelector('.theme-toggle');
+    const lightModeIcon = document.querySelector('.light-mode');
+    const darkModeIcon = document.querySelector('.dark-mode');
+
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        lightModeIcon.style.display = document.body.classList.contains('dark-mode') ? 'none' : 'inline';
+        darkModeIcon.style.display = document.body.classList.contains('dark-mode') ? 'inline' : 'none';
+        
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('theme-preference', isDarkMode ? 'dark' : 'light');
+        
+        updateRecentlyEditedTheme();
+    });
+});
+
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -21,17 +76,13 @@ function formatRelativeTime(dateString) {
     });
 }
 
-
-/**
- * @ignore
- * A object containing various template links. Each key is a label, and each value is the corresponding template URL.
- */
 const TEMPLATE_LINKS = {
     'Todo': 'todo_template/todo.html',
     'Bug Report': 'bug-review/bug-review.html',
-    'Feature Specification': 'feature-specs/feature.html',
+    'Feature Specification': 'feature.html',
     'Minutes of Meeting': 'meeting.html'
 };
+
 
 // Create HTML for a single entry card
 /** 
@@ -43,9 +94,9 @@ const TEMPLATE_LINKS = {
  */
  function createEntryCard(entry, isRecentlyEdited = false) {
     const link = TEMPLATE_LINKS[entry.template_type] || 'new-page/editor.html';
+    const isDarkMode = document.body.classList.contains('dark-mode');
 
     if (isRecentlyEdited) {
-        // For recently edited, only show title, template type, and last updated time
         return `
             <div class="entry-card ${isDarkMode ? 'dark-mode' : ''}">
                 <div class="entry-content">
@@ -65,11 +116,10 @@ const TEMPLATE_LINKS = {
         `;
     }
 
-    // Original full entry card for other views
     const contentPreview = entry.content.length > 100 ? `${entry.content.substring(0, 100)}...` : entry.content;
 
     return `
-        <div class="entry-card">
+        <div class="entry-card ${isDarkMode ? 'dark-mode' : ''}">
             <h3>${entry.title || 'Untitled'}</h3>
             <p>${contentPreview}</p>
             <small>Last updated: ${formatRelativeTime(entry.updated_at)}</small>
@@ -166,32 +216,7 @@ async function fetchAndDisplayRecentlyEdited() {
             container.innerHTML = `<p>Error loading recent entries: ${error.message}</p>`;
         }
     }
-}
-// function toggleTheme() {
-//     document.body.classList.toggle('dark-mode');
-    
-//     // Explicitly update recently edited section
-//     const recentlyEditedContainer = document.getElementById('recently-edited-container');
-//     const cards = recentlyEditedContainer.querySelectorAll('.entry-card');
-    
-//     cards.forEach(card => {
-//         if (document.body.classList.contains('dark-mode')) {
-//             card.classList.add('dark-mode');
-//         } else {
-//             card.classList.remove('dark-mode');
-//         }
-//     });
-    
-//     // Dispatch custom event for theme toggling
-//     const event = new Event('theme-toggled');
-//     window.dispatchEvent(event);
-
-//     // Optional: Save theme preference to localStorage
-//     const isDarkMode = document.body.classList.contains('dark-mode');
-//     localStorage.setItem('theme-preference', isDarkMode ? 'dark' : 'light');
-// }
-function toggleTheme() {
-
+}function toggleTheme() {
     document.body.classList.toggle('dark-mode');
     
     // Explicitly update recently edited section
@@ -214,7 +239,6 @@ function toggleTheme() {
     const isDarkMode = document.body.classList.contains('dark-mode');
     localStorage.setItem('theme-preference', isDarkMode ? 'dark' : 'light');
 }
-
 
 
 /**
@@ -369,6 +393,7 @@ const fetchDocuments = async () => {
 };
 
 
+
 /**
  * Opens a document by its ID.
  *
@@ -462,7 +487,7 @@ function createNewBugReviewFromTemplate() {
 }
 
 function createNewFeatureFromTemplate() {
-    window.location.href = 'feature-specs/feature.html';
+    window.location.href = 'feature.html';
 }
 
 function createNewMeetingFromTemplate() {
@@ -580,3 +605,9 @@ async function getGithubCredentials() {
         console.log('No cached username found.');
     }
 }
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme-preference');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+});
