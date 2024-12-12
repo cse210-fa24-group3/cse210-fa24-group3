@@ -27,6 +27,46 @@
     text-align: left;
 }
 
+/* Dark mode contribution colors - Updated for better visibility */
+body.dark-mode .square[data-level="0"] { background-color: #242424; }  /* Lighter empty square */
+body.dark-mode .square[data-level="1"] { background-color: #0e4429; }  /* Keep original */
+body.dark-mode .square[data-level="2"] { background-color: #006d32; }  /* Keep original */
+body.dark-mode .square[data-level="3"] { background-color: #26a641; }  /* Keep original */
+body.dark-mode .square[data-level="4"] { background-color: #39d353; }  /* Keep original */
+
+/* Dark mode scale colors - Match the squares */
+body.dark-mode .contribution-scale li[data-level="0"] { background-color: #242424; }
+body.dark-mode .contribution-scale li[data-level="1"] { background-color: #0e4429; }
+body.dark-mode .contribution-scale li[data-level="2"] { background-color: #006d32; }
+body.dark-mode .contribution-scale li[data-level="3"] { background-color: #26a641; }
+body.dark-mode .contribution-scale li[data-level="4"] { background-color: #39d353; }
+
+/* Additional dark mode improvements */
+body.dark-mode .github-dashboard {
+    background-color: #242424;  /* Match the new background */
+}
+
+body.dark-mode .months span,
+body.dark-mode .days span {
+    color: #b0b0b0;  /* Lighter text for better readability */
+}
+
+body.dark-mode .contribution-footer {
+    color: #b0b0b0;  /* Match the text color */
+}
+
+body.dark-mode .square.inactive {
+    background-color: #2d2d2d;  /* Slightly visible inactive squares */
+}
+
+body.dark-mode #contribution-loading {
+    color: #b0b0b0;
+}
+
+body.dark-mode #contribution-error {
+    color: #ff6b6b;  /* Keep the error color */
+}
+
 body.dark-mode .months span {
     color: #a3a3a3;
 }
