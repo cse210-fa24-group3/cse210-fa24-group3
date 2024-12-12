@@ -67,16 +67,16 @@
     <main class="main-content">
         <div class="container">
             <div class="header">
-                <input type="text" class="title-input" placeholder="Untitled Feature Specifications" id="featureName">
+                <input type="text" class="title-input" placeholder="Untitled Feature Specifications" id="meetingName">
                 <div class="header-right">
                     <div class="save-status" id="saveStatus"></div>
                     <button class="save-button" id="saveButton">
                         <span>Save</span>
                     </button>
-                    <button class="save-button" id="commitButton">
+                    <button class="save-button" id="commitid">
                         Commit
                     </button>
-                    <button id="download-pdf">Download PDF</button>
+                    <button id="downloadButton">Download PDF</button>
                     <button id="go-home" class="save-button">
                         <span class="home-icon">🏠</span> Home
                     </button>
@@ -88,7 +88,7 @@
             </div>
             <div class="section">
                 <h3>Feature description</h3>
-                <textarea class="content-area" id="feature-content" contenteditable="true">
+                <textarea class="content-area" id="markdown-editor" contenteditable="true">
 Feature ID: [Tracking number from your system]
 Title: [Short, descriptive title of the bug]
 Target Release: [version/sprint]
@@ -103,21 +103,7 @@ Business Context
 • Problem Statement: [What problem does this solve?]
 • Success Metrics: [How will we measure success?]
 • User Value: [Why is this important to users?]
-    
-Scope 
-• In Scope: [List of what's included]
-• Out of Scope: [List of what's explicitly not included]
-• Future Considerations: [Potential future enhancements]
-    
-2. Technical Architecture
-System Design:
-• Architecture Diagram: High-level system diagram depicting API requests, data model interactions, and response handling.
-Component Interaction: APIs interact with the updated database schema and leverage error-handling middleware.
-• Data Flow: [input data, processed data, responses]
-    
-Data Model:
-• Schema Changes: Introduction of new fields to support detailed API requests.
-• New Tables/Fields:
-• User transaction logs
-• Performance benchmarks
-• Data Migration: Scripts to
+                </textarea>
+            </div>
+        </div>
+    </main>
