@@ -1,167 +1,261 @@
+/**
+ * Event listener for the DOMContentLoaded event. This function handles loading or creating a new feature document
+ * based on the URL parameters. It also loads the feature content and populates the UI.
+ */
 document.addEventListener('DOMContentLoaded', async function () {
     try {
-        // Get document ID from URL parameters
+        // Get the document ID from the URL
         const urlParams = new URLSearchParams(window.location.search);
         const documentId = urlParams.get('id');
 
         console.log('Current document ID:', documentId);
 
         if (documentId) {
-            // Load document by ID
+            // Check if the feature exists
             const response = await fetch(`/api/documents/${documentId}`);
-            console.log('Load response:', response);
+            if (response.ok) {
+                // Feature exists, load its content
+                const loadDocument = await response.json();
+                console.log('Loaded document:', loadDocument);
 
-            if (!response.ok) {
-                throw new Error('Failed to load document');
+                // Populate the fields with the existing data
+                document.getElementById('meetingName').value = loadDocument.title || 'Untitled Feature';
+                document.getElementById('markdown-editor').value = loadDocument.content || '';
+                updatePreview();
+            } else if (response.status === 404) {
+                // Feature does not exist, create a new document
+                console.log('Feature not found, creating a new document...');
+                await createNewFeature();
+            } else {
+                throw new Error(`Unexpected response: ${response.status}`);
             }
-
-            const loadDocument = await response.json();
-            console.log('Loaded document:', loadDocument);
-
-            const content = loadDocument.content ? JSON.parse(loadDocument.content) : {};
-
-            // Set the document
-            document.getElementById('featureName').value = loadDocument.title || '';
-            document.getElementById('feature-content').value = content.text || '';
-
-            // Store the ID for future saves
-            localStorage.setItem('featureDocumentId', documentId);
+        } else {
+            // No document ID provided, create a new document
+            console.log('No document ID found in URL, creating a new document...');
+            await createNewFeature();
         }
-
-        // Add event listener for the delete button
-        const deleteButton = document.getElementById('deleteButton');
-        deleteButton.addEventListener('click', deleteDocument);
+        
+        // Add event listeners for buttons
+        document.getElementById('deleteButton').addEventListener('click', deleteDocument);
+        document.getElementById('commitid').addEventListener('click', commitDocument);
+        document.getElementById('saveButton').addEventListener('click', saveDocument);
+        document.getElementById('downloadButton').addEventListener('click', downloadFeaturePDF);
 
     } catch (error) {
-        console.error('Error loading document:', error);
+        console.error('Error during document loading/creation:', error);
     }
 });
 
-// ============= SAVE FUNCTION =============
-async function saveFeatureDocument() {
-    // Get DOM elements with null checks
-    const saveButton = document.getElementById('saveButton');
-    const featureNameInput = document.getElementById('featureName');
-    const featureContentInput = document.getElementById('feature-content');
+/**
+ * Creates a new feature document and saves it to the server.
+ */
+async function createNewFeature() {
+    const newDocData = {
+        title: 'Untitled Feature',
+        content: `# Feature Specification
+**Description:** [Provide feature description]
+
+**Details:** [Feature details]
+
+## Objectives
+- [Objective 1]
+- [Objective 2]
+
+## Requirements
+### Functional Requirements
+- [Requirement 1]
+- [Requirement 2]
+
+### Non-Functional Requirements
+- [Performance requirement]
+- [Security requirement]
+
+## Design Considerations
+- [Design constraint 1]
+- [Design constraint 2]
+
+## Implementation Notes
+- [Technical implementation detail]
+
+## Testing Strategy
+- [Testing approach]
+- [Test cases]
+
+## Acceptance Criteria
+- [Criterion 1]
+- [Criterion 2]`,
+        template_type: 'Feature Specification'
+    };
+
+    const response = await fetch('/api/documents', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newDocData)
+    });
+
+    if (response.ok) {
+        const result = await response.json();
+        console.log('New feature created:', result);
+
+        // Update the UI with the new document's data
+        document.getElementById('meetingName').value = newDocData.title;
+        document.getElementById('markdown-editor').value = newDocData.content;
+
+        // Store the new document ID and update the URL
+        localStorage.setItem('meetingDocumentId', result.documentId);
+        history.replaceState(null, '', `feature.html?id=${result.documentId}`);
+    } else {
+        throw new Error('Failed to create a new document');
+    }
+}
+
+/**
+ * Commits the current document to the backend and updates the UI accordingly.
+ */
+async function commitDocument() {
+    const saveButton = document.getElementById('commitid');
     const saveStatus = document.getElementById('saveStatus');
 
-    // Defensive checks for required elements
-    if (!saveButton || !featureNameInput || !featureContentInput || !saveStatus) {
-        console.error('Missing DOM elements:', {
-            saveButton: !!saveButton,
-            featureNameInput: !!featureNameInput,
-            featureContentInput: !!featureContentInput,
-            saveStatus: !!saveStatus
-        });
-        alert('Error: Some page elements are missing. Please reload the page.');
-        return;
-    }
+    const documentId = localStorage.getItem('meetingDocumentId') || Date.now().toString();
+
+    // Get the current title from the input field
+    const currentTitle = document.getElementById('meetingName').value.trim() || 'Untitled Feature';
+
+    const featureData = {
+        documentId,
+        title: currentTitle,
+        content: document.getElementById('markdown-editor').value || '', 
+        template_type: 'Feature Specification'
+    };
+
+    saveButton.disabled = true;
+    saveStatus.textContent = 'Running CLI command...';
 
     try {
-        saveButton.disabled = true;
-        saveStatus.textContent = 'Saving...';
-
-        // Get current document ID from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const documentId = urlParams.get('id');
-
-        // Determine whether to use existing ID or create new one
-        const finalDocumentId = documentId || Date.now().toString();
-
-        const featureData = {
-            id: finalDocumentId,
-            title: featureNameInput.value || 'Untitled Feature',
-            content: JSON.stringify({
-                text: featureContentInput.value || '',
-            }),
-            template_type: 'Feature Specification'
-        };
-
-        console.log('Preparing to save document:', featureData);
-
-        const method = documentId ? 'PUT' : 'POST';
-        const url = method === 'PUT' 
-            ? `/api/documents/${finalDocumentId}` 
-            : '/api/documents';
-
-        console.log('Save request details:', {
-            method,
-            url,
-            body: featureData
-        });
-
-        const response = await fetch(url, {
-            method: method,
+        const response = await fetch('/run-command', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(featureData)
+            body: JSON.stringify(featureData),
         });
 
-        // Log full response details
-        console.log('Response status:', response.status);
-        const responseText = await response.text();
-        console.log('Response body:', responseText);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
+        if (response.ok) {
+            const result = await response.text();
+            saveStatus.textContent = `Pushed to GitHub`;
+        } else {
+            const error = await response.text();
+            saveStatus.textContent = `Error: ${error}`;
         }
-
-        let result;
-        try {
-            result = JSON.parse(responseText);
-        } catch (parseError) {
-            console.error('Failed to parse response:', parseError);
-            result = responseText;
-        }
-
-        console.log('Save result:', result);
-
-        saveStatus.textContent = 'Saved successfully';
-
-        // Store the document ID for future reference
-        localStorage.setItem('featureDocumentId', finalDocumentId);
-
-        // Dispatch custom event to trigger recently edited refresh
-        const event = new CustomEvent('document-saved');
-        window.dispatchEvent(event);
-
-        // Redirect to index.html after a short delay
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 500);
-
     } catch (error) {
-        console.error('Detailed save error:', error);
-        console.error('Error stack:', error.stack);
-        saveStatus.textContent = `Failed to save: ${error.message}`;
+        saveStatus.textContent = `Error: ${error.message}`;
     } finally {
         saveButton.disabled = false;
     }
 }
 
+/**
+ * Saves the currently edited document.
+ */
+async function saveDocument() {
+    const saveButton = document.getElementById('saveButton');
+    const saveStatus = document.getElementById('saveStatus');
 
-// ============= DELETE FUNCTION =============
+    const urlParams = new URLSearchParams(window.location.search);
+    const documentId = urlParams.get('id') || localStorage.getItem('meetingDocumentId');
+
+    // Get the current title from the input field, ensure it's not empty
+    const currentTitle = document.getElementById('meetingName').value.trim() || 'Untitled Feature';
+
+    const featureData = {
+        title: currentTitle,
+        content: document.getElementById('markdown-editor').value || '', 
+        template_type: 'Feature Specification'
+    };
+
+    saveButton.disabled = true;
+    saveStatus.textContent = 'Saving...';
+    saveStatus.style.color = 'black';
+
+    try {
+        let response;
+        if (!documentId) {
+            // Create new document
+            response = await fetch('/api/documents', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(featureData)
+            });
+        } else {
+            // Update existing document
+            response = await fetch(`/api/documents/${documentId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...featureData,
+                    documentId // Include documentId for backend tracking
+                })
+            });
+        }
+
+        if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(errorData || 'Failed to save document');
+        }
+
+        const result = await response.json();
+
+        // Update localStorage and URL if it's a new document
+        if (!documentId) {
+            localStorage.setItem('meetingDocumentId', result.documentId);
+            history.replaceState(null, '', `feature.html?id=${result.documentId}`);
+        }
+
+        // Show success message
+        saveStatus.textContent = 'Saved Successfully';
+        saveStatus.style.color = 'green';
+
+        // Optional: Automatically clear the success message after 3 seconds
+        setTimeout(() => {
+            saveStatus.textContent = '';
+        }, 3000);
+
+    } catch (error) {
+        console.error('Save failed:', error);
+        saveStatus.textContent = `Failed to save: ${error.message}`;
+        saveStatus.style.color = 'red';
+    } finally {
+        saveButton.disabled = false;
+    }
+}
+
+/**
+ * Deletes the current document.
+ */
 async function deleteDocument() {
     const deleteButton = document.getElementById('deleteButton');
-    const deleteStatus = document.getElementById('deleteStatus');
+    const deleteStatus = document.getElementById('saveStatus');
 
-    // Confirmation Dialog
     const confirmDelete = confirm('Are you sure you want to delete this feature specification? This action cannot be undone.');
     if (!confirmDelete) {
-        return; // User canceled the deletion
+        return;
     }
 
     try {
         deleteButton.disabled = true;
         deleteStatus.textContent = 'Deleting...';
 
-        // Get current document ID from URL
-        const pathParts = window.location.pathname.split('/');
-        const documentId = pathParts[pathParts.length - 1];
-
-        if (!documentId || documentId === 'feature') {
-            throw new Error('Invalid document ID');
+        const urlParams = new URLSearchParams(window.location.search);
+        const documentId = urlParams.get('id') || localStorage.getItem('meetingDocumentId');
+        
+        if (!documentId) {
+            throw new Error('No document ID found');
         }
 
         const response = await fetch(`/api/documents/${documentId}`, {
@@ -172,18 +266,15 @@ async function deleteDocument() {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to delete document');
+            const errorData = await response.text();
+            throw new Error(errorData || 'Failed to delete document');
         }
-
-        const result = await response.json();
-        console.log('Delete result:', result);
 
         deleteStatus.textContent = 'Deleted successfully. Redirecting...';
 
-        // Redirect to Home or another appropriate page after deletion
+        localStorage.removeItem('meetingDocumentId');
         setTimeout(() => {
-            window.location.href = '/'; // Change this URL if you want to redirect elsewhere
+            window.location.href = '/';
         }, 2000);
 
     } catch (error) {
@@ -194,59 +285,25 @@ async function deleteDocument() {
     }
 }
 
-
-
-// ============= LOADING FUNCTIONS =============
-async function loadDocument(documentId) {
-    try {
-        //const baseUrl = 'http://104.155.190.17:8080';
-        const response = await fetch(`/api/documents/${documentId}`);
-
-        if (!response.ok) {
-            throw new Error('Document not found');
-        }
-
-        const loadDocument = await response.json();
-        const content = JSON.parse(loadDocument.content);
-        console.log(content);
-
-        // Update document
-        document.getElementById('featureName').textContent = loadDocument.title;
-        if (content.text != ''){
-            document.getElementById('feature-content').textContent = content.text;
-        }
-
-        // Store the ID
-        localStorage.setItem('featureDocumentId', documentId);
-
-    } catch (error) {
-        console.error('Failed to load document:', error);
-        // If document not found, redirect to home
-        if (error.message === 'Document not found') {
-            window.location.href = '/';
-        }
-    }
+/**
+ * Downloads the feature document as a PDF.
+ */
+function downloadFeaturePDF() {
+    const content = document.getElementById('markdown-editor').value;
+    const filename = `${document.getElementById('meetingName').value || 'feature'}.pdf`;
+    
+    // Create a blob with the content
+    const blob = new Blob([content], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create a temporary anchor element to trigger download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
-
-// ============= UTILITY FUNCTIONS =============
-// Update the current date
-function updateDate() {
-    const dateElement = document.getElementById('currentDate');
-    if (dateElement) {  // Only proceed if element exists
-        const now = new Date();
-        dateElement.textContent = now.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    }
-}
-// Auto-save functionality
-let autoSaveTimeout;
-function scheduleAutoSave() {
-    clearTimeout(autoSaveTimeout);
-    autoSaveTimeout = setTimeout(saveDocument, 30000);
-}
-
-// Call updateDate when the page loads
-document.addEventListener('DOMContentLoaded', updateDate);
