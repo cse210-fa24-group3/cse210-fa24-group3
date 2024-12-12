@@ -107,7 +107,7 @@ body.dark-mode .theme-text {
 }
 
 body.dark-mode .theme-cards {
-    background-color: #2c2c2c;
+    background-color: #1a1a1a;
 }
 
 body.dark-mode .theme-card {
@@ -125,7 +125,39 @@ body.dark-mode .theme-link {
     color: #333;
     transition: all 0.3s ease;
 }
+.entry-card .entry-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
+.entry-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.entry-link:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.entry-link svg {
+    stroke: currentColor;
+    transition: transform 0.2s ease;
+}
+
+.entry-link:hover svg {
+    transform: translateX(3px);
+}
+
+/* Dark mode adjustments */
+.entry-card.dark-mode .entry-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
 /* Dark mode styles */
 body.dark-mode .entry-card.dark-mode {
     background-color: #2d2d2d;
@@ -162,7 +194,7 @@ body.dark-mode .entry-card.dark-mode:hover {
 
 /* Additional dark mode styles for the recently-edited section */
 body.dark-mode .recently-edited {
-    background-color: #2d2d2d;
+    background-color: #1a1a1a;  /* Match the dark mode body background */
 }
 
 body.dark-mode .section-title {
@@ -537,8 +569,8 @@ body.dark-mode .recently-edited .section-title {
 }
 
 body.dark-mode .recently-edited .card {
-    background: #242424;
-    border-color: #242424;
+    background: #232222;
+    border-color: #2c2b2b;
     color: #e5e7eb;
 }
 
