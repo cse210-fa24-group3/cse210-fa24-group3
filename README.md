@@ -143,5 +143,3 @@ https://cse210-fa24-group3.github.io/cse210-fa24-group3/global.html#TEMPLATE_LIN
 ## Support
 For issues or questions, [open an issue](https://github.com/cse210-fa24-group3/cse210-fa24-group3/issues)
 
-## Code Coverage
-[![Code Coverage](https://codecov.io/gh/cse210-fa24-group3/cse210-fa24-group3/branch/main/graph/badge.svg?token=M2UL3ELWEF)](https://codecov.io/gh/cse210-fa24-group3/cse210-fa24-group3)
