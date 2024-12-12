@@ -2,8 +2,6 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { exec } = require('child_process');
-const PDFDocument = require('pdfkit');
-const marked = require('marked');
 
 const fs = require('fs').promises;
 
@@ -837,43 +835,6 @@ app.delete('/api/documents/:id', (req, res) => {
             }
         );
     });
-});
-
-app.post('/api/download-pdf', async (req, res) => {
-    const { title, content } = req.body;
-
-    try {
-        // Create a new PDF document
-        const doc = new PDFDocument();
-        
-        // Set response headers for PDF download
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${title}.pdf"`);
-        
-        // Pipe the PDF document to the response
-        doc.pipe(res);
-        
-        // Add title to PDF
-        doc.fontSize(24).text(title, { align: 'center' });
-        doc.moveDown();
-        
-        // Convert markdown to text content
-        const htmlContent = marked.parse(content);
-        const textContent = htmlContent.replace(/<[^>]*>/g, '');
-        
-        // Add content to PDF
-        doc.fontSize(12).text(textContent, {
-            align: 'left',
-            continued: false
-        });
-        
-        // Finalize the PDF
-        doc.end();
-
-    } catch (error) {
-        console.error('PDF generation error:', error);
-        res.status(500).json({ error: 'Failed to generate PDF' });
-    }
 });
 
 // Start server
