@@ -8,6 +8,8 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/template.css">
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./template.css">
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 </head>
@@ -18,10 +20,10 @@
             <div><a class="logo" href="/">DevLog</a></div>
         </div>
         <div class="navbar-right">
-            <div class="search-container">
+            <!-- <div class="search-container"> -->
                 <!-- <input type="text" class="search-input" placeholder="Search entries"> -->
                 <!-- <span class="search-icon">🔍</span> -->
-            </div>
+            <!-- </div> -->
             <div class="theme-toggle">
                 <span class="light-mode">🌙</span>
                 <span class="dark-mode" style="display:none;">☀️</span>
@@ -36,7 +38,17 @@
                 <input type="text" class="title-input" placeholder="Untitled Bug Review ###" id="titleInput">
                 <div class="header-right">
                     <div class="save-status" id="saveStatus"></div>
-                    <button class="save-button" id="saveButton" onclick="saveDocument()">Save</button>
+                    <button class="save-button" id="saveButton" onclick="saveDocument()">
+                        Save
+                    </button>
+                    <button class="download-button" id="download-pdf" onclick="downloadPDF()">Download PDF</button>
+                    <button id="go-home" class="save-button" onclick="goToHome()">
+                        <span class="home-icon">🏠</span> Home
+                    </button>
+                   <button class="delete-button" id="deleteButton" aria-label="Delete Feature">
+                            <span>Delete</span>
+                        </button>
+                </div>
                 </div>
             </div>
 

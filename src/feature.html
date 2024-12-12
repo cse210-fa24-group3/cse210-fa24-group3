@@ -1,33 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feature Specification</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/template.css">
-    
-    <style>
-        #go-home {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        #go-home:hover {
-            background-color: #45a049;
-        }
-
-        .home-icon {
-            font-size: 16px;
-        }
-    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -57,7 +36,7 @@
     </div>
 
     <div class="overlay"></div>
-    
+
     <div class="user-menu">
         <a href="#" class="block p-2">Profile</a>
         <a href="#" class="block p-2">Settings</a>
@@ -76,11 +55,10 @@
                     <button class="save-button" id="commitButton">
                         Commit
                     </button>
-                    <button id="download-pdf">Download PDF</button>
+                    <button class="download-button" id="download-pdf">Download PDF</button>
                     <button id="go-home" class="save-button">
                         <span class="home-icon">🏠</span> Home
                     </button>
-                    <div class="delete-status" id="deleteStatus"></div>                    
                     <button class="delete-button" id="deleteButton">
                         <span>Delete</span>
                     </button>
