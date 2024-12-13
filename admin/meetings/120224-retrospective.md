@@ -21,4 +21,3 @@ Attended by: Amy, Andrew, Aryan, Keqian, Krithika, Sneha, Venu
     - Better plan the time
     - Will have to work more efficiently in the upcoming weeks to cover up the backlog
     - Planning the timeline better and ahead of time
-
