@@ -1,12 +1,12 @@
-# DevLog
+# DevLog 📝
 
-## Project Overview
+## 🌟 Project Overview
 
 DevLog is a developer documentation tool designed to ease documentation tasks for developers, providing a comprehensive platform for document management and collaboration.
 
-## New User Guide
+## 📘 New User Guide
 
-### Getting Started
+##  Getting Started
 
 #### 1. Initial Setup
 
@@ -99,7 +99,7 @@ cse210-fa24-group3/
 - Commit directly from the editor
 - Track document versions
 
-## Features
+## 🛠️ Features
 - **GitHub Integration**: Commit goes directly to your repository with the click of a button
 - **Minutes of Meeting and Bug Review Templates**
 - **AI-Assisted Coding**
@@ -110,36 +110,65 @@ cse210-fa24-group3/
 - **Auto-Save Functionality**
 - **Light and Dark Mode Support**
 
-## Technologies Used
+## 💻 Technologies Used
 - **Frontend**: JavaScript, HTML, CSS
 - **Backend**: Node.js, Express.js
 - **Database**: SQLite
 
-## Hosting
+## 🌐 Hosting
 - Hosted on Google Cloud Platform (GCP), providing reliable and scalable infrastructure
 
-## Links
+## 🚀 Project Resources Explorer
+
+Got questions about our project? We've got answers! Click through to discover key project resources:
+
+### 🌐 Where can I see the live hosted site?
+
+[View Live Site](http://104.155.190.17:8080/)
+
+### 📋 How do we track our project decisions?
+
+[Explore Architecture Decision Records (ADRs)](https://github.com/cse210-fa24-group3/cse210-fa24-group3/tree/main/specs/adrs)
+
+Our ADRs capture the strategic choices and reasoning behind our project's technical direction.
+
+### 📊 Want to track our project progress?
+
+[View Project Board](https://github.com/cse210-fa24-group3/cse210-fa24-group3/projects?query=is%3Aopen)
+
+Stay up-to-date with our current tasks, ongoing work, and project milestones!
+
+### 🔧 How do we manage our development workflow?
+
+[CI/CD Pipeline Details](https://github.com/cse210-fa24-group3/cse210-fa24-group3/blob/main/admin/cipipeline/cicd.md)
+
+Learn about our continuous integration and continuous deployment process.
+
+<!--## Want to see our 
 - [Hosted Site]()
 - [Architecture Decision Records (ADRs)](https://github.com/cse210-fa24-group3/cse210-fa24-group3/tree/main/specs/adrs)
 - [Project Board](https://github.com/cse210-fa24-group3/cse210-fa24-group3/projects?query=is%3Aopen)
-- [CI/CD Pipeline](https://github.com/cse210-fa24-group3/cse210-fa24-group3/blob/main/admin/cipipeline/cicd.md)
+- [CI/CD Pipeline](https://github.com/cse210-fa24-group3/cse210-fa24-group3/blob/main/admin/cipipeline/cicd.md)-->
 
-## Prerequisites
+## 📦 Prerequisites
 - Modern web browser
 - Git
 - GitHub credentials
 
-## Documentation
-For detailed API and feature documentation, visit: 
+## 📑 Documentation
+For detailed feature documentation, visit: 
 https://cse210-fa24-group3.github.io/cse210-fa24-group3/global.html#TEMPLATE_LINKS
 
-## Contribution Guidelines
+For detailed API documentation, visit:
+https://documenter.getpostman.com/view/40376097/2sAYHxn41G
+
+## 🤝 Contribution Guidelines
 1. Fork repository
 2. Create feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit changes (`git commit -m 'Add AmazingFeature'`)
 4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Open Pull Request
 
-## Support
+## 💬 Support
 For issues or questions, [open an issue](https://github.com/cse210-fa24-group3/cse210-fa24-group3/issues)
 
